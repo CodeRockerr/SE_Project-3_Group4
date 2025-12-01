@@ -13,7 +13,7 @@ import { llmService } from '../services/llm.service.js';
  */
 export const parseLLMQuery = async (req, res, next) => {
   try {
-    const { query } = req.body;
+    const { query, previousCriteria } = req.body;
 
     if (!query || typeof query !== 'string') {
       return res.status(400).json({
@@ -23,8 +23,9 @@ export const parseLLMQuery = async (req, res, next) => {
       });
     }
 
-    // Parse the query using LLM service
-    const result = await llmService.parseQuery(query);
+    // Parse the query using LLM service. If `previousCriteria` is provided,
+    // pass it so the LLM can interpret refinements relative to prior search.
+    const result = await llmService.parseQuery(query, previousCriteria);
 
     // Attach parsed criteria to request object
     req.parsedCriteria = result.criteria;

@@ -39,8 +39,15 @@ class LLMService {
      * @param {string} userPrompt - The user's natural language query
      * @returns {string} - Formatted prompt for the LLM
      */
-    buildPrompt(userPrompt) {
-        return `Your goal is to extract nutritional and taste-based information from user prompts in the form of a structured json object.
+    buildPrompt(userPrompt, previousCriteria = null) {
+        // If previousCriteria is provided, instruct the LLM to treat the prompt
+        // as a refinement and merge it with previousCriteria.
+        const contextPrefix = previousCriteria
+            ? `This prompt is a refinement to the user's previous search criteria: ${JSON.stringify(previousCriteria)}.\nPlease merge the previous criteria with the new user prompt where appropriate and return the resulting JSON criteria object.\n`
+            : '';
+
+        return `${contextPrefix}Your goal is to extract nutritional and taste-based information from user prompts in the form of a structured json object.
+    If the user issues a relative refinement (for example: "show me cheaper options", "make it cheaper", "more expensive", "show cheaper"), include a top-level field ` + "\"sort\"" + ` with a value indicating desired ordering, for example: {"sort":"price_asc"} for cheaper-first, {"sort":"price_desc"} for more expensive-first. Respond only with the JSON object and nothing else.
 For example, the user might ask 'I want to eat something that has at least 30g of protein, less than 500 calories, and is pretty spicy.'
 The response should be a json object with the following fields:
 {
@@ -120,7 +127,7 @@ Now, here is the user prompt: ${userPrompt}
      * @returns {Promise<Object>} - Parsed nutritional criteria as JSON object
      * @throws {Error} if API call fails or response is invalid
      */
-    async parseQuery(userPrompt) {
+    async parseQuery(userPrompt, previousCriteria = null) {
         this.initialize();
 
         if (!userPrompt || typeof userPrompt !== "string") {
@@ -128,6 +135,10 @@ Now, here is the user prompt: ${userPrompt}
         }
 
         try {
+            // Build prompt and include previous criteria if present so LLM can
+            // infer refinement intents (e.g., "show me cheaper options").
+            const prompt = this.buildPrompt(userPrompt, previousCriteria);
+
             const response = await this.client.chat.completions.create({
                 model: this.model,
                 messages: [
@@ -138,7 +149,7 @@ Now, here is the user prompt: ${userPrompt}
                     },
                     {
                         role: "user",
-                        content: this.buildPrompt(userPrompt),
+                        content: prompt,
                     },
                 ],
                 temperature: 0.1,

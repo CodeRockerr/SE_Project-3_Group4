@@ -44,10 +44,19 @@ export const recommendFood = async (req, res) => {
             .lean();
 
         // Add calculated price to each recommendation
-        const recommendationsWithPrice = recommendations.map(item => ({
+        let recommendationsWithPrice = recommendations.map(item => ({
             ...item,
             price: calculatePrice(item.calories)
         }));
+
+        // If LLM requested a sort override (e.g., "cheaper options" -> sort: "price_asc"),
+        // apply it on the results after price calculation.
+        const sortOverride = req.parsedCriteria?.sort;
+        if (sortOverride === 'price_asc') {
+            recommendationsWithPrice = recommendationsWithPrice.sort((a, b) => (a.price || 0) - (b.price || 0));
+        } else if (sortOverride === 'price_desc') {
+            recommendationsWithPrice = recommendationsWithPrice.sort((a, b) => (b.price || 0) - (a.price || 0));
+        }
 
         return res.status(200).json({
             success: true,
