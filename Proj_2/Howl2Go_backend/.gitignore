@@ -3,5 +3,5 @@ node_modules/
 npm-debug.log
 .DS_Store
 coverage/
-src/scripts/
+# src/scripts/
 src/dummy_tests/
