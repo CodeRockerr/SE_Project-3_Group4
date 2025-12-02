@@ -117,7 +117,17 @@ export default function IngredientRecommendationsPage() {
       </div>
 
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {data
+        {loading && (
+          Array.from({ length: 6 }).map((_, i) => (
+            <div key={`skeleton-${i}`} className="space-y-2 animate-pulse">
+              <div className="h-40 rounded-lg bg-[var(--bg-card)] border border-[var(--border)]" />
+              <div className="h-4 w-2/3 rounded bg-[var(--border)]" />
+              <div className="h-3 w-1/2 rounded bg-[var(--border)]" />
+            </div>
+          ))
+        )}
+
+        {!loading && data
           .slice() // shallow copy for client sorting
           .sort((a, b) => {
             const getMatchScore = (obj: unknown): number => {
@@ -168,7 +178,14 @@ export default function IngredientRecommendationsPage() {
             </div>
           );
         })}
-        {!loading && data.length === 0 && <p className="text-sm text-gray-500 col-span-full">No results found for current filters.</p>}
+
+        {!loading && data.length === 0 && (
+          <div className="col-span-full text-center py-12 border border-[var(--border)] rounded-lg bg-[var(--bg-card)]">
+            <UtensilsCrossed className="mx-auto h-8 w-8 text-[var(--text-subtle)]" />
+            <p className="mt-2 text-sm text-[var(--text-subtle)]">No results for current filters.</p>
+            <p className="mt-1 text-xs text-[var(--text-subtle)]">Try removing an exclude or adding more include ingredients.</p>
+          </div>
+        )}
       </div>
 
       <div className="mt-8 flex items-center gap-4">
