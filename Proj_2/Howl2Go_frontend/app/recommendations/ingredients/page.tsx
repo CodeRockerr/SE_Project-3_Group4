@@ -1,9 +1,11 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import ItemCard from "@/components/ItemCard";
 import IngredientTagInput from "@/components/IngredientTagInput";
-import { UtensilsCrossed, SlidersHorizontal } from 'lucide-react';
+import { UtensilsCrossed, SlidersHorizontal, ShoppingCart } from 'lucide-react';
+import { useCart } from "@/context/CartContext";
 import { getIngredientRecommendations } from "@/lib/api";
 import type { FoodItem } from "@/types/food";
 
@@ -25,6 +27,7 @@ export default function IngredientRecommendationsPage() {
   const [total, setTotal] = useState<number | undefined>(undefined);
   const [limit] = useState(20);
   const [sortMode, setSortMode] = useState<'matches' | 'calories'>('matches');
+  const { summary } = useCart();
 
   // Persist filters
   useEffect(() => {
@@ -62,7 +65,20 @@ export default function IngredientRecommendationsPage() {
 
   return (
     <div className="px-6 py-10 max-w-7xl mx-auto">
-      <div className="mb-8 text-center">
+      <div className="mb-8 text-center relative">
+        {/* Cart Button - Top Right */}
+        <Link
+          href="/cart"
+          className="absolute top-0 right-0 p-2 transition-colors hover:opacity-70 text-[var(--howl-neutral)]"
+        >
+          <ShoppingCart className="h-6 w-6" />
+          {summary.totalItems > 0 && (
+            <span className="absolute -top-1 -right-1 bg-[var(--orange)] text-[var(--text)] text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {summary.totalItems}
+            </span>
+          )}
+        </Link>
+
         <h1 className="text-center text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4 text-[var(--howl-neutral)]">
           Ingredient{' '}
           <span className="relative inline-block">
@@ -86,7 +102,7 @@ export default function IngredientRecommendationsPage() {
           </span>
         </h1>
         <p className="mt-2 text-sm text-[var(--text-subtle)] max-w-2xl mx-auto">
-          Find menu items containing all of your include ingredients while excluding any you don't want. Results are ranked by number of matches.
+          <b>Build your Plate: Include flavors you love, Exclude what you don’t!!</b>
         </p>
       </div>
 
