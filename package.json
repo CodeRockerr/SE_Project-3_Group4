@@ -32,5 +32,8 @@
   "devDependencies": {
     "husky": "^9.1.7",
     "lint-staged": "^16.2.4"
+  },
+  "dependencies": {
+    "mongodb": "^7.0.0"
   }
 }

@@ -43,10 +43,22 @@ export const recommendFood = async (req, res) => {
             // .limit(limit)
             .lean();
 
-        // Add calculated price to each recommendation
+        // Add calculated price and ensure all fields are present
         const recommendationsWithPrice = recommendations.map(item => ({
             ...item,
-            price: calculatePrice(item.calories)
+            restaurant: item.company, // Map company to restaurant for frontend
+            price: calculatePrice(item.calories),
+            // Ensure nutrition fields are included
+            totalFat: item.totalFat ?? null,
+            saturatedFat: item.saturatedFat ?? null,
+            transFat: item.transFat ?? null,
+            cholesterol: item.cholesterol ?? null,
+            sodium: item.sodium ?? null,
+            carbs: item.carbs ?? null,
+            fiber: item.fiber ?? null,
+            sugars: item.sugars ?? null,
+            protein: item.protein ?? null,
+            ingredients: item.ingredients || []
         }));
 
         return res.status(200).json({

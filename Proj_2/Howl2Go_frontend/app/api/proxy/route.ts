@@ -30,11 +30,25 @@ async function handleRequest(req: Request) {
     }
   }
 
-  const backendReq = await fetch(`${process.env.BACKEND_URL}${decodeURIComponent(url)}`, {
-    method: req.method,
-    headers,
-    body,
-  });
+  if (!url) {
+    return new Response(JSON.stringify({ error: 'Missing path parameter' }), { status: 400 });
+  }
+
+  // Determine base URL. Prefer BACKEND_URL; fallback to NEXT_PUBLIC_API_BASE (strip trailing /api)
+  const rawBackend = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3001';
+  const baseUrl = rawBackend.replace(/\/?api\/?$/i, '');
+  const target = `${baseUrl}${decodeURIComponent(url)}`;
+
+  let backendReq: Response;
+  try {
+    backendReq = await fetch(target, {
+      method: req.method,
+      headers,
+      body,
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: 'Upstream fetch failed', detail: (e as Error).message, target }), { status: 502 });
+  }
 
   // Create response and forward Set-Cookie headers for session management
   const responseHeaders = new Headers(backendReq.headers);
