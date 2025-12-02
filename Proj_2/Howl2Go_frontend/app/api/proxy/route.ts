@@ -35,7 +35,8 @@ async function handleRequest(req: Request) {
   }
 
   // Determine base URL. Prefer BACKEND_URL; fallback to NEXT_PUBLIC_API_BASE (strip trailing /api)
-  const rawBackend = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3001';
+  // Default to http://localhost:4000 to match project README/backend default
+  const rawBackend = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:4000';
   const baseUrl = rawBackend.replace(/\/?api\/?$/i, '');
   const target = `${baseUrl}${decodeURIComponent(url)}`;
 
@@ -47,7 +48,16 @@ async function handleRequest(req: Request) {
       body,
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: 'Upstream fetch failed', detail: (e as Error).message, target }), { status: 502 });
+    return new Response(
+      JSON.stringify({
+        error: 'Upstream fetch failed',
+        detail: (e as Error).message,
+        target,
+        backendBase: baseUrl,
+        method: req.method,
+      }),
+      { status: 502 }
+    );
   }
 
   // Create response and forward Set-Cookie headers for session management

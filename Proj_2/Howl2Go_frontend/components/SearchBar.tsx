@@ -94,19 +94,19 @@ export default function SearchBar({
               Press Enter to search
             </p>
           )}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <span className="text-center font-bold leading-tight text-[var(--howl-neutral)] text-2xl sm:text-3xl flex items-center gap-2">
-              <span>Find meals by</span>{' '}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <span className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--text)] flex items-center gap-2 text-center leading-tight">
+              <span>Order based on</span>
               <span className="relative inline-block">
-                ingredients
+                Ingredients
                 <motion.svg
-                  className="absolute -bottom-2 left-0 w-full"
-                  height="8"
+                  className="absolute -bottom-1 left-0 w-full"
+                  height="6"
                   viewBox="0 0 200 8"
                   fill="none"
                   initial={{ pathLength: 0, opacity: 0 }}
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 0.8, delay: 0.3, ease: "easeInOut" }}
+                  transition={{ duration: 0.8, delay: 0.2, ease: "easeInOut" }}
                 >
                   <motion.path
                     d="M2 5C60 2 140 2 198 5"
@@ -116,7 +116,7 @@ export default function SearchBar({
                   />
                 </motion.svg>
               </span>
-              <ArrowRight className="h-5 w-5 text-[var(--howl-primary)]" />
+              <span>&rarr;</span>
             </span>
             <button
               type="button"

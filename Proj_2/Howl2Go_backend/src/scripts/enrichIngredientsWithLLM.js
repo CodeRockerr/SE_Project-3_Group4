@@ -31,7 +31,7 @@ Examples:
 
 Focus on common fast food ingredients. Return only the JSON array, no other text.`;
 
-  const attempt = async () => {
+  try {
     const response = await groq.chat.completions.create({
       model: "llama-3.1-8b-instant",
       messages: [
@@ -45,8 +45,7 @@ Focus on common fast food ingredients. Return only the JSON array, no other text
         }
       ],
       temperature: 0.1,
-      // Lower max tokens to reduce TPM and 429s
-      max_tokens: 140,
+      max_tokens: 200,
     });
 
     const content = response.choices[0].message.content.trim();
@@ -59,26 +58,9 @@ Focus on common fast food ingredients. Return only the JSON array, no other text
     }
     
     return [];
-  };
-
-  // Simple retry with exponential backoff for rate limits
-  const maxRetries = 4;
-  let delayMs = 800;
-  for (let attemptNum = 0; attemptNum <= maxRetries; attemptNum++) {
-    try {
-      return await attempt();
-    } catch (error) {
-      const msg = (error && error.message) || String(error);
-      const is429 = msg.includes('rate limit') || msg.includes('rate_limit_exceeded');
-      if (!is429 || attemptNum === maxRetries) {
-        console.error(`Error extracting ingredients for "${itemName}":`, msg);
-        return [];
-      }
-      // Backoff and retry
-      const jitter = Math.floor(Math.random() * 300);
-      await new Promise(r => setTimeout(r, delayMs + jitter));
-      delayMs *= 2;
-    }
+  } catch (error) {
+    console.error(`Error extracting ingredients for "${itemName}":`, error.message);
+    return [];
   }
 }
 
@@ -87,39 +69,29 @@ Focus on common fast food ingredients. Return only the JSON array, no other text
  */
 async function processBatch(items, batchSize = 3) {
   const results = [];
-  const sanitize = (arr) => {
-    if (!Array.isArray(arr)) return [];
-    const flat = arr.flat ? arr.flat(Infinity) : arr; // Node supports flat
-    const cleaned = flat
-      .filter((x) => typeof x === 'string')
-      .map((s) => s.trim().toLowerCase())
-      .filter((s) => s && s !== 'none' && s !== 'n/a');
-    return Array.from(new Set(cleaned)).slice(0, 40);
-  };
   
   for (let i = 0; i < items.length; i += batchSize) {
     const batch = items.slice(i, i + batchSize);
     console.log(`\nProcessing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(items.length / batchSize)}...`);
     
-    const batchResults = [];
-    for (const item of batch) {
+    const batchPromises = batch.map(async (item) => {
       const ingredients = await extractIngredients(item.item, item.company);
-      batchResults.push({ itemId: item._id, ingredients: sanitize(ingredients) });
-      // small per-item delay to smooth token usage
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
+      return { itemId: item._id, ingredients };
+    });
+    
+    const batchResults = await Promise.all(batchPromises);
     results.push(...batchResults);
     
     // Display results
     batchResults.forEach(result => {
       const item = items.find(i => i._id.toString() === result.itemId.toString());
       console.log(`  ✓ ${item.company}: ${item.item}`);
-      console.log(`    Ingredients: ${result.ingredients.length ? result.ingredients.join(', ') : 'None'}`);
+      console.log(`    Ingredients: ${result.ingredients.join(', ') || 'None'}`);
     });
     
     // Wait a bit between batches to respect rate limits
     if (i + batchSize < items.length) {
-      await new Promise(resolve => setTimeout(resolve, 4000)); // 4 seconds between batches
+      await new Promise(resolve => setTimeout(resolve, 2500)); // 2.5 seconds between batches
     }
   }
   
@@ -154,20 +126,16 @@ async function enrichIngredients() {
     console.log(`\n📋 Found ${items.length} items to enrich with LLM-generated ingredients\n`);
     
     // Process in batches
-    // Reduce batch size to lower concurrency and 429s
-    const results = await processBatch(items, 3);
+    const results = await processBatch(items, 5);
     
     // Update database
     console.log('\n💾 Updating database...');
     let updated = 0;
     
     for (const result of results) {
-      const safeIngredients = Array.isArray(result.ingredients)
-        ? result.ingredients.filter((s) => typeof s === 'string').map((s) => s.trim()).filter((s) => s.length > 0)
-        : [];
-      if (safeIngredients.length > 0) {
+      if (result.ingredients.length > 0) {
         await FastFoodItem.findByIdAndUpdate(result.itemId, {
-          ingredients: safeIngredients
+          ingredients: result.ingredients
         });
         updated++;
       }

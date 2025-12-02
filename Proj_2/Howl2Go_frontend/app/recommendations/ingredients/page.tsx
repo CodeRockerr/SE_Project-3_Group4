@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect, useCallback, ChangeEvent } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
 import ItemCard from "@/components/ItemCard";
 import IngredientTagInput from "@/components/IngredientTagInput";
 import { UtensilsCrossed, SlidersHorizontal } from 'lucide-react';
@@ -48,14 +49,8 @@ export default function IngredientRecommendationsPage() {
       const items = res.items || res.results || [];
       setData(items);
       if (typeof res.total === "number") setTotal(res.total);
-    } catch (e: unknown) {
-      if (e instanceof Error) {
-        setError(e.message);
-      } else if (typeof e === "string") {
-        setError(e);
-      } else {
-        setError("Failed to load recommendations");
-      }
+    } catch (e: any) {
+      setError(e?.message || "Failed to load recommendations");
     } finally {
       setLoading(false);
     }
@@ -69,15 +64,29 @@ export default function IngredientRecommendationsPage() {
     <div className="px-6 py-10 max-w-7xl mx-auto">
       <div className="mb-8 text-center">
         <h1 className="text-center text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4 text-[var(--howl-neutral)]">
-          Ingredient
-          {' '}
+          Ingredient{' '}
           <span className="relative inline-block">
             Matches
-            <span className="block h-1.5 bg-[var(--howl-primary)] rounded-full mt-2"/>
+            <motion.svg
+              className="absolute -bottom-2 left-0 w-full"
+              height="8"
+              viewBox="0 0 200 8"
+              fill="none"
+              initial={{ pathLength: 0, opacity: 0 }}
+              animate={{ pathLength: 1, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeInOut" }}
+            >
+              <motion.path
+                d="M2 5C60 2 140 2 198 5"
+                stroke="var(--howl-primary)"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+            </motion.svg>
           </span>
         </h1>
         <p className="mt-2 text-sm text-[var(--text-subtle)] max-w-2xl mx-auto">
-          Find menu items containing all of your include ingredients while excluding any you don&apos;t want. Results are ranked by number of matches.
+          Find menu items containing all of your include ingredients while excluding any you don't want. Results are ranked by number of matches.
         </p>
       </div>
 
@@ -99,7 +108,7 @@ export default function IngredientRecommendationsPage() {
           <SlidersHorizontal className="h-4 w-4 text-[var(--text-subtle)]" />
           <select
             value={sortMode}
-            onChange={(e: ChangeEvent<HTMLSelectElement>) => setSortMode(e.target.value as 'matches' | 'calories')}
+            onChange={e => setSortMode(e.target.value as any)}
             className="bg-[var(--bg-card)] border border-[var(--border)] rounded px-2 py-1 text-xs text-[var(--text)] focus:border-[var(--orange)] focus:outline-none"
           >
             <option value="matches">Sort: Matches</option>
@@ -117,55 +126,24 @@ export default function IngredientRecommendationsPage() {
       </div>
 
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {loading && (
-          Array.from({ length: 6 }).map((_, i) => (
-            <div key={`skeleton-${i}`} className="space-y-2 animate-pulse">
-              <div className="h-40 rounded-lg bg-[var(--bg-card)] border border-[var(--border)]" />
-              <div className="h-4 w-2/3 rounded bg-[var(--border)]" />
-              <div className="h-3 w-1/2 rounded bg-[var(--border)]" />
-            </div>
-          ))
-        )}
-
-        {!loading && data
+        {data
           .slice() // shallow copy for client sorting
-          .sort((a, b) => {
-            const getMatchScore = (obj: unknown): number => {
-              if (typeof obj !== 'object' || obj === null) return 0;
-              const v = (obj as Record<string, unknown>).matchScore;
-              return typeof v === 'number' ? v : 0;
-            };
-
+          .sort((a,b) => {
             if (sortMode === 'calories') {
               return (a.calories || 0) - (b.calories || 0);
             }
-            return getMatchScore(b) - getMatchScore(a);
+            return ((b as any).matchScore || 0) - ((a as any).matchScore || 0);
           })
           .map(food => {
-          // treat food as a record to safely access optional fields without using `any`
-          const f = food as unknown as Record<string, unknown>;
-          const { restaurant: _r, company: _c, ...rest } = f;
-          const restaurantName = typeof _r === 'string' ? _r : (typeof _c === 'string' ? _c : 'Unknown');
-          const key = typeof f._id === 'string' ? String(f._id) : `${restaurantName}-${String(f.item ?? '')}`;
-          const itemName = typeof f.item === 'string' ? f.item : String(f.item ?? '');
-          const calories = typeof f.calories === 'number' ? f.calories : 0;
-          const price = f.price as number | string | undefined;
-          // normalize price to a number or undefined (ItemCard expects number | undefined)
-          const priceNumber = typeof price === 'string'
-            ? (() => {
-                const parsed = Number(price);
-                return Number.isFinite(parsed) ? parsed : undefined;
-              })()
-            : price;
-
+          const key = (food as any)._id || `${food.restaurant || (food as any).company}-${food.item}`;
           return (
             <div key={key} className="space-y-2">
               <ItemCard
-                restaurant={restaurantName}
-                item={itemName}
-                calories={calories}
-                price={priceNumber}
-                {...(rest as Record<string, unknown>)}
+                restaurant={food.restaurant || (food as any).company || "Unknown"}
+                item={food.item}
+                calories={food.calories || 0}
+                price={(food as any).price}
+                {...food}
               />
               {/* Matched ingredients chips */}
               {include.length > 0 && (
@@ -178,14 +156,7 @@ export default function IngredientRecommendationsPage() {
             </div>
           );
         })}
-
-        {!loading && data.length === 0 && (
-          <div className="col-span-full text-center py-12 border border-[var(--border)] rounded-lg bg-[var(--bg-card)]">
-            <UtensilsCrossed className="mx-auto h-8 w-8 text-[var(--text-subtle)]" />
-            <p className="mt-2 text-sm text-[var(--text-subtle)]">No results for current filters.</p>
-            <p className="mt-1 text-xs text-[var(--text-subtle)]">Try removing an exclude or adding more include ingredients.</p>
-          </div>
-        )}
+        {!loading && data.length === 0 && <p className="text-sm text-gray-500 col-span-full">No results found for current filters.</p>}
       </div>
 
       <div className="mt-8 flex items-center gap-4">
