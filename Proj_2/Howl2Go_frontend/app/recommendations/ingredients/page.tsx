@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import ItemCard from "@/components/ItemCard";
 import IngredientTagInput from "@/components/IngredientTagInput";
-import { UtensilsCrossed, SlidersHorizontal, ShoppingCart } from 'lucide-react';
+import { UtensilsCrossed, SlidersHorizontal, ShoppingCart, Home } from 'lucide-react';
 import { useCart } from "@/context/CartContext";
 import { getIngredientRecommendations } from "@/lib/api";
 import type { FoodItem } from "@/types/food";
@@ -26,7 +26,7 @@ export default function IngredientRecommendationsPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState<number | undefined>(undefined);
   const [limit] = useState(20);
-  const [sortMode, setSortMode] = useState<'matches' | 'calories'>('matches');
+  const [sortMode, setSortMode] = useState<'matches' | 'calories' | 'price-asc' | 'price-desc'>('matches');
   const { summary } = useCart();
 
   // Persist filters
@@ -66,6 +66,15 @@ export default function IngredientRecommendationsPage() {
   return (
     <div className="px-6 py-10 max-w-7xl mx-auto">
       <div className="mb-8 text-center relative">
+        {/* Home Button - Top Left */}
+        <Link
+          href="/dashboard"
+          className="absolute top-0 left-0 p-2 transition-colors hover:opacity-70 text-[var(--howl-neutral)]"
+          title="Back to Dashboard"
+        >
+          <Home className="h-6 w-6" />
+        </Link>
+
         {/* Cart Button - Top Right */}
         <Link
           href="/cart"
@@ -111,25 +120,44 @@ export default function IngredientRecommendationsPage() {
         <IngredientTagInput label="Exclude Ingredients" value={exclude} onChange={(tags) => { setExclude(tags); setPage(1); }} />
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 mb-6">
-        <button
-          onClick={fetchData}
-          className="inline-flex items-center gap-2 bg-[var(--orange)] text-[var(--text)] text-sm font-semibold px-4 py-2 rounded-full hover:bg-[var(--cream)] hover:text-[var(--bg)] transition-colors"
-          disabled={loading}
-        >
-          <UtensilsCrossed className="h-4 w-4" />
-          {loading ? 'Loading...' : 'Get Matches'}
-        </button>
-        <div className="flex items-center gap-2 ml-auto">
-          <SlidersHorizontal className="h-4 w-4 text-[var(--text-subtle)]" />
-          <select
-            value={sortMode}
-            onChange={e => setSortMode(e.target.value as any)}
-            className="bg-[var(--bg-card)] border border-[var(--border)] rounded px-2 py-1 text-xs text-[var(--text)] focus:border-[var(--orange)] focus:outline-none"
+      <div className="flex flex-col items-center gap-4 mb-6">
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <motion.button
+            onClick={fetchData}
+            className="inline-flex items-center gap-2 bg-[var(--orange)] text-[var(--text)] text-sm font-semibold px-4 py-2 rounded-full hover:bg-[var(--cream)] hover:text-[var(--bg)] transition-colors"
+            disabled={loading}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
           >
-            <option value="matches">Sort: Matches</option>
-            <option value="calories">Sort: Calories</option>
-          </select>
+            <UtensilsCrossed className="h-4 w-4" />
+            {loading ? 'Loading...' : 'Get Matches'}
+          </motion.button>
+          <motion.div 
+            className="flex items-center gap-2"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+            >
+              <SlidersHorizontal className="h-4 w-4 text-[var(--text-subtle)]" />
+            </motion.div>
+            <select
+              value={sortMode}
+              onChange={e => setSortMode(e.target.value as any)}
+              className="bg-[var(--bg-card)] border border-[var(--border)] rounded px-2 py-1 text-xs text-[var(--text)] focus:border-[var(--orange)] focus:outline-none"
+            >
+              <option value="matches">Sort: Matches</option>
+              <option value="calories">Sort: Calories</option>
+              <option value="price-asc">Sort: Price (Low to High)</option>
+              <option value="price-desc">Sort: Price (High to Low)</option>
+            </select>
+          </motion.div>
         </div>
         {loading && <span className="text-xs text-gray-500">Loading...</span>}
         {error && <span className="text-xs text-red-600">{error}</span>}
@@ -147,6 +175,10 @@ export default function IngredientRecommendationsPage() {
           .sort((a,b) => {
             if (sortMode === 'calories') {
               return (a.calories || 0) - (b.calories || 0);
+            } else if (sortMode === 'price-asc') {
+              return ((a as any).price || 0) - ((b as any).price || 0);
+            } else if (sortMode === 'price-desc') {
+              return ((b as any).price || 0) - ((a as any).price || 0);
             }
             return ((b as any).matchScore || 0) - ((a as any).matchScore || 0);
           })
