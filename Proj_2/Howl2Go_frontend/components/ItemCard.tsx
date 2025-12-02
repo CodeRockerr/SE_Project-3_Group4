@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { MessageSquare, CheckCircle } from "lucide-react";
+import { MessageSquare, CheckCircle, Utensils } from "lucide-react";
 import type { FoodItem } from "@/types/food";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
@@ -62,7 +62,6 @@ export default function ItemCard({
 }: ItemCardProps) {
   const [showDescription, setShowDescription] = useState(false);
   const [showReviewsSection, setShowReviewsSection] = useState(false);
-  const [showAllIngredients, setShowAllIngredients] = useState(false);
   const [rating, setRating] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState(0);
   const [userReview, setUserReview] = useState<{ rating: number; _id: string } | null>(null);
@@ -94,13 +93,6 @@ export default function ItemCard({
         });
     }
   }, [restProps._id, showReviews, isAuthenticated]);
-
-  // Reset expandable sections when the item changes
-  useEffect(() => {
-    setShowAllIngredients(false);
-    setShowDescription(false);
-    setShowReviewsSection(false);
-  }, [restProps._id, item]);
 
   // Listen for review submission events (from order page or elsewhere)
   useEffect(() => {
@@ -206,7 +198,7 @@ export default function ItemCard({
       transition={
         disableAnimation ? undefined : { delay: index * 0.05, duration: 0.25 }
       }
-      className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-6 hover:border-[var(--orange)] transition-all group shadow-sm hover:shadow-md"
+      className="bg-[var(--bg-card)] border border-[var(--border)] rounded-xl p-6 hover:border-[var(--orange)] transition-all group"
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
     >
       {/* Header: Restaurant Logo and Price */}
@@ -275,7 +267,7 @@ export default function ItemCard({
 
       {/* Nutrition Info */}
       <div className="mb-4 space-y-2">
-        <div className="inline-flex items-center gap-2 bg-[var(--bg-hover)] px-3 py-1.5 rounded-full" title="Calories">
+        <div className="inline-flex items-center gap-2 bg-[var(--bg-hover)] px-3 py-1.5 rounded-full">
           <svg
             className="w-4 h-4 text-[var(--orange)]"
             fill="none"
@@ -301,25 +293,30 @@ export default function ItemCard({
         
         {/* Ingredients */}
         {restProps.ingredients && restProps.ingredients.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {(showAllIngredients ? restProps.ingredients : restProps.ingredients.slice(0, 5)).map((ingredient, idx) => (
-              <span
-                key={idx}
-                className="text-xs px-2 py-0.5 rounded-full bg-[var(--cream)]/10 text-[var(--text-subtle)] border border-[var(--border)]"
-              >
-                {ingredient}
-              </span>
-            ))}
-            {restProps.ingredients.length > 5 && (
-              <button
-                type="button"
-                onClick={() => setShowAllIngredients(v => !v)}
-                aria-expanded={showAllIngredients}
-                className="text-xs px-2 py-0.5 rounded-full border border-[var(--border)] bg-[var(--bg-hover)] text-[var(--text)] hover:border-[var(--orange)] transition-colors"
-              >
-                {showAllIngredients ? "Show less" : `+${restProps.ingredients.length - 5} more`}
-              </button>
-            )}
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-[var(--text-subtle)]">
+              <Utensils size={14} className="text-[var(--orange)]" />
+              <span className="text-xs font-semibold">Ingredients</span>
+            </div>
+            <div className="flex flex-wrap gap-1" aria-label="ingredients">
+              {restProps.ingredients.slice(0, 6).map((ingredient, idx) => (
+                <span
+                  key={idx}
+                  className="text-xs px-2 py-0.5 rounded-full bg-[var(--cream)]/10 text-[var(--text-subtle)] border border-[var(--border)]"
+                  title={ingredient}
+                >
+                  {ingredient}
+                </span>
+              ))}
+              {restProps.ingredients.length > 6 && (
+                <span
+                  className="text-xs px-2 py-0.5 text-[var(--text-subtle)]"
+                  title={restProps.ingredients.slice(6).join(', ')}
+                >
+                  +{restProps.ingredients.length - 6} more
+                </span>
+              )}
+            </div>
           </div>
         )}
       </div>
