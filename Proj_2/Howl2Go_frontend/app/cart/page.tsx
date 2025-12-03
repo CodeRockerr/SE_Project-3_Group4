@@ -1,24 +1,72 @@
 "use client";
 
 import { useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, CheckCircle, Loader2 } from "lucide-react";
+import {
+  Trash2,
+  Plus,
+  Minus,
+  ShoppingBag,
+  ArrowLeft,
+  CheckCircle,
+  Loader2,
+} from "lucide-react";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { createOrder } from "@/lib/api/order";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import toast from "react-hot-toast";
+import ComboSuggestionsModal from "@/components/ComboSuggestionsModal";
+import { getComboSuggestions } from "@/lib/api/combo";
 
 export default function CartPage() {
   const router = useRouter();
-  const { items: cartItems, removeFromCart, updateQuantity, clearCart, summary, isLoading: isCartLoading } = useCart();
+  const {
+    items: cartItems,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    summary,
+    isLoading: isCartLoading,
+    addToCart,
+    addMultipleToCart,
+  } = useCart();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
 
   // Order state
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderSummary, setOrderSummary] = useState({ total: 0, totalItems: 0 });
+  const [comboSuggestions, setComboSuggestions] = useState<any[]>([]);
+  const [showComboModal, setShowComboModal] = useState(false);
+
+  // Fetch combo suggestions when cart items change (MVP uses first cart item)
+  useEffect(() => {
+    let mounted = true;
+    async function fetchSuggestions() {
+      if (!cartItems || cartItems.length === 0) return;
+      const main = cartItems[0];
+      const mainId = main.foodItem._id;
+      try {
+        const suggestions = await getComboSuggestions(mainId, 5);
+        if (!mounted) return;
+        if (suggestions && suggestions.length > 0) {
+          setComboSuggestions(suggestions);
+          setShowComboModal(true);
+        }
+      } catch (err) {
+        console.error("Failed to load combo suggestions", err);
+      }
+    }
+
+    fetchSuggestions();
+
+    return () => {
+      mounted = false;
+    };
+  }, [cartItems]);
 
   // Increase quantity
   const increaseQuantity = async (id: string) => {
@@ -92,13 +140,17 @@ export default function CartPage() {
     } catch (error: any) {
       console.error("Failed to place order:", error);
       setIsProcessing(false);
-      
+
       // Show user-friendly error message
-      const errorMessage = error?.message || "Failed to place order. Please try again.";
+      const errorMessage =
+        error?.message || "Failed to place order. Please try again.";
       toast.error(errorMessage);
-      
+
       // If authentication error, redirect to login
-      if (errorMessage.includes("Authentication") || errorMessage.includes("401")) {
+      if (
+        errorMessage.includes("Authentication") ||
+        errorMessage.includes("401")
+      ) {
         setTimeout(() => {
           router.push("/login?redirect=/cart");
         }, 2000);
@@ -154,14 +206,12 @@ export default function CartPage() {
             <p className="text-sm mb-2" style={{ color: "var(--text-muted)" }}>
               Order Total
             </p>
-            <p
-              className="text-3xl font-bold"
-              style={{ color: "var(--cream)" }}
-            >
+            <p className="text-3xl font-bold" style={{ color: "var(--cream)" }}>
               ${orderSummary.total.toFixed(2)}
             </p>
             <p className="text-sm mt-2" style={{ color: "var(--text-subtle)" }}>
-              {orderSummary.totalItems} {orderSummary.totalItems === 1 ? "item" : "items"}
+              {orderSummary.totalItems}{" "}
+              {orderSummary.totalItems === 1 ? "item" : "items"}
             </p>
           </div>
 
@@ -172,15 +222,24 @@ export default function CartPage() {
             <div className="flex gap-1">
               <span
                 className="w-2 h-2 rounded-full animate-pulse"
-                style={{ backgroundColor: "var(--orange)", animationDelay: "0s" }}
+                style={{
+                  backgroundColor: "var(--orange)",
+                  animationDelay: "0s",
+                }}
               />
               <span
                 className="w-2 h-2 rounded-full animate-pulse"
-                style={{ backgroundColor: "var(--orange)", animationDelay: "0.2s" }}
+                style={{
+                  backgroundColor: "var(--orange)",
+                  animationDelay: "0.2s",
+                }}
               />
               <span
                 className="w-2 h-2 rounded-full animate-pulse"
-                style={{ backgroundColor: "var(--orange)", animationDelay: "0.4s" }}
+                style={{
+                  backgroundColor: "var(--orange)",
+                  animationDelay: "0.4s",
+                }}
               />
             </div>
             <span>Redirecting to home...</span>
@@ -256,7 +315,11 @@ export default function CartPage() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {isCartLoading ? (
-          <LoadingSpinner message="Loading your cart..." size="lg" fullScreen={false} />
+          <LoadingSpinner
+            message="Loading your cart..."
+            size="lg"
+            fullScreen={false}
+          />
         ) : cartItems.length === 0 ? (
           // Empty Cart State
           <div className="text-center py-20">
@@ -285,317 +348,354 @@ export default function CartPage() {
             </Link>
           </div>
         ) : (
-          // Cart Items Grid
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Left Column - Cart Items */}
-            <div className="lg:col-span-2 space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <h2
-                  className="text-xl font-semibold"
-                  style={{ color: "var(--text)" }}
-                >
-                  {totalItems} {totalItems === 1 ? "Item" : "Items"}
-                </h2>
-                <button
-                  onClick={() => clearCart()}
-                  className="text-sm font-medium transition-colors"
-                  style={{ color: "var(--text-subtle)" }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = "var(--error)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = "var(--text-subtle)";
-                  }}
-                >
-                  Clear Cart
-                </button>
+          <>
+            {/* Cart Items Grid */}
+            <div className="grid lg:grid-cols-3 gap-8">
+              {/* Left Column - Cart Items */}
+              <div className="lg:col-span-2 space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h2
+                    className="text-xl font-semibold"
+                    style={{ color: "var(--text)" }}
+                  >
+                    {totalItems} {totalItems === 1 ? "Item" : "Items"}
+                  </h2>
+                  <button
+                    onClick={() => clearCart()}
+                    className="text-sm font-medium transition-colors"
+                    style={{ color: "var(--text-subtle)" }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = "var(--error)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = "var(--text-subtle)";
+                    }}
+                  >
+                    Clear Cart
+                  </button>
+                </div>
+
+                {cartItems.map((cartItem) => (
+                  <div
+                    key={cartItem.id}
+                    className="rounded-2xl p-6 border transition-all"
+                    style={{
+                      backgroundColor: "var(--bg-card)",
+                      borderColor: "var(--border)",
+                    }}
+                  >
+                    <div className="flex gap-4">
+                      {/* Item Info */}
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h3
+                              className="font-semibold text-lg mb-1"
+                              style={{ color: "var(--text)" }}
+                            >
+                              {cartItem.foodItem.item}
+                            </h3>
+                            <p
+                              className="text-sm"
+                              style={{ color: "var(--text-subtle)" }}
+                            >
+                              {cartItem.foodItem.restaurant}
+                            </p>
+                          </div>
+                          <button
+                            onClick={async () => {
+                              try {
+                                await removeFromCart(cartItem.id);
+                              } catch (error) {
+                                console.error("Failed to remove item:", error);
+                                // You could show a toast notification here
+                              }
+                            }}
+                            className="p-2 rounded-lg transition-colors"
+                            style={{ color: "var(--text-muted)" }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                "var(--bg-hover)";
+                              e.currentTarget.style.color = "var(--error)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                "transparent";
+                              e.currentTarget.style.color = "var(--text-muted)";
+                            }}
+                            aria-label="Remove item"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+
+                        {/* Nutritional Info */}
+                        <div className="flex gap-4 mb-4">
+                          <span
+                            className="text-sm px-3 py-1 rounded-full"
+                            style={{
+                              backgroundColor:
+                                "color-mix(in srgb, var(--cream) 15%, transparent)",
+                              color: "var(--cream)",
+                            }}
+                          >
+                            {cartItem.foodItem.calories} cal
+                          </span>
+                          {cartItem.foodItem.protein && (
+                            <span
+                              className="text-sm px-3 py-1 rounded-full"
+                              style={{
+                                backgroundColor:
+                                  "color-mix(in srgb, var(--success) 15%, transparent)",
+                                color: "var(--success)",
+                              }}
+                            >
+                              {cartItem.foodItem.protein}g protein
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Quantity Controls & Price */}
+                        <div className="flex items-center justify-between">
+                          <div
+                            className="flex items-center gap-3 rounded-lg border px-3 py-2"
+                            style={{
+                              borderColor: "var(--border)",
+                              backgroundColor: "var(--bg)",
+                            }}
+                          >
+                            <button
+                              onClick={() => decreaseQuantity(cartItem.id)}
+                              className="p-1 rounded transition-colors"
+                              style={{ color: "var(--text-subtle)" }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor =
+                                  "var(--bg-hover)";
+                                e.currentTarget.style.color = "var(--orange)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor =
+                                  "transparent";
+                                e.currentTarget.style.color =
+                                  "var(--text-subtle)";
+                              }}
+                              aria-label="Decrease quantity"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </button>
+                            <span
+                              className="font-semibold min-w-[2rem] text-center"
+                              style={{ color: "var(--text)" }}
+                            >
+                              {cartItem.quantity}
+                            </span>
+                            <button
+                              onClick={() => increaseQuantity(cartItem.id)}
+                              className="p-1 rounded transition-colors"
+                              style={{ color: "var(--text-subtle)" }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor =
+                                  "var(--bg-hover)";
+                                e.currentTarget.style.color = "var(--orange)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor =
+                                  "transparent";
+                                e.currentTarget.style.color =
+                                  "var(--text-subtle)";
+                              }}
+                              aria-label="Increase quantity"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          <div className="text-right">
+                            <div
+                              className="text-xl font-bold"
+                              style={{ color: "var(--cream)" }}
+                            >
+                              ${(cartItem.price * cartItem.quantity).toFixed(2)}
+                            </div>
+                            <div
+                              className="text-sm"
+                              style={{ color: "var(--text-muted)" }}
+                            >
+                              ${cartItem.price.toFixed(2)} each
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              {cartItems.map((cartItem) => (
+              {/* Right Column - Order Summary */}
+              <div className="lg:col-span-1">
                 <div
-                  key={cartItem.id}
-                  className="rounded-2xl p-6 border transition-all"
+                  className="rounded-2xl p-6 border sticky top-24"
                   style={{
                     backgroundColor: "var(--bg-card)",
                     borderColor: "var(--border)",
                   }}
                 >
-                  <div className="flex gap-4">
-                    {/* Item Info */}
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3
-                            className="font-semibold text-lg mb-1"
-                            style={{ color: "var(--text)" }}
-                          >
-                            {cartItem.foodItem.item}
-                          </h3>
-                          <p
-                            className="text-sm"
-                            style={{ color: "var(--text-subtle)" }}
-                          >
-                            {cartItem.foodItem.restaurant}
-                          </p>
-                        </div>
-                        <button
-                          onClick={async () => {
-                            try {
-                              await removeFromCart(cartItem.id);
-                            } catch (error) {
-                              console.error("Failed to remove item:", error);
-                              // You could show a toast notification here
-                            }
-                          }}
-                          className="p-2 rounded-lg transition-colors"
-                          style={{ color: "var(--text-muted)" }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor =
-                              "var(--bg-hover)";
-                            e.currentTarget.style.color = "var(--error)";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor =
-                              "transparent";
-                            e.currentTarget.style.color = "var(--text-muted)";
-                          }}
-                          aria-label="Remove item"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </div>
-
-                      {/* Nutritional Info */}
-                      <div className="flex gap-4 mb-4">
-                        <span
-                          className="text-sm px-3 py-1 rounded-full"
-                          style={{
-                            backgroundColor:
-                              "color-mix(in srgb, var(--cream) 15%, transparent)",
-                            color: "var(--cream)",
-                          }}
-                        >
-                          {cartItem.foodItem.calories} cal
-                        </span>
-                        {cartItem.foodItem.protein && (
-                          <span
-                            className="text-sm px-3 py-1 rounded-full"
-                            style={{
-                              backgroundColor:
-                                "color-mix(in srgb, var(--success) 15%, transparent)",
-                              color: "var(--success)",
-                            }}
-                          >
-                            {cartItem.foodItem.protein}g protein
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Quantity Controls & Price */}
-                      <div className="flex items-center justify-between">
-                        <div
-                          className="flex items-center gap-3 rounded-lg border px-3 py-2"
-                          style={{
-                            borderColor: "var(--border)",
-                            backgroundColor: "var(--bg)",
-                          }}
-                        >
-                          <button
-                            onClick={() => decreaseQuantity(cartItem.id)}
-                            className="p-1 rounded transition-colors"
-                            style={{ color: "var(--text-subtle)" }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor =
-                                "var(--bg-hover)";
-                              e.currentTarget.style.color = "var(--orange)";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor =
-                                "transparent";
-                              e.currentTarget.style.color =
-                                "var(--text-subtle)";
-                            }}
-                            aria-label="Decrease quantity"
-                          >
-                            <Minus className="w-4 h-4" />
-                          </button>
-                          <span
-                            className="font-semibold min-w-[2rem] text-center"
-                            style={{ color: "var(--text)" }}
-                          >
-                            {cartItem.quantity}
-                          </span>
-                          <button
-                            onClick={() => increaseQuantity(cartItem.id)}
-                            className="p-1 rounded transition-colors"
-                            style={{ color: "var(--text-subtle)" }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor =
-                                "var(--bg-hover)";
-                              e.currentTarget.style.color = "var(--orange)";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor =
-                                "transparent";
-                              e.currentTarget.style.color =
-                                "var(--text-subtle)";
-                            }}
-                            aria-label="Increase quantity"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
-                        </div>
-
-                        <div className="text-right">
-                          <div
-                            className="text-xl font-bold"
-                            style={{ color: "var(--cream)" }}
-                          >
-                            ${(cartItem.price * cartItem.quantity).toFixed(2)}
-                          </div>
-                          <div
-                            className="text-sm"
-                            style={{ color: "var(--text-muted)" }}
-                          >
-                            ${cartItem.price.toFixed(2)} each
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Right Column - Order Summary */}
-            <div className="lg:col-span-1">
-              <div
-                className="rounded-2xl p-6 border sticky top-24"
-                style={{
-                  backgroundColor: "var(--bg-card)",
-                  borderColor: "var(--border)",
-                }}
-              >
-                <h2
-                  className="text-xl font-bold mb-6"
-                  style={{ color: "var(--text)" }}
-                >
-                  Order Summary
-                </h2>
-
-                <div className="space-y-4 mb-6">
-                  {/* Subtotal */}
-                  <div className="flex justify-between">
-                    <span style={{ color: "var(--text-subtle)" }}>
-                      Subtotal
-                    </span>
-                    <span
-                      className="font-semibold"
-                      style={{ color: "var(--text)" }}
-                    >
-                      ${subtotal.toFixed(2)}
-                    </span>
-                  </div>
-
-                  {/* Tax */}
-                  <div className="flex justify-between">
-                    <span style={{ color: "var(--text-subtle)" }}>
-                      Tax (8%)
-                    </span>
-                    <span
-                      className="font-semibold"
-                      style={{ color: "var(--text)" }}
-                    >
-                      ${tax.toFixed(2)}
-                    </span>
-                  </div>
-
-                  {/* Delivery Fee */}
-                  <div className="flex justify-between">
-                    <span style={{ color: "var(--text-subtle)" }}>
-                      Delivery Fee
-                    </span>
-                    <span
-                      className="font-semibold"
-                      style={{ color: "var(--text)" }}
-                    >
-                      ${deliveryFee.toFixed(2)}
-                    </span>
-                  </div>
-
-                  {/* Divider */}
-                  <div
-                    className="border-t pt-4"
-                    style={{ borderColor: "var(--border)" }}
+                  <h2
+                    className="text-xl font-bold mb-6"
+                    style={{ color: "var(--text)" }}
                   >
-                    <div className="flex justify-between items-center">
+                    Order Summary
+                  </h2>
+
+                  <div className="space-y-4 mb-6">
+                    {/* Subtotal */}
+                    <div className="flex justify-between">
+                      <span style={{ color: "var(--text-subtle)" }}>
+                        Subtotal
+                      </span>
                       <span
-                        className="text-lg font-semibold"
+                        className="font-semibold"
                         style={{ color: "var(--text)" }}
                       >
-                        Total
-                      </span>
-                      <span
-                        className="text-2xl font-bold"
-                        style={{ color: "var(--cream)" }}
-                      >
-                        ${total.toFixed(2)}
+                        ${subtotal.toFixed(2)}
                       </span>
                     </div>
-                  </div>
-                </div>
 
-                {/* Place Order Button */}
-                <button
-                  onClick={handlePlaceOrder}
-                  disabled={isProcessing || isAuthLoading || !isAuthenticated || cartItems.length === 0}
-                  className="w-full py-4 rounded-full font-bold text-lg transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    backgroundColor: "var(--orange)",
-                    color: "var(--text)",
-                  }}
-                >
-                  {isProcessing ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <Loader2 className="w-5 h-5 animate-spin text-[var(--text)]" />
-                      Processing your order...
-                    </span>
-                  ) : !isAuthenticated ? (
-                    "Log In to Place Order"
-                  ) : (
-                    "Place Order"
-                  )}
-                </button>
-
-                {/* Additional Info */}
-                <div className="mt-4 text-center space-y-2">
-                  <p
-                    className="text-sm"
-                    style={{ color: "var(--text-muted)" }}
-                  >
-                    Free delivery on orders over $30
-                  </p>
-                  {!isAuthenticated && !isAuthLoading && (
-                    <p
-                      className="text-xs"
-                      style={{ color: "var(--text-subtle)" }}
-                    >
-                      <Link
-                        href="/login?redirect=/cart"
-                        className="underline hover:no-underline"
-                        style={{ color: "var(--orange)" }}
+                    {/* Tax */}
+                    <div className="flex justify-between">
+                      <span style={{ color: "var(--text-subtle)" }}>
+                        Tax (8%)
+                      </span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: "var(--text)" }}
                       >
-                        Log in
-                      </Link>{" "}
-                      to place an order
+                        ${tax.toFixed(2)}
+                      </span>
+                    </div>
+
+                    {/* Delivery Fee */}
+                    <div className="flex justify-between">
+                      <span style={{ color: "var(--text-subtle)" }}>
+                        Delivery Fee
+                      </span>
+                      <span
+                        className="font-semibold"
+                        style={{ color: "var(--text)" }}
+                      >
+                        ${deliveryFee.toFixed(2)}
+                      </span>
+                    </div>
+
+                    {/* Divider */}
+                    <div
+                      className="border-t pt-4"
+                      style={{ borderColor: "var(--border)" }}
+                    >
+                      <div className="flex justify-between items-center">
+                        <span
+                          className="text-lg font-semibold"
+                          style={{ color: "var(--text)" }}
+                        >
+                          Total
+                        </span>
+                        <span
+                          className="text-2xl font-bold"
+                          style={{ color: "var(--cream)" }}
+                        >
+                          ${total.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Place Order Button */}
+                  <button
+                    onClick={handlePlaceOrder}
+                    disabled={
+                      isProcessing ||
+                      isAuthLoading ||
+                      !isAuthenticated ||
+                      cartItems.length === 0
+                    }
+                    className="w-full py-4 rounded-full font-bold text-lg transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      backgroundColor: "var(--orange)",
+                      color: "var(--text)",
+                    }}
+                  >
+                    {isProcessing ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <Loader2 className="w-5 h-5 animate-spin text-[var(--text)]" />
+                        Processing your order...
+                      </span>
+                    ) : !isAuthenticated ? (
+                      "Log In to Place Order"
+                    ) : (
+                      "Place Order"
+                    )}
+                  </button>
+
+                  {/* Additional Info */}
+                  <div className="mt-4 text-center space-y-2">
+                    <p
+                      className="text-sm"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      Free delivery on orders over $30
                     </p>
-                  )}
+                    {!isAuthenticated && !isAuthLoading && (
+                      <p
+                        className="text-xs"
+                        style={{ color: "var(--text-subtle)" }}
+                      >
+                        <Link
+                          href="/login?redirect=/cart"
+                          className="underline hover:no-underline"
+                          style={{ color: "var(--orange)" }}
+                        >
+                          Log in
+                        </Link>{" "}
+                        to place an order
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+            {/* Combo suggestions modal */}
+            {showComboModal && (
+              <ComboSuggestionsModal
+                suggestions={comboSuggestions}
+                onClose={() => setShowComboModal(false)}
+                onAddOne={async (itemId: string) => {
+                  try {
+                    // Find suggestion item to pass to addToCart
+                    const sug = comboSuggestions.find(
+                      (s) => s.item._id === itemId
+                    );
+                    if (!sug) return;
+                    await addToCart(sug.item as any, 1);
+                    setShowComboModal(false);
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }}
+                onAddAll={async (items) => {
+                  try {
+                    await addMultipleToCart(items);
+                    setShowComboModal(false);
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }}
+              />
+            )}
+          </>
         )}
       </div>
     </div>
   );
 }
+
+// (suggestions fetched inside component useEffect above)

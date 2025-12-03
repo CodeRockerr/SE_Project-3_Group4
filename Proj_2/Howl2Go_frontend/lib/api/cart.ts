@@ -2,13 +2,15 @@ import { apiFetch } from "../api";
 
 // Backend cart item structure
 interface BackendCartItem {
-  foodItem: {
-    _id: string;
-    company: string;
-    item: string;
-    calories: number;
-    [key: string]: any;
-  } | string; // Can be ObjectId string or populated object
+  foodItem:
+    | {
+        _id: string;
+        company: string;
+        item: string;
+        calories: number;
+        [key: string]: any;
+      }
+    | string; // Can be ObjectId string or populated object
   restaurant: string;
   item: string;
   calories: number;
@@ -35,9 +37,10 @@ interface BackendCartResponse {
 
 // Transform backend cart item to frontend CartItem format
 function transformCartItem(backendItem: BackendCartItem) {
-  const foodItemId = typeof backendItem.foodItem === 'string' 
-    ? backendItem.foodItem 
-    : backendItem.foodItem._id;
+  const foodItemId =
+    typeof backendItem.foodItem === "string"
+      ? backendItem.foodItem
+      : backendItem.foodItem._id;
 
   return {
     id: `cart-${foodItemId}`, // Use foodItemId as unique identifier
@@ -78,9 +81,7 @@ export async function fetchCart() {
     }
 
     // Transform backend cart items to frontend format
-    const items = data.data.cart.items.map((item) => 
-      transformCartItem(item)
-    );
+    const items = data.data.cart.items.map((item) => transformCartItem(item));
 
     return items;
   } catch (error) {
@@ -108,7 +109,9 @@ export async function addItemToCart(foodItemId: string, quantity: number = 1) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Failed to add item: ${response.status}`);
+      throw new Error(
+        errorData.message || `Failed to add item: ${response.status}`
+      );
     }
 
     const data: BackendCartResponse = await response.json();
@@ -118,9 +121,7 @@ export async function addItemToCart(foodItemId: string, quantity: number = 1) {
     }
 
     // Return transformed items
-    const items = data.data.cart.items.map((item) => 
-      transformCartItem(item)
-    );
+    const items = data.data.cart.items.map((item) => transformCartItem(item));
 
     return items;
   } catch (error) {
@@ -132,7 +133,10 @@ export async function addItemToCart(foodItemId: string, quantity: number = 1) {
 /**
  * Update item quantity in cart
  */
-export async function updateCartItemQuantity(foodItemId: string, quantity: number) {
+export async function updateCartItemQuantity(
+  foodItemId: string,
+  quantity: number
+) {
   try {
     const response = await apiFetch(`/api/cart/items/${foodItemId}`, {
       method: "PATCH",
@@ -145,7 +149,9 @@ export async function updateCartItemQuantity(foodItemId: string, quantity: numbe
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Failed to update item: ${response.status}`);
+      throw new Error(
+        errorData.message || `Failed to update item: ${response.status}`
+      );
     }
 
     const data: BackendCartResponse = await response.json();
@@ -155,9 +161,7 @@ export async function updateCartItemQuantity(foodItemId: string, quantity: numbe
     }
 
     // Return transformed items
-    const items = data.data.cart.items.map((item) => 
-      transformCartItem(item)
-    );
+    const items = data.data.cart.items.map((item) => transformCartItem(item));
 
     return items;
   } catch (error) {
@@ -178,7 +182,9 @@ export async function removeItemFromCart(foodItemId: string) {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Failed to remove item: ${response.status}`);
+      throw new Error(
+        errorData.message || `Failed to remove item: ${response.status}`
+      );
     }
 
     const data: BackendCartResponse = await response.json();
@@ -188,9 +194,7 @@ export async function removeItemFromCart(foodItemId: string) {
     }
 
     // Return transformed items
-    const items = data.data.cart.items.map((item) => 
-      transformCartItem(item)
-    );
+    const items = data.data.cart.items.map((item) => transformCartItem(item));
 
     return items;
   } catch (error) {
@@ -211,7 +215,9 @@ export async function clearCart() {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Failed to clear cart: ${response.status}`);
+      throw new Error(
+        errorData.message || `Failed to clear cart: ${response.status}`
+      );
     }
 
     const data: BackendCartResponse = await response.json();
@@ -227,3 +233,42 @@ export async function clearCart() {
   }
 }
 
+/**
+ * Add multiple items to cart in a single request
+ * Body: { items: [{ foodItemId, quantity }, ...] }
+ */
+export async function addItemsToCart(
+  items: { foodItemId: string; quantity?: number }[]
+) {
+  try {
+    const response = await apiFetch("/api/cart/items/bulk", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ items }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.message || `Failed to add items: ${response.status}`
+      );
+    }
+
+    const data: BackendCartResponse = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.message || "Failed to add items to cart");
+    }
+
+    const transformed = data.data.cart.items.map((item) =>
+      transformCartItem(item)
+    );
+    return transformed;
+  } catch (error) {
+    console.error("Error adding items to cart:", error);
+    throw error;
+  }
+}

@@ -1,17 +1,17 @@
-import Cart from '../models/Cart.js';
-import FastFoodItem from '../models/FastFoodItem.js';
+import Cart from "../models/Cart.js";
+import FastFoodItem from "../models/FastFoodItem.js";
 
 /**
  * Get or create cart for current session
  */
 const getOrCreateCart = async (sessionId, userId = null) => {
-  let cart = await Cart.findOne({ sessionId }).populate('items.foodItem');
+  let cart = await Cart.findOne({ sessionId }).populate("items.foodItem");
 
   if (!cart) {
     cart = await Cart.create({
       sessionId,
       userId,
-      items: []
+      items: [],
     });
   } else if (userId && !cart.userId) {
     // Associate cart with user if they log in
@@ -41,16 +41,16 @@ export const getCart = async (req, res) => {
           items: cart.items,
           totalItems: cart.totalItems,
           totalPrice: cart.totalPrice,
-          userId: cart.userId
-        }
-      }
+          userId: cart.userId,
+        },
+      },
     });
   } catch (error) {
-    console.error('Error getting cart:', error);
+    console.error("Error getting cart:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to retrieve cart',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Failed to retrieve cart",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -66,7 +66,7 @@ export const addItemToCart = async (req, res) => {
     if (!foodItemId) {
       return res.status(400).json({
         success: false,
-        message: 'Food item ID is required'
+        message: "Food item ID is required",
       });
     }
 
@@ -76,7 +76,7 @@ export const addItemToCart = async (req, res) => {
     if (!foodItem) {
       return res.status(404).json({
         success: false,
-        message: 'Food item not found'
+        message: "Food item not found",
       });
     }
 
@@ -102,33 +102,113 @@ export const addItemToCart = async (req, res) => {
       protein: foodItem.protein || 0,
       carbohydrates: foodItem.carbs || 0,
       price: foodItem.price || calculatePrice(foodItem.calories),
-      quantity: parseInt(quantity, 10)
+      quantity: parseInt(quantity, 10),
     });
 
     // Reload cart with populated items
-    const updatedCart = await Cart.findById(cart._id).populate('items.foodItem');
+    const updatedCart = await Cart.findById(cart._id).populate(
+      "items.foodItem"
+    );
 
     res.status(200).json({
       success: true,
-      message: 'Item added to cart',
+      message: "Item added to cart",
       data: {
         cart: {
           id: updatedCart._id,
           items: updatedCart.items,
           totalItems: updatedCart.totalItems,
-          totalPrice: updatedCart.totalPrice
-        }
-      }
+          totalPrice: updatedCart.totalPrice,
+        },
+      },
     });
   } catch (error) {
-    console.error('Error adding item to cart:', error);
+    console.error("Error adding item to cart:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to add item to cart',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Failed to add item to cart",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
+
+/**
+ * Add multiple items to cart in a single request
+ * POST /api/cart/items/bulk
+ * Body: { items: [{ foodItemId, quantity }, ...] }
+ */
+export const addItemsToCart = async (req, res) => {
+  try {
+    const { items } = req.body;
+
+    if (!Array.isArray(items) || items.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "items array is required" });
+    }
+
+    const sessionId = req.session.id;
+    const userId = req.user?.id || null;
+
+    const cart = await getOrCreateCart(sessionId, userId);
+
+    // Helper price calc (same as single-add)
+    const calculatePrice = (calories) => {
+      if (!calories || calories <= 0) return 2.0;
+      const basePrice = calories * 0.01;
+      return Math.min(Math.max(basePrice, 2.0), 15.0);
+    };
+
+    for (const itm of items) {
+      const { foodItemId, quantity = 1 } = itm;
+      const foodItem = await FastFoodItem.findById(foodItemId);
+      if (!foodItem) continue; // skip missing items
+
+      await cart.addItem({
+        foodItem: foodItem._id,
+        restaurant: foodItem.company,
+        item: foodItem.item,
+        calories: foodItem.calories || 0,
+        totalFat: foodItem.totalFat || 0,
+        protein: foodItem.protein || 0,
+        carbohydrates: foodItem.carbs || 0,
+        price: foodItem.price || calculatePrice(foodItem.calories),
+        quantity: parseInt(quantity, 10),
+      });
+    }
+
+    const updatedCart = await Cart.findById(cart._id).populate(
+      "items.foodItem"
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Items added to cart",
+      data: {
+        cart: {
+          id: updatedCart._id,
+          items: updatedCart.items,
+          totalItems: updatedCart.totalItems,
+          totalPrice: updatedCart.totalPrice,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error adding items to cart:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to add items to cart",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+};
+
+/**
+ * Add multiple items to cart in one request
+ * POST /api/cart/items/bulk
+ * Body: { items: [{ foodItemId, quantity }, ...] }
+ */
+// duplicate bulk-add handler removed (implemented earlier in file)
 
 /**
  * Update item quantity in cart
@@ -142,7 +222,7 @@ export const updateCartItemQuantity = async (req, res) => {
     if (!quantity || quantity < 0) {
       return res.status(400).json({
         success: false,
-        message: 'Valid quantity is required'
+        message: "Valid quantity is required",
       });
     }
 
@@ -152,33 +232,35 @@ export const updateCartItemQuantity = async (req, res) => {
     if (!cart) {
       return res.status(404).json({
         success: false,
-        message: 'Cart not found'
+        message: "Cart not found",
       });
     }
 
     await cart.updateItemQuantity(foodItemId, parseInt(quantity, 10));
 
     // Reload cart with populated items
-    const updatedCart = await Cart.findById(cart._id).populate('items.foodItem');
+    const updatedCart = await Cart.findById(cart._id).populate(
+      "items.foodItem"
+    );
 
     res.status(200).json({
       success: true,
-      message: quantity === 0 ? 'Item removed from cart' : 'Cart updated',
+      message: quantity === 0 ? "Item removed from cart" : "Cart updated",
       data: {
         cart: {
           id: updatedCart._id,
           items: updatedCart.items,
           totalItems: updatedCart.totalItems,
-          totalPrice: updatedCart.totalPrice
-        }
-      }
+          totalPrice: updatedCart.totalPrice,
+        },
+      },
     });
   } catch (error) {
-    console.error('Error updating cart item:', error);
+    console.error("Error updating cart item:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update cart item',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Failed to update cart item",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -197,33 +279,35 @@ export const removeItemFromCart = async (req, res) => {
     if (!cart) {
       return res.status(404).json({
         success: false,
-        message: 'Cart not found'
+        message: "Cart not found",
       });
     }
 
     await cart.removeItem(foodItemId);
 
     // Reload cart with populated items
-    const updatedCart = await Cart.findById(cart._id).populate('items.foodItem');
+    const updatedCart = await Cart.findById(cart._id).populate(
+      "items.foodItem"
+    );
 
     res.status(200).json({
       success: true,
-      message: 'Item removed from cart',
+      message: "Item removed from cart",
       data: {
         cart: {
           id: updatedCart._id,
           items: updatedCart.items,
           totalItems: updatedCart.totalItems,
-          totalPrice: updatedCart.totalPrice
-        }
-      }
+          totalPrice: updatedCart.totalPrice,
+        },
+      },
     });
   } catch (error) {
-    console.error('Error removing cart item:', error);
+    console.error("Error removing cart item:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to remove cart item',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Failed to remove cart item",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -240,7 +324,7 @@ export const clearCart = async (req, res) => {
     if (!cart) {
       return res.status(404).json({
         success: false,
-        message: 'Cart not found'
+        message: "Cart not found",
       });
     }
 
@@ -248,22 +332,22 @@ export const clearCart = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Cart cleared',
+      message: "Cart cleared",
       data: {
         cart: {
           id: cart._id,
           items: [],
           totalItems: 0,
-          totalPrice: 0
-        }
-      }
+          totalPrice: 0,
+        },
+      },
     });
   } catch (error) {
-    console.error('Error clearing cart:', error);
+    console.error("Error clearing cart:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to clear cart',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Failed to clear cart",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };
@@ -277,7 +361,7 @@ export const mergeCart = async (req, res) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication required'
+        message: "Authentication required",
       });
     }
 
@@ -288,7 +372,10 @@ export const mergeCart = async (req, res) => {
     const sessionCart = await Cart.findOne({ sessionId });
 
     // Get user's existing cart
-    let userCart = await Cart.findOne({ userId, sessionId: { $ne: sessionId } });
+    let userCart = await Cart.findOne({
+      userId,
+      sessionId: { $ne: sessionId },
+    });
 
     if (sessionCart && sessionCart.items.length > 0) {
       if (userCart) {
@@ -309,31 +396,33 @@ export const mergeCart = async (req, res) => {
       userCart = await Cart.create({
         sessionId,
         userId,
-        items: []
+        items: [],
       });
     }
 
     // Reload cart with populated items
-    const finalCart = await Cart.findById(userCart._id).populate('items.foodItem');
+    const finalCart = await Cart.findById(userCart._id).populate(
+      "items.foodItem"
+    );
 
     res.status(200).json({
       success: true,
-      message: 'Cart merged successfully',
+      message: "Cart merged successfully",
       data: {
         cart: {
           id: finalCart._id,
           items: finalCart.items,
           totalItems: finalCart.totalItems,
-          totalPrice: finalCart.totalPrice
-        }
-      }
+          totalPrice: finalCart.totalPrice,
+        },
+      },
     });
   } catch (error) {
-    console.error('Error merging cart:', error);
+    console.error("Error merging cart:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to merge cart',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      message: "Failed to merge cart",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 };

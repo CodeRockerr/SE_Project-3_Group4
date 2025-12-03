@@ -7,6 +7,7 @@ import type { FoodItem } from "@/types/food";
 import {
   fetchCart,
   addItemToCart as addItemToCartAPI,
+  addItemsToCart as addItemsToCartAPI,
   removeItemFromCart as removeItemFromCartAPI,
   updateCartItemQuantity as updateCartItemQuantityAPI,
   clearCart as clearCartAPI,
@@ -16,6 +17,9 @@ interface CartContextType {
   items: CartItem[];
   isLoading: boolean;
   addToCart: (foodItem: FoodItem, quantity?: number) => Promise<void>;
+  addMultipleToCart: (
+    items: { foodItemId: string; quantity?: number }[]
+  ) => Promise<void>;
   removeFromCart: (itemId: string) => Promise<void>;
   updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -55,7 +59,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const foodItemId = foodItem._id || (foodItem as any).id;
     if (!foodItemId) {
       console.error("Cannot add item to cart: missing _id", foodItem);
-      const errorMessage = "Unable to add item to cart: missing item ID. Please try searching again.";
+      const errorMessage =
+        "Unable to add item to cart: missing item ID. Please try searching again.";
       toast.error(errorMessage);
       throw new Error("Food item must have an _id to add to cart");
     }
@@ -67,13 +72,37 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } catch (error: any) {
       console.error("Failed to add item to cart:", error);
       // Only show error toast if it's not already shown (avoid duplicates)
-      const errorMessage = error?.message || "Failed to add item to cart. Please try again.";
+      const errorMessage =
+        error?.message || "Failed to add item to cart. Please try again.";
       if (!errorMessage.includes("already shown")) {
         toast.error(errorMessage);
       }
       throw error;
     }
   };
+
+  const addMultipleToCart = async (
+    itemsArr: { foodItemId: string; quantity?: number }[]
+  ) => {
+    if (!Array.isArray(itemsArr) || itemsArrLength(itemsArr) === 0) {
+      return;
+    }
+
+    try {
+      const updatedItems = await addItemsToCartAPI(itemsArr);
+      setItems(updatedItems);
+      toast.success("Items added to cart!");
+    } catch (error) {
+      console.error("Failed to add multiple items to cart:", error);
+      toast.error("Failed to add suggested items to cart");
+      throw error;
+    }
+  };
+
+  // small helper to guard TS unused
+  function itemsArrLength(arr: any[]) {
+    return arr.length;
+  }
 
   const removeFromCart = async (itemId: string) => {
     try {
@@ -155,6 +184,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     items,
     isLoading,
     addToCart,
+    addMultipleToCart,
     removeFromCart,
     updateQuantity,
     clearCart,
