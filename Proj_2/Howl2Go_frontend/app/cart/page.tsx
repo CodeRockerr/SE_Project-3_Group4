@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Trash2,
@@ -41,32 +40,44 @@ export default function CartPage() {
   const [orderSummary, setOrderSummary] = useState({ total: 0, totalItems: 0 });
   const [comboSuggestions, setComboSuggestions] = useState<any[]>([]);
   const [showComboModal, setShowComboModal] = useState(false);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
 
-  // Fetch combo suggestions when cart items change (MVP uses first cart item)
-  useEffect(() => {
-    let mounted = true;
-    async function fetchSuggestions() {
-      if (!cartItems || cartItems.length === 0) return;
-      const main = cartItems[0];
-      const mainId = main.foodItem._id;
-      try {
-        const suggestions = await getComboSuggestions(mainId, 5);
-        if (!mounted) return;
-        if (suggestions && suggestions.length > 0) {
-          setComboSuggestions(suggestions);
-          setShowComboModal(true);
-        }
-      } catch (err) {
-        console.error("Failed to load combo suggestions", err);
-      }
+  // Fetch combo suggestions when user clicks the button
+  const handleCompleteYourMeal = async () => {
+    if (!cartItems || cartItems.length === 0) {
+      toast.error("Add an item to your cart first");
+      return;
     }
 
-    fetchSuggestions();
+    setIsLoadingSuggestions(true);
+    try {
+      const main = cartItems[0];
+      const mainId = main.foodItem._id;
+      const suggestions = await getComboSuggestions(mainId, 5);
 
-    return () => {
-      mounted = false;
-    };
-  }, [cartItems]);
+      if (suggestions && suggestions.length > 0) {
+        // Filter out suggestions that are already in the cart
+        const cartItemIds = new Set(cartItems.map((item) => item.foodItem._id));
+        const filteredSuggestions = suggestions.filter(
+          (s) => !cartItemIds.has(s.item._id)
+        );
+
+        if (filteredSuggestions.length > 0) {
+          setComboSuggestions(filteredSuggestions);
+          setShowComboModal(true);
+        } else {
+          toast("All suggested items are already in your cart!");
+        }
+      } else {
+        toast("No combo suggestions available for this item.");
+      }
+    } catch (err) {
+      console.error("Failed to load combo suggestions", err);
+      toast.error("Failed to load combo suggestions");
+    } finally {
+      setIsLoadingSuggestions(false);
+    }
+  };
 
   // Increase quantity
   const increaseQuantity = async (id: string) => {
@@ -529,6 +540,26 @@ export default function CartPage() {
                     </div>
                   </div>
                 ))}
+
+                {/* Complete Your Meal Button */}
+                <button
+                  onClick={handleCompleteYourMeal}
+                  disabled={isLoadingSuggestions || cartItems.length === 0}
+                  className="w-full py-3 rounded-full font-semibold text-base transition-all hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    backgroundColor: "var(--orange)",
+                    color: "var(--text)",
+                  }}
+                >
+                  {isLoadingSuggestions ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Loading...
+                    </span>
+                  ) : (
+                    "🍔 Complete Your Meal"
+                  )}
+                </button>
               </div>
 
               {/* Right Column - Order Summary */}
@@ -675,18 +706,26 @@ export default function CartPage() {
                       (s) => s.item._id === itemId
                     );
                     if (!sug) return;
+                    // Await the add operation before proceeding
                     await addToCart(sug.item as any, 1);
-                    setShowComboModal(false);
+                    // Remove the added item from suggestions list
+                    setComboSuggestions((prev) =>
+                      prev.filter((s) => s.item._id !== itemId)
+                    );
                   } catch (err) {
-                    console.error(err);
+                    console.error("Failed to add item from suggestions:", err);
+                    toast.error("Failed to add item to cart");
                   }
                 }}
                 onAddAll={async (items) => {
                   try {
                     await addMultipleToCart(items);
+                    // Clear all suggestions after successful bulk add
+                    setComboSuggestions([]);
                     setShowComboModal(false);
                   } catch (err) {
-                    console.error(err);
+                    console.error("Failed to add all items:", err);
+                    toast.error("Failed to add all items to cart");
                   }
                 }}
               />
