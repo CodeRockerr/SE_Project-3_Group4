@@ -47,7 +47,9 @@ function SmartMenuSearchContent() {
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [lastCriteria, setLastCriteria] = useState<any>(null);
-  // Persist lastCriteria so conversational refinements survive reloads
+  
+  // Load previous search criteria from localStorage on component mount
+  // Enables conversational refinements to survive page reloads
   useEffect(() => {
     try {
       const raw = localStorage.getItem("howl_lastCriteria");
@@ -55,12 +57,13 @@ function SmartMenuSearchContent() {
         setLastCriteria(JSON.parse(raw));
       }
     } catch (e) {
-      // ignore parse errors
+      // Silently ignore parse errors, user can start fresh search
       console.warn("Failed to load lastCriteria from localStorage", e);
     }
   }, []);
 
-  // Keep localStorage in sync with state
+  // Synchronize lastCriteria state with localStorage
+  // Keeps search context in sync across page reloads and tabs
   useEffect(() => {
     try {
       if (lastCriteria) {
@@ -76,7 +79,7 @@ function SmartMenuSearchContent() {
   // Auto-submit when page loads with initial query from main page
   useEffect(() => {
     if (initialQuery && !foodItems.length && !isLoading && !error) {
-      // Trigger search automatically
+      // Trigger search automatically with no previous criteria (fresh search)
       const submitSearch = async () => {
         setIsLoading(true);
         setError(null);
@@ -88,6 +91,7 @@ function SmartMenuSearchContent() {
             headers: {
               "Content-Type": "application/json",
             },
+            // Initial search: previousCriteria is null
             body: JSON.stringify({ query: initialQuery, previousCriteria: null }),
           });
 
@@ -105,7 +109,7 @@ function SmartMenuSearchContent() {
           }
 
           const data = await response.json();
-          // store criteria so subsequent refinement queries can reference it
+          // Store returned criteria to enable conversational refinements
           if (data && typeof data === 'object' && 'criteria' in data) {
             setLastCriteria(data.criteria || null);
           }
