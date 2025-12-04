@@ -5,6 +5,8 @@ import { llmService } from '../services/llm.service.js';
 /**
  * Unit tests for conversational refinement in LLM service
  * Tests the ability to merge new prompts with previous criteria
+ * Validates that the LLM correctly interprets refinement intents
+ * and applies sort overrides for relative queries like "cheaper"
  */
 
 describe('LLM Service - Conversational Refinement', () => {
