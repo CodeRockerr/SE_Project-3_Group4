@@ -165,7 +165,7 @@ npm install groq-sdk
 ### 2. Configure Environment Variables
 Add to `.env` file:
 ```env
-GROQ_API_KEY=your_groq_api_key_here
+***REMOVED***
 ```
 
 ### 3. Start the Server

@@ -14,43 +14,15 @@ export default function Footer() {
           </div>
 
           {/* Team */}
-          <div className="flex items-center gap-1 text-[var(--text-subtle)]">
+          <div className="flex items-center gap-2 text-[var(--text-subtle)]">
             <span className="text-[var(--text-muted)] text-xs mr-2">Team:</span>
-            <a
-              href="https://github.com/harsha711"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[var(--orange)] transition-colors"
-            >
-              Harsha
-            </a>
+            <span className="hover:text-[var(--orange)] transition-colors">Adit</span>
             <span>•</span>
-            <a
-              href="https://github.com/Samarth061"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[var(--orange)] transition-colors"
-            >
-              Samarth
-            </a>
+            <span className="hover:text-[var(--orange)] transition-colors">AnandaTeertha</span>
             <span>•</span>
-            <a
-              href="https://github.com/pratham2879"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[var(--orange)] transition-colors"
-            >
-              Pratham
-            </a>
+            <span className="hover:text-[var(--orange)] transition-colors">Advait</span>
             <span>•</span>
-            <a
-              href="https://github.com/JaiRumz"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-[var(--orange)] transition-colors"
-            >
-              Jai
-            </a>
+            <span className="hover:text-[var(--orange)] transition-colors">Kavya</span>
           </div>
 
           {/* Links */}

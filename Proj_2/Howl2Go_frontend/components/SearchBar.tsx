@@ -1,6 +1,8 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, UtensilsCrossed, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 interface SearchBarProps {
   isDemoMode: boolean;
@@ -23,6 +25,8 @@ export default function SearchBar({
   onSearchFocus,
   onSearchBlur,
 }: SearchBarProps) {
+  const router = useRouter();
+
   return (
     <div className="w-full">
       {/* Search Bar - Hero Element with Shared Layout ID */}
@@ -83,12 +87,48 @@ export default function SearchBar({
           )}
         </div>
 
-        {/* CTA Text Below Search Bar */}
-        {isSearchFocused && inputValue.trim().length > 1 && (
-          <p className="text-center text-sm text-[var(--cream)] mt-3 opacity-70 animate-[fadeIn_0.3s_ease-out]">
-            Press Enter to find your craving
-          </p>
-        )}
+        {/* Below-bar actions */}
+        <div className="mt-6 flex flex-col items-center gap-3">
+          {isSearchFocused && inputValue.trim().length > 1 && (
+            <p className="text-xs text-[var(--text-subtle)] opacity-70 animate-[fadeIn_0.3s_ease-out]">
+              Press Enter to search
+            </p>
+          )}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <span className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--text)] flex items-center gap-2 text-center leading-tight">
+              <span>Order based on</span>
+              <span className="relative inline-block">
+                Ingredients
+                <motion.svg
+                  className="absolute -bottom-1 left-0 w-full"
+                  height="6"
+                  viewBox="0 0 200 8"
+                  fill="none"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.2, ease: "easeInOut" }}
+                >
+                  <motion.path
+                    d="M2 5C60 2 140 2 198 5"
+                    stroke="var(--howl-primary)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                  />
+                </motion.svg>
+              </span>
+              <span>&rarr;</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => router.push('/recommendations/ingredients')}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--orange)] text-[var(--text)] text-sm font-semibold hover:bg-[var(--cream)] hover:text-[var(--bg)] transition-colors border border-[var(--orange)] shadow-[0_4px_14px_rgba(0,0,0,0.35)] focus:outline-none focus:ring-2 focus:ring-[var(--orange)] focus:ring-offset-2 focus:ring-offset-[var(--bg)]"
+              aria-label="Ingredient based recommendations"
+            >
+              <UtensilsCrossed className="h-4 w-4" />
+              Ingredient Matches
+            </button>
+          </div>
+        </div>
       </div>
 
       <style jsx>{`

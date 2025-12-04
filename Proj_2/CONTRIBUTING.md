@@ -19,7 +19,7 @@ Contributors are expected to maintain a respectful, inclusive, and constructive 
 ## Ways to Contribute
 
 ### Bug Reports
-Use [GitHub Issues](https://github.com/harsha711/SE_Project_Grp_27/issues) for reproducible bugs, with a clear title, expected vs. actual behavior, and environment details.
+Use [GitHub Issues](https://github.com/CodeRockerr/SE-Project-3_Group4/issues) for reproducible bugs, with a clear title, expected vs. actual behavior, and environment details.
 
 **Example:**
 ```
@@ -68,16 +68,16 @@ Submit improvements for backend (API, performance, security), frontend (UI, acce
 ## Quick Start
 
 ### 1. Fork the Repo
-1. Visit https://github.com/harsha711/SE_Project_Grp_27
+1. Visit https://github.com/CodeRockerr/SE-Project-3_Group4
 2. Click "Fork" button
 3. Clone to your workspace:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/SE_Project_Grp_27.git
-cd SE_Project_Grp_27/Proj\ 2
+git clone https://github.com/YOUR_USERNAME/SE-Project-3_Group4.git
+cd SE-Project-3_Group4/Proj_2
 
 # Add upstream remote
-git remote add upstream https://github.com/harsha711/SE_Project_Grp_27.git
+git remote add upstream https://github.com/CodeRockerr/SE-Project-3_Group4.git
 ```
 
 ### 2. Set Up
