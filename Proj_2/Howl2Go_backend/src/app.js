@@ -18,18 +18,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 
 // Session middleware
-app.use(session({
-  secret: env.session.secret,
-  name: env.session.name,
-  resave: false,
-  saveUninitialized: true, // Create session even if not modified (needed for cart)
-  store: MongoStore.create({
+const sessionStore = env.nodeEnv === 'test'
+  ? undefined // Use default in-memory session store for tests
+  : MongoStore.create({
     mongoUrl: env.mongodbUri,
     touchAfter: 24 * 3600, // lazy session update (in seconds)
     crypto: {
       secret: env.session.secret
     }
-  }),
+  });
+
+app.use(session({
+  secret: env.session.secret,
+  name: env.session.name,
+  resave: false,
+  saveUninitialized: true, // Create session even if not modified (needed for cart)
+  ...(sessionStore && { store: sessionStore }), // Only add store if not test environment
   cookie: {
     maxAge: env.session.maxAge,
     httpOnly: true,
