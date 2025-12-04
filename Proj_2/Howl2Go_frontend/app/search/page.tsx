@@ -417,14 +417,15 @@ function SmartMenuSearchContent() {
               </motion.div>
             </form>
 
-            {/* Clear conversational context */}
+            {/* Clear conversational context UI */}
+            {/* Shows when lastCriteria exists, allowing user to reset search history */}
             {lastCriteria && (
               <div className="mt-3 flex items-center justify-center gap-3">
                 <div className="text-sm text-[var(--text-subtle)]">
                   Refining previous search
                 </div>
                 <button
-                  onClick={() => setLastCriteria(null)}
+                  onClick={() => setLastCriteria(null)} // Clears localStorage and state
                   className="px-3 py-1 text-sm rounded-full bg-[var(--bg-card)] border border-[var(--border)] hover:bg-[var(--bg-hover)]"
                   aria-label="Clear search context"
                 >
