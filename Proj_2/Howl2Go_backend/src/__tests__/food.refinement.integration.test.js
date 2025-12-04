@@ -2,6 +2,11 @@
  * Integration tests for food recommendation refinement feature
  * Tests the /api/food/recommend endpoint with and without refinement context
  *
+ * Test Scenarios:
+ * 1. Parameter Acceptance: Validates endpoint handles query and previousCriteria
+ * 2. Response Structure: Ensures proper JSON structure with required fields
+ * 3. Refinement Flow: Tests multi-step refinement chaining
+ *
  * Note: These tests validate endpoint parameter acceptance and response structure.
  * LLM-dependent tests are covered in unit tests (llm.refinement.test.js)
  */
@@ -16,7 +21,7 @@ describe('Food Refinement Endpoint Tests', () => {
         .post('/api/food/recommend')
         .send({ previousCriteria: { calories: { min: 200 } } });
 
-      // Expect error response
+      // Expect error response when query is missing
       expect(response.status).toBeGreaterThanOrEqual(400);
       expect(response.body).toHaveProperty('error');
     });
