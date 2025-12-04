@@ -1,7 +1,5 @@
 # Howl2Go
 
-# PR resolve
-
 <div align="center">
 
 ![Howl2Go Logo](https://img.shields.io/badge/🍔_Howl2Go-Food_Discovery-orange?style=for-the-badge)
