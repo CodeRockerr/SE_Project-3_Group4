@@ -159,9 +159,11 @@ Now, here is the user prompt: ${userPrompt}
                 max_tokens: 500,
             });
 
+            // Extract text content from LLM response
             const content = response.choices[0].message.content;
 
-            // Parse the JSON response
+            // Parse the JSON response from LLM
+            // Expected format: { "protein": {"min": 30}, "calories": {"max": 500}, "sort": "price_asc" }
             let parsedCriteria;
             try {
                 parsedCriteria = JSON.parse(content);
@@ -171,6 +173,7 @@ Now, here is the user prompt: ${userPrompt}
                 );
             }
 
+            // Return parsed criteria along with raw response for debugging
             return {
                 success: true,
                 criteria: parsedCriteria,
