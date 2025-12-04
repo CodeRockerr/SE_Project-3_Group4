@@ -7,7 +7,7 @@
  */
 
 import request from 'supertest';
-import app from '../app.js';
+//import app from '../app.js';
 
 describe('Food Refinement Endpoint Tests', () => {
   describe('POST /api/food/recommend - Parameter Acceptance', () => {
