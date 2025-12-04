@@ -1,15 +1,19 @@
 import FastFoodItem from "../models/FastFoodItem.js";
 
 /**
- * Calculate price based on calories
- * Formula: ~$0.01 per calorie, min $2.00, max $15.00
+ * Calculate estimated price based on calorie content
+ * Uses heuristic: ~$0.01 per calorie, with min/max bounds
+ * This enables price-based sorting for refinement queries like "cheaper options"
  *
- * @param {number} calories - Calorie count
- * @returns {number} - Calculated price
+ * @param {number} calories - Calorie count for the food item
+ * @returns {number} - Estimated price in dollars (2.00 - 15.00 range)
  */
 const calculatePrice = (calories) => {
+    // Default to minimum price if calories not available or invalid
     if (!calories || calories <= 0) return 2.0;
+    // Calculate base price: $0.01 per calorie
     const basePrice = calories * 0.01;
+    // Clamp to realistic range: $2.00 minimum, $15.00 maximum
     return Math.min(Math.max(basePrice, 2.0), 15.0);
 };
 
