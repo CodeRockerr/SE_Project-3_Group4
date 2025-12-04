@@ -46,6 +46,32 @@ function SmartMenuSearchContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [lastCriteria, setLastCriteria] = useState<any>(null);
+  // Persist lastCriteria so conversational refinements survive reloads
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("howl_lastCriteria");
+      if (raw) {
+        setLastCriteria(JSON.parse(raw));
+      }
+    } catch (e) {
+      // ignore parse errors
+      console.warn("Failed to load lastCriteria from localStorage", e);
+    }
+  }, []);
+
+  // Keep localStorage in sync with state
+  useEffect(() => {
+    try {
+      if (lastCriteria) {
+        localStorage.setItem("howl_lastCriteria", JSON.stringify(lastCriteria));
+      } else {
+        localStorage.removeItem("howl_lastCriteria");
+      }
+    } catch (e) {
+      console.warn("Failed to persist lastCriteria", e);
+    }
+  }, [lastCriteria]);
 
   // Auto-submit when page loads with initial query from main page
   useEffect(() => {
@@ -62,7 +88,7 @@ function SmartMenuSearchContent() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ query: initialQuery }),
+            body: JSON.stringify({ query: initialQuery, previousCriteria: null }),
           });
 
           if (!response.ok) {
@@ -79,6 +105,10 @@ function SmartMenuSearchContent() {
           }
 
           const data = await response.json();
+          // store criteria so subsequent refinement queries can reference it
+          if (data && typeof data === 'object' && 'criteria' in data) {
+            setLastCriteria(data.criteria || null);
+          }
           await parseAndSetFoodItems(data);
         } catch (error) {
           console.error("Error fetching recommendations:", error);
@@ -237,7 +267,7 @@ function SmartMenuSearchContent() {
       const response = await fetch("/api/food/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: searchQuery }),
+        body: JSON.stringify({ query: searchQuery, previousCriteria: lastCriteria }),
       });
 
       if (!response.ok) {
@@ -254,6 +284,9 @@ function SmartMenuSearchContent() {
       }
 
       const data = await response.json();
+      if (data && typeof data === 'object' && 'criteria' in data) {
+        setLastCriteria(data.criteria || null);
+      }
       await parseAndSetFoodItems(data);
     } catch (error) {
       console.error("Error fetching recommendations:", error);
@@ -376,6 +409,22 @@ function SmartMenuSearchContent() {
                 </div>
               </motion.div>
             </form>
+
+            {/* Clear conversational context */}
+            {lastCriteria && (
+              <div className="mt-3 flex items-center justify-center gap-3">
+                <div className="text-sm text-[var(--text-subtle)]">
+                  Refining previous search
+                </div>
+                <button
+                  onClick={() => setLastCriteria(null)}
+                  className="px-3 py-1 text-sm rounded-full bg-[var(--bg-card)] border border-[var(--border)] hover:bg-[var(--bg-hover)]"
+                  aria-label="Clear search context"
+                >
+                  Clear context
+                </button>
+              </div>
+            )}
           </div>
         </motion.div>
 
