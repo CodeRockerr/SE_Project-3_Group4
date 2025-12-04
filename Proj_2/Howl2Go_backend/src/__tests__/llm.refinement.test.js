@@ -79,20 +79,24 @@ describe('LLM Service - Conversational Refinement', () => {
 
       const mongoQuery = llmService.buildMongoQuery(criteria);
 
+      // Verify calories and protein constraints are properly converted
       assert.deepEqual(mongoQuery.calories, { $lte: 500 });
       assert.deepEqual(mongoQuery.protein, { $gte: 25 });
+      // Sort field should be removed from query (handled by controller)
       assert.strictEqual(mongoQuery.sort, undefined);
     });
 
     test('should preserve item name filter when present', () => {
       const criteria = {
         item: { name: 'burger' },
-        sort: 'price_asc'
+        sort: 'price_asc' // Sort override from LLM
       };
 
       const mongoQuery = llmService.buildMongoQuery(criteria);
 
+      // Item filter should be included in query
       assert.ok(mongoQuery.item.$regex === 'burger' || mongoQuery.item.includes('burger'));
+      // Sort field should not appear in MongoDB query
       assert.strictEqual(mongoQuery.sort, undefined);
     });
 
