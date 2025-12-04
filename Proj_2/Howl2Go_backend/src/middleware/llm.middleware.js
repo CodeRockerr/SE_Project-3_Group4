@@ -22,6 +22,7 @@ export const parseLLMQuery = async (req, res, next) => {
   try {
     const { query, previousCriteria } = req.body;
 
+    // Validate query parameter
     if (!query || typeof query !== 'string') {
       return res.status(400).json({
         success: false,
@@ -34,15 +35,9 @@ export const parseLLMQuery = async (req, res, next) => {
     // pass it so the LLM can interpret refinements relative to prior search.
     const result = await llmService.parseQuery(query, previousCriteria);
 
-    // Attach parsed criteria to request object
+    // Attach parsed criteria to request object for downstream middleware/controllers
     req.parsedCriteria = result.criteria;
     req.llmRawResponse = result.rawResponse;
-
-    // Log for debugging
-    // console.log('Parsed Query:', {
-    //   original: query,
-    //   criteria: result.criteria
-    // });
 
     next();
   } catch (error) {
