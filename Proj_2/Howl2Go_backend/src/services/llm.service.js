@@ -124,7 +124,9 @@ Now, here is the user prompt: ${userPrompt}
 
     /**
      * Parse natural language query into structured criteria
+     * Supports conversational refinement when previousCriteria is provided
      * @param {string} userPrompt - The user's natural language query
+     * @param {Object|null} previousCriteria - Previous search criteria for context-aware refinement
      * @returns {Promise<Object>} - Parsed nutritional criteria as JSON object
      * @throws {Error} if API call fails or response is invalid
      */
