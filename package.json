@@ -34,6 +34,7 @@
     "lint-staged": "^16.2.4"
   },
   "dependencies": {
+    "csv-parser": "^3.2.0",
     "mongodb": "^7.0.0"
   }
 }

@@ -1,7 +1,9 @@
 import { llmService } from '../services/llm.service.js';
+import { simpleSearchService } from '../services/simpleSearch.service.js';
 
 /**
  * Middleware to parse natural language queries using LLM
+ * Falls back to simple keyword search if LLM fails (e.g., rate limited)
  * Attaches parsed criteria to req.parsedCriteria
  *
  * @example
@@ -23,18 +25,38 @@ export const parseLLMQuery = async (req, res, next) => {
       });
     }
 
-    // Parse the query using LLM service
-    const result = await llmService.parseQuery(query);
+    let result;
+    let usedFallback = false;
+
+    // Try to parse with LLM first
+    try {
+      result = await llmService.parseQuery(query);
+    } catch (llmError) {
+      console.warn('LLM parsing failed, falling back to simple search:', llmError.message);
+      
+      // Fallback to simple keyword search
+      usedFallback = true;
+      const mongoQuery = simpleSearchService.parseSimpleQuery(query);
+      result = {
+        criteria: {},
+        mongoQuery: mongoQuery,
+        rawResponse: null,
+        fallback: true
+      };
+    }
 
     // Attach parsed criteria to request object
-    req.parsedCriteria = result.criteria;
+    req.parsedCriteria = result.criteria || {};
+    req.mongoQuery = result.mongoQuery || {};
     req.llmRawResponse = result.rawResponse;
+    req.usedFallback = usedFallback;
 
     // Log for debugging
-    // console.log('Parsed Query:', {
-    //   original: query,
-    //   criteria: result.criteria
-    // });
+    console.log('Query Parsing Result:', {
+      original: query,
+      criteria: req.parsedCriteria,
+      usedFallback: usedFallback
+    });
 
     next();
   } catch (error) {
@@ -51,6 +73,7 @@ export const parseLLMQuery = async (req, res, next) => {
  * Middleware to build MongoDB query from parsed criteria
  * Requires parseLLMQuery to be run first
  * Attaches MongoDB query to req.mongoQuery
+ * If fallback was used, mongoQuery is already set
  */
 export const buildMongoQuery = (req, res, next) => {
   try {
@@ -60,6 +83,11 @@ export const buildMongoQuery = (req, res, next) => {
         error: 'No parsed criteria found',
         message: 'parseLLMQuery middleware must be run first'
       });
+    }
+
+    // If we already have a mongoQuery from fallback, skip building
+    if (req.usedFallback && req.mongoQuery) {
+      return next();
     }
 
     // Build MongoDB query from criteria
@@ -81,10 +109,15 @@ export const buildMongoQuery = (req, res, next) => {
 
 /**
  * Middleware to validate that the query resulted in meaningful criteria
- * Returns 400 if criteria is empty
+ * Allows both LLM-parsed criteria and fallback search results
+ * Returns 400 only if both criteria AND mongoQuery are empty
  */
 export const validateCriteria = (req, res, next) => {
-  if (!req.parsedCriteria || Object.keys(req.parsedCriteria).length === 0) {
+  // Allow if we have either parsed criteria OR a mongoQuery from fallback
+  const hasCriteria = req.parsedCriteria && Object.keys(req.parsedCriteria).length > 0;
+  const hasQuery = req.mongoQuery && Object.keys(req.mongoQuery).length > 0;
+  
+  if (!hasCriteria && !hasQuery && !req.usedFallback) {
     return res.status(400).json({
       success: false,
       error: 'No nutritional criteria found',

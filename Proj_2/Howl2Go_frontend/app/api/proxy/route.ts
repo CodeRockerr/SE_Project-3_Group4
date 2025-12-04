@@ -35,8 +35,8 @@ async function handleRequest(req: Request) {
   }
 
   // Determine base URL. Prefer BACKEND_URL; fallback to NEXT_PUBLIC_API_BASE (strip trailing /api)
-  // Default to http://localhost:4000 to match project README/backend default
-  const rawBackend = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:4000';
+  // Default to http://localhost:3001 (backend dev server)
+  const rawBackend = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3001';
   const baseUrl = rawBackend.replace(/\/?api\/?$/i, '');
   const target = `${baseUrl}${decodeURIComponent(url)}`;
 

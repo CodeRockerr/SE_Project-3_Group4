@@ -31,67 +31,76 @@ Examples:
 
 Focus on common fast food ingredients. Return only the JSON array, no other text.`;
 
-  try {
-    const response = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
-      messages: [
-        {
-          role: "system",
-          content: "You are a food ingredient extraction expert. Always return valid JSON arrays only."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.1,
-      max_tokens: 200,
-    });
+  // Retry logic for rate limits
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const response = await groq.chat.completions.create({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          {
+            role: "system",
+            content: "You are a food ingredient extraction expert. Always return valid JSON arrays only."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.1,
+        max_tokens: 200,
+      });
 
-    const content = response.choices[0].message.content.trim();
-    
-    // Try to extract JSON array from response
-    const jsonMatch = content.match(/\[.*\]/s);
-    if (jsonMatch) {
-      const ingredients = JSON.parse(jsonMatch[0]);
-      return Array.isArray(ingredients) ? ingredients : [];
+      const content = response.choices[0].message.content.trim();
+      
+      // Try to extract JSON array from response
+      const jsonMatch = content.match(/\[.*\]/s);
+      if (jsonMatch) {
+        const ingredients = JSON.parse(jsonMatch[0]);
+        return Array.isArray(ingredients) ? ingredients : [];
+      }
+      
+      return [];
+    } catch (error) {
+      if (error.status === 429 && attempt < 3) {
+        // Rate limit hit - wait exponentially longer
+        const waitTime = attempt * 30000; // 30s, 60s
+        console.log(`⏳ Rate limit hit for "${itemName}", waiting ${waitTime/1000}s (attempt ${attempt}/3)...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      } else {
+        console.error(`❌ Error extracting ingredients for "${itemName}":`, error.message);
+        return [];
+      }
     }
-    
-    return [];
-  } catch (error) {
-    console.error(`Error extracting ingredients for "${itemName}":`, error.message);
-    return [];
   }
+  
+  return [];
 }
 
 /**
- * Process items in batches to avoid rate limits
+ * Process items sequentially with delays to avoid rate limits
  */
-async function processBatch(items, batchSize = 3) {
+async function processBatch(items) {
   const results = [];
+  const total = items.length;
   
-  for (let i = 0; i < items.length; i += batchSize) {
-    const batch = items.slice(i, i + batchSize);
-    console.log(`\nProcessing batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(items.length / batchSize)}...`);
+  console.log(`\n📦 Processing ${total} items sequentially (~4s delay between each)...`);
+  
+  for (let i = 0; i < total; i++) {
+    const item = items[i];
+    console.log(`\n[${i + 1}/${total}] ${item.company}: ${item.item}`);
     
-    const batchPromises = batch.map(async (item) => {
-      const ingredients = await extractIngredients(item.item, item.company);
-      return { itemId: item._id, ingredients };
-    });
+    const ingredients = await extractIngredients(item.item, item.company);
+    results.push({ itemId: item._id, ingredients });
     
-    const batchResults = await Promise.all(batchPromises);
-    results.push(...batchResults);
+    if (ingredients.length > 0) {
+      console.log(`  ✓ Found ${ingredients.length} ingredients: ${ingredients.slice(0, 5).join(', ')}${ingredients.length > 5 ? '...' : ''}`);
+    } else {
+      console.log(`  ⚠️  No ingredients found`);
+    }
     
-    // Display results
-    batchResults.forEach(result => {
-      const item = items.find(i => i._id.toString() === result.itemId.toString());
-      console.log(`  ✓ ${item.company}: ${item.item}`);
-      console.log(`    Ingredients: ${result.ingredients.join(', ') || 'None'}`);
-    });
-    
-    // Wait a bit between batches to respect rate limits
-    if (i + batchSize < items.length) {
-      await new Promise(resolve => setTimeout(resolve, 2500)); // 2.5 seconds between batches
+    // Wait ~4 seconds between each item to stay under rate limits
+    if (i < total - 1) {
+      await new Promise(resolve => setTimeout(resolve, 4000));
     }
   }
   
@@ -106,16 +115,21 @@ async function enrichIngredients() {
     console.log('🔗 Connecting to MongoDB...');
     await connectDB();
     
-    // Get items that need ingredient enrichment (empty or auto-generated ingredients)
-    const items = await FastFoodItem.find({
-      $or: [
-        { ingredients: { $exists: false } },
-        { ingredients: { $size: 0 } },
-        { ingredients: { $size: 1 } }, // Single-word auto-generated ones
-        { ingredients: { $size: 2 } }, // Two-word auto-generated ones
-        { ingredients: { $size: 3 } }  // Three-word auto-generated ones
-      ]
-    }).limit(50); // Process 50 at a time
+    // Get items that need ingredient enrichment (any with <10 ingredients)
+    const items = await FastFoodItem.aggregate([
+      {
+        $project: {
+          item: 1,
+          company: 1,
+          ingredients: 1,
+          ingredientCount: { $size: { $ifNull: ['$ingredients', []] } }
+        }
+      },
+      {
+        $match: { ingredientCount: { $lt: 10 } }
+      },
+      { $limit: 25 } // Process 25 at a time for slightly higher throughput
+    ]);
     
     if (items.length === 0) {
       console.log('\n✅ All items already have ingredients!');
@@ -125,8 +139,8 @@ async function enrichIngredients() {
     
     console.log(`\n📋 Found ${items.length} items to enrich with LLM-generated ingredients\n`);
     
-    // Process in batches
-    const results = await processBatch(items, 5);
+    // Process sequentially with delays
+    const results = await processBatch(items);
     
     // Update database
     console.log('\n💾 Updating database...');

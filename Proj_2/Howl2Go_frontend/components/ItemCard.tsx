@@ -290,35 +290,6 @@ export default function ItemCard({
             </span>
           )}
         </div>
-        
-        {/* Ingredients */}
-        {restProps.ingredients && restProps.ingredients.length > 0 && (
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-[var(--text-subtle)]">
-              <Utensils size={14} className="text-[var(--orange)]" />
-              <span className="text-xs font-semibold">Ingredients</span>
-            </div>
-            <div className="flex flex-wrap gap-1" aria-label="ingredients">
-              {restProps.ingredients.slice(0, 6).map((ingredient, idx) => (
-                <span
-                  key={idx}
-                  className="text-xs px-2 py-0.5 rounded-full bg-[var(--cream)]/10 text-[var(--text-subtle)] border border-[var(--border)]"
-                  title={ingredient}
-                >
-                  {ingredient}
-                </span>
-              ))}
-              {restProps.ingredients.length > 6 && (
-                <span
-                  className="text-xs px-2 py-0.5 text-[var(--text-subtle)]"
-                  title={restProps.ingredients.slice(6).join(', ')}
-                >
-                  +{restProps.ingredients.length - 6} more
-                </span>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Description Section (Collapsible) */}

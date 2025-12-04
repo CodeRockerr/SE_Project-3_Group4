@@ -8,12 +8,23 @@ import FastFoodItem from '../models/FastFoodItem.js';
  */
 export function buildIngredientQuery(include = [], exclude = []) {
   const clauses = [];
+  
   if (include.length) {
-    clauses.push({ ingredients: { $all: include } });
+    // Use case-insensitive partial matching for each included ingredient
+    const includeRegexes = include.map(ing => new RegExp(ing, 'i'));
+    clauses.push({
+      $and: includeRegexes.map(regex => ({ ingredients: regex }))
+    });
   }
+  
   if (exclude.length) {
-    clauses.push({ ingredients: { $nin: exclude } });
+    // Use case-insensitive partial matching for excluded ingredients
+    const excludeRegexes = exclude.map(ing => new RegExp(ing, 'i'));
+    clauses.push({
+      $and: excludeRegexes.map(regex => ({ ingredients: { $not: regex } }))
+    });
   }
+  
   if (!clauses.length) return {}; // no filtering
   if (clauses.length === 1) return clauses[0];
   return { $and: clauses };
@@ -27,8 +38,9 @@ export function buildIngredientQuery(include = [], exclude = []) {
  */
 export function rankItems(items, include = []) {
   return items.map(doc => {
-    const ing = doc.ingredients || [];
-    const score = include.filter(i => ing.includes(i)).length;
+    const ing = (doc.ingredients || []).map(i => i.toLowerCase());
+    const includeLower = include.map(i => i.toLowerCase());
+    const score = includeLower.filter(i => ing.includes(i)).length;
     const itemObj = doc.toObject ? doc.toObject() : doc;
     return { 
       ...itemObj, 

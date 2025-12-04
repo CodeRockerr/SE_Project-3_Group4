@@ -196,7 +196,9 @@ export default function IngredientRecommendationsPage() {
               {/* Matched ingredients chips */}
               {include.length > 0 && (
                 <div className="flex flex-wrap gap-1 text-[10px]">
-                  {(food.ingredients || []).filter(ing => include.includes(ing)).map(ing => (
+                  {(food.ingredients || []).filter(ing => 
+                    include.some(inc => ing.toLowerCase().includes(inc.toLowerCase()))
+                  ).map(ing => (
                     <span key={ing} className="px-2 py-1 rounded-full bg-[var(--orange)]/15 border border-[var(--orange)]/30 text-[var(--text)]">{ing}</span>
                   ))}
                 </div>
