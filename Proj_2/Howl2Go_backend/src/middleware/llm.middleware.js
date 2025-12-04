@@ -2,7 +2,14 @@ import { llmService } from '../services/llm.service.js';
 
 /**
  * Middleware to parse natural language queries using LLM
- * Attaches parsed criteria to req.parsedCriteria
+ * Attaches parsed criteria to req.parsedCriteria for use in controllers
+ * Supports conversational refinement with previousCriteria parameter
+ *
+ * @param {Object} req - Express request object
+ * @param {string} req.body.query - Natural language food query (required)
+ * @param {Object} req.body.previousCriteria - Previous search criteria for refinement (optional)
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
  *
  * @example
  * // In routes:
