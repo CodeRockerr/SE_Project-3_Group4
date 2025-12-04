@@ -37,6 +37,7 @@ class LLMService {
     /**
      * Build the prompt for the LLM
      * @param {string} userPrompt - The user's natural language query
+     * @param {Object|null} previousCriteria - Previous search criteria for refinement
      * @returns {string} - Formatted prompt for the LLM
      */
     buildPrompt(userPrompt, previousCriteria = null) {
