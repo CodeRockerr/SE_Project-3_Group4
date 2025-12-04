@@ -1,50 +1,61 @@
 import { cookies } from "next/headers";
 
+// Force dynamic rendering to prevent cookie caching
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function handleRequest(req: Request) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
   const url = req.url.split("?path=")[1];
-  
+
   // Get cookie header from request to forward session cookies
-  const cookieHeader = req.headers.get('Cookie') || '';
+  const cookieHeader = req.headers.get("Cookie") || "";
+
+  // Check for retry token in headers (bypasses cookie caching)
+  const retryToken = req.headers.get("X-Retry-Token");
 
   const headers: HeadersInit = {};
 
   // Forward cookies for session management
   if (cookieHeader) {
-    headers['Cookie'] = cookieHeader;
+    headers["Cookie"] = cookieHeader;
   }
 
-  // Add authorization token if available
-  if (accessToken) {
-    headers['Authorization'] = `Bearer ${accessToken}`;
+  // Add authorization token - prefer retry token over cookie
+  const token = retryToken || accessToken;
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
   }
 
   // Get request body if present
   let body: BodyInit | undefined;
-  if (req.method !== 'GET' && req.method !== 'HEAD') {
+  if (req.method !== "GET" && req.method !== "HEAD") {
     body = await req.text();
-    const contentType = req.headers.get('Content-Type');
+    const contentType = req.headers.get("Content-Type");
     if (contentType) {
-      headers['Content-Type'] = contentType;
+      headers["Content-Type"] = contentType;
     }
   }
 
-  const backendReq = await fetch(`${process.env.BACKEND_URL}${decodeURIComponent(url)}`, {
-    method: req.method,
-    headers,
-    body,
-  });
+  const backendReq = await fetch(
+    `${process.env.BACKEND_URL}${decodeURIComponent(url)}`,
+    {
+      method: req.method,
+      headers,
+      body,
+    }
+  );
 
   // Create response and forward Set-Cookie headers for session management
   const responseHeaders = new Headers(backendReq.headers);
-  
+
   // Forward Set-Cookie headers to client
   const setCookieHeaders = backendReq.headers.getSetCookie();
   if (setCookieHeaders.length > 0) {
-    responseHeaders.delete('Set-Cookie');
-    setCookieHeaders.forEach(cookie => {
-      responseHeaders.append('Set-Cookie', cookie);
+    responseHeaders.delete("Set-Cookie");
+    setCookieHeaders.forEach((cookie) => {
+      responseHeaders.append("Set-Cookie", cookie);
     });
   }
 

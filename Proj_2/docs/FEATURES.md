@@ -15,6 +15,7 @@ Howl2Go is a smart food discovery platform that uses natural language AI to help
 ### 1. User Authentication & Profiles
 
 **Endpoints:**
+
 - `POST /api/users/register` - User registration
 - `POST /api/users/login` - User login
 - `GET /api/users/profile` - Get user profile (authenticated)
@@ -22,6 +23,7 @@ Howl2Go is a smart food discovery platform that uses natural language AI to help
 - `POST /api/users/refresh-token` - Refresh access token
 
 **Features:**
+
 - JWT-based authentication (access + refresh tokens)
 - Password hashing with bcrypt (salt rounds: 12)
 - Email validation and uniqueness enforcement
@@ -32,6 +34,7 @@ Howl2Go is a smart food discovery platform that uses natural language AI to help
 - User preferences storage (dietary restrictions, favorite restaurants, calorie/protein goals)
 
 **User Model:**
+
 ```javascript
 {
   name: String,
@@ -54,9 +57,11 @@ Howl2Go is a smart food discovery platform that uses natural language AI to help
 ### 2. AI-Powered Food Search & Recommendations
 
 **Endpoint:**
+
 - `POST /api/food/recommend` - Get food recommendations based on natural language
 
 **Features:**
+
 - **LLM Integration:** Groq API with Llama 3.1 8B Instant model
 - Natural language query parsing (e.g., "high protein low carb under 500 calories")
 - Extracts nutritional criteria from conversational queries
@@ -71,6 +76,7 @@ Howl2Go is a smart food discovery platform that uses natural language AI to help
 - Automatic price calculation based on calories ($0.01/cal, min $2, max $15)
 
 **Example Request:**
+
 ```json
 POST /api/food/recommend
 {
@@ -79,6 +85,7 @@ POST /api/food/recommend
 ```
 
 **LLM Service:**
+
 - Converts natural language to structured criteria
 - Builds MongoDB queries from criteria
 - Handles non-food queries (returns empty criteria)
@@ -89,6 +96,7 @@ POST /api/food/recommend
 ### 3. Shopping Cart Management
 
 **Endpoints:**
+
 - `GET /api/cart` - Get current cart
 - `POST /api/cart/items` - Add item to cart
 - `PATCH /api/cart/items/:foodItemId` - Update item quantity
@@ -97,6 +105,7 @@ POST /api/food/recommend
 - `POST /api/cart/merge` - Merge guest cart with user cart on login (authenticated)
 
 **Features:**
+
 - **Session-based carts** for guest users (no login required)
 - **User-based carts** for authenticated users
 - Automatic cart creation on first use
@@ -116,6 +125,7 @@ POST /api/food/recommend
 - Quantity management (update or set to 0 to remove)
 
 **Cart Model:**
+
 ```javascript
 {
   sessionId: String (unique, indexed),
@@ -142,6 +152,7 @@ POST /api/food/recommend
 ### 4. Ratings & Reviews System
 
 **Endpoints:**
+
 - `POST /api/reviews` - Create a review for a food item (authenticated)
 - `GET /api/reviews/item/:foodItemId` - Get reviews for a specific food item (public)
 - `GET /api/reviews/my-reviews` - Get current user's reviews (authenticated)
@@ -150,6 +161,7 @@ POST /api/food/recommend
 - `POST /api/reviews/:reviewId/helpful` - Mark a review as helpful (authenticated)
 
 **Features:**
+
 - **Verified Reviews**: Only users who ordered the item can review it
 - **Star Ratings**: 1-5 star rating system
 - **Comments**: Optional text reviews (up to 1000 characters)
@@ -161,6 +173,7 @@ POST /api/food/recommend
 - **Review Display**: Beautiful UI with user avatars, verified badges, and helpful counts
 
 **Review Model:**
+
 ```javascript
 {
   userId: ObjectId (ref: 'User'),
@@ -179,12 +192,14 @@ POST /api/food/recommend
 ```
 
 **Review Statistics:**
+
 - Average rating calculation
 - Total review count
 - Rating distribution (percentage for each star rating)
 - Helpful vote tracking
 
 **Frontend Features:**
+
 - Star rating display on item cards
 - Expandable reviews section
 - Review modal for writing reviews
@@ -199,6 +214,7 @@ POST /api/food/recommend
 **Database:** MongoDB with 1,148+ fast food items
 
 **Supported Restaurants:**
+
 - McDonald's
 - Burger King
 - Wendy's
@@ -207,6 +223,7 @@ POST /api/food/recommend
 - Pizza Hut
 
 **FastFoodItem Model:**
+
 ```javascript
 {
   company: String,
@@ -227,17 +244,136 @@ POST /api/food/recommend
 ```
 
 **Database Optimizations:**
+
 - Text indexes on item and company fields for efficient search
 - Compound index on (company, item)
 - Nutritional field indexes for filtering
 
 ---
 
-### 6. Session Management
+### 6. Payment Processing (Stripe Integration)
+
+**Endpoints:**
+
+- `POST /api/payments/create-intent` - Create payment intent for order (authenticated)
+- `POST /api/payments/confirm` - Confirm payment completion (authenticated)
+- `GET /api/payments/:id` - Get payment by ID (authenticated)
+- `GET /api/payments` - List user's payments (authenticated, paginated)
+- `GET /api/payments/order/:orderId` - Get payments for order (authenticated)
+- `POST /api/payments/webhook` - Handle Stripe webhook events (raw body)
+- `POST /api/payments/:id/refund` - Refund payment (admin only)
+
+**Features:**
+
+- **Secure Payment Processing:** Stripe integration for PCI-compliant payments
+- **Payment Intent Creation:** Creates Stripe payment intent with order details
+- **Client-Side Payment Confirmation:** Stripe Elements handles sensitive card data
+- **Automatic Order Status Updates:** Orders updated to "confirmed" on successful payment
+- **Webhook Support:** Real-time payment event processing (succeeded, failed, refunded)
+- **Payment Tracking:** Complete payment history with transaction IDs
+- **Refund Support:** Admin can process refunds through Stripe
+- **Payment Records:** Detailed payment information including:
+  - Amount and currency
+  - Payment status lifecycle
+  - Payment method details (brand, last4, expiry)
+  - Failure messages for debugging
+  - Transaction timestamps
+
+**Payment Model:**
+
+```javascript
+{
+  orderId: ObjectId (ref: 'Order'),
+  userId: ObjectId (ref: 'User'),
+  amount: Number (cents),
+  currency: String (default: 'usd'),
+  status: String (pending/processing/succeeded/failed/canceled/refunded),
+  paymentIntentId: String (Stripe PI ID),
+  transactionId: String (Stripe charge ID),
+  paymentMethod: String (card/apple_pay/google_pay),
+  paymentMethodDetails: {
+    brand: String,
+    last4: String,
+    expMonth: Number,
+    expYear: Number
+  },
+  metadata: Object,
+  failureMessage: String,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+**Order Model Updates:**
+
+```javascript
+{
+  // ... existing fields
+  paymentStatus: String (pending/paid/failed/refunded),
+  paymentId: ObjectId (ref: 'Payment'),
+  status: String (pending/confirmed/preparing/ready/delivered/completed/cancelled)
+}
+```
+
+**Frontend Components:**
+
+- **PaymentModal:** Modal wrapper with Stripe Elements provider
+  - Initializes payment intent on mount
+  - Dark theme customization matching app design
+  - Loading and error states
+  - Success/failure callbacks
+- **CheckoutForm:** Stripe payment form component
+
+  - Secure card input via Stripe PaymentElement
+  - Real-time validation
+  - Loading states during processing
+  - Success/error visual feedback
+  - Security notice footer
+
+- **Payment Success Page:** `/payment/success`
+
+  - Animated success confirmation
+  - Order details display
+  - Next steps for user
+  - Links to order tracking
+
+- **Payment Failed Page:** `/payment/failed`
+  - Clear error messaging
+  - Common failure reasons
+  - Retry payment option
+  - Support contact link
+
+**Security Features:**
+
+- Stripe-hosted payment form (PCI compliant)
+- Webhook signature verification
+- Ownership verification for all payment operations
+- Admin-only refund access
+- HTTPS required in production
+- No card data stored in our database
+
+**Supported Payment Methods:**
+
+- Credit/Debit Cards (Visa, Mastercard, Amex, Discover)
+- 3D Secure authentication support
+- Future: Apple Pay, Google Pay, ACH
+
+**Test Cards (Development):**
+
+```
+Success: 4242 4242 4242 4242
+Declined: 4000 0000 0000 9995
+3D Secure: 4000 0025 0000 3155
+```
+
+---
+
+### 7. Session Management
 
 **Technology:** express-session + connect-mongo
 
 **Features:**
+
 - MongoDB-backed session storage
 - Session encryption with crypto secret
 - Secure cookies:
@@ -250,19 +386,22 @@ POST /api/food/recommend
 
 ---
 
-### 7. Security & Middleware
+### 8. Security & Middleware
 
 **Authentication Middleware:**
+
 - `authenticate` - Requires valid JWT token
 - `optionalAuth` - Accepts token if provided, continues without if missing
 - `authorize(roles)` - Role-based access control
 
 **LLM Middleware:**
+
 - `parseLLMQuery` - Converts natural language to criteria using Groq API
 - `buildMongoQuery` - Converts criteria to MongoDB query
 - `validateCriteria` - Ensures meaningful criteria exists
 
 **Security Features:**
+
 - Password hashing with bcrypt (12 salt rounds)
 - JWT token validation
 - Token expiration handling
@@ -272,12 +411,14 @@ POST /api/food/recommend
 
 ---
 
-### 8. API Health & Monitoring
+### 9. API Health & Monitoring
 
 **Endpoint:**
+
 - `GET /api/health` - Health check
 
 **Response:**
+
 ```json
 {
   "status": "ok",
@@ -287,17 +428,20 @@ POST /api/food/recommend
 
 ---
 
-### 9. Testing Infrastructure
+### 10. Testing Infrastructure
 
 **Test Coverage:**
+
 - User authentication tests (registration, login, profile, password change)
 - Cart management tests (add, update, remove, merge)
 - Food controller tests
 - LLM service tests (query parsing, MongoDB query building)
 - Database connection tests
 - Health check tests
+- Payment processing tests (planned)
 
 **Testing Framework:**
+
 - Jest with Supertest for API testing
 - MongoDB memory server for test isolation
 - Test database safety checks
@@ -307,6 +451,7 @@ POST /api/food/recommend
 ## Technical Stack
 
 ### Backend
+
 - **Runtime:** Node.js 18+
 - **Framework:** Express.js 5.1.0
 - **Database:** MongoDB with Mongoose 8.19.1
@@ -314,16 +459,20 @@ POST /api/food/recommend
 - **Password Hashing:** bcrypt 5.1.1
 - **AI/LLM:** Groq SDK 0.33.0 (Llama 3.1 8B Instant)
 - **Session:** express-session 1.18.1 + connect-mongo 5.1.0
+- **Payment Processing:** Stripe SDK (latest)
 - **Testing:** Jest 29.x + Supertest 7.1.4
 
 ### Frontend
+
 - **Framework:** Next.js 15.5.5 (React 19.1.0)
 - **Language:** TypeScript 5.x
 - **Styling:** Tailwind CSS 4.x
 - **Animations:** Framer Motion 12.23.24
 - **Icons:** Lucide React 0.545.0
+- **Payment UI:** @stripe/stripe-js + @stripe/react-stripe-js
 
 ### DevOps
+
 - **Pre-commit Hooks:** Husky 9.1.7 + lint-staged 16.2.4
 - **Code Quality:** ESLint
 - **API Testing:** Supertest 7.1.4
@@ -333,6 +482,7 @@ POST /api/food/recommend
 ## Configuration
 
 **Environment Variables Required:**
+
 ```bash
 # Server
 PORT=4000
@@ -355,6 +505,11 @@ SESSION_MAX_AGE=86400000
 # AI/LLM
 GROQ_API_KEY=your-groq-api-key
 
+# Payment Processing (Stripe)
+STRIPE_SECRET_KEY=your-stripe-secret-key
+STRIPE_PUBLISHABLE_KEY=your-stripe-publishable-key
+STRIPE_WEBHOOK_SECRET=your-stripe-webhook-secret
+
 # Frontend (for CORS)
 FRONTEND_URL=http://localhost:3000
 ```
@@ -364,51 +519,69 @@ FRONTEND_URL=http://localhost:3000
 ## API Routes Summary
 
 ### User Routes (`/api/users`)
-| Method | Endpoint | Auth Required | Description |
-|--------|----------|---------------|-------------|
-| POST | `/register` | No | Register new user |
-| POST | `/login` | No | Login user |
-| GET | `/profile` | Yes | Get user profile |
-| POST | `/change-password` | Yes | Change password |
-| POST | `/refresh-token` | No | Refresh access token |
+
+| Method | Endpoint           | Auth Required | Description          |
+| ------ | ------------------ | ------------- | -------------------- |
+| POST   | `/register`        | No            | Register new user    |
+| POST   | `/login`           | No            | Login user           |
+| GET    | `/profile`         | Yes           | Get user profile     |
+| POST   | `/change-password` | Yes           | Change password      |
+| POST   | `/refresh-token`   | No            | Refresh access token |
 
 ### Food Routes (`/api/food`)
-| Method | Endpoint | Auth Required | Description |
-|--------|----------|---------------|-------------|
-| POST | `/recommend` | No | Get food recommendations |
+
+| Method | Endpoint     | Auth Required | Description              |
+| ------ | ------------ | ------------- | ------------------------ |
+| POST   | `/recommend` | No            | Get food recommendations |
 
 ### Cart Routes (`/api/cart`)
-| Method | Endpoint | Auth Required | Description |
-|--------|----------|---------------|-------------|
-| GET | `/` | No | Get current cart |
-| POST | `/items` | No | Add item to cart |
-| PATCH | `/items/:foodItemId` | No | Update item quantity |
-| DELETE | `/items/:foodItemId` | No | Remove item from cart |
-| DELETE | `/` | No | Clear cart |
-| POST | `/merge` | Yes | Merge guest cart with user cart |
+
+| Method | Endpoint             | Auth Required | Description                     |
+| ------ | -------------------- | ------------- | ------------------------------- |
+| GET    | `/`                  | No            | Get current cart                |
+| POST   | `/items`             | No            | Add item to cart                |
+| PATCH  | `/items/:foodItemId` | No            | Update item quantity            |
+| DELETE | `/items/:foodItemId` | No            | Remove item from cart           |
+| DELETE | `/`                  | No            | Clear cart                      |
+| POST   | `/merge`             | Yes           | Merge guest cart with user cart |
 
 ### Order Routes (`/api/orders`)
-| Method | Endpoint | Auth Required | Description |
-|--------|----------|---------------|-------------|
-| POST | `/` | Yes | Create order from cart |
-| GET | `/` | Yes | Get order history |
-| GET | `/:orderId` | Yes | Get single order |
-| GET | `/insights` | Yes | Get order insights & analytics |
+
+| Method | Endpoint    | Auth Required | Description                    |
+| ------ | ----------- | ------------- | ------------------------------ |
+| POST   | `/`         | Yes           | Create order from cart         |
+| GET    | `/`         | Yes           | Get order history              |
+| GET    | `/:orderId` | Yes           | Get single order               |
+| GET    | `/insights` | Yes           | Get order insights & analytics |
 
 ### Review Routes (`/api/reviews`)
-| Method | Endpoint | Auth Required | Description |
-|--------|----------|---------------|-------------|
-| POST | `/` | Yes | Create review for ordered item |
-| GET | `/item/:foodItemId` | No | Get reviews for food item |
-| GET | `/my-reviews` | Yes | Get current user's reviews |
-| PATCH | `/:reviewId` | Yes | Update review |
-| DELETE | `/:reviewId` | Yes | Delete review |
-| POST | `/:reviewId/helpful` | Yes | Mark review as helpful |
+
+| Method | Endpoint             | Auth Required | Description                    |
+| ------ | -------------------- | ------------- | ------------------------------ |
+| POST   | `/`                  | Yes           | Create review for ordered item |
+| GET    | `/item/:foodItemId`  | No            | Get reviews for food item      |
+| GET    | `/my-reviews`        | Yes           | Get current user's reviews     |
+| PATCH  | `/:reviewId`         | Yes           | Update review                  |
+| DELETE | `/:reviewId`         | Yes           | Delete review                  |
+| POST   | `/:reviewId/helpful` | Yes           | Mark review as helpful         |
+
+### Payment Routes (`/api/payments`)
+
+| Method | Endpoint          | Auth Required | Description                     |
+| ------ | ----------------- | ------------- | ------------------------------- |
+| POST   | `/create-intent`  | Yes           | Create payment intent for order |
+| POST   | `/confirm`        | Yes           | Confirm payment completion      |
+| GET    | `/:id`            | Yes           | Get payment by ID               |
+| GET    | `/`               | Yes           | List user's payments            |
+| GET    | `/order/:orderId` | Yes           | Get payments for order          |
+| POST   | `/webhook`        | No            | Handle Stripe webhooks          |
+| POST   | `/:id/refund`     | Yes (Admin)   | Refund payment                  |
 
 ### Health Routes (`/api`)
-| Method | Endpoint | Auth Required | Description |
-|--------|----------|---------------|-------------|
-| GET | `/health` | No | Health check |
+
+| Method | Endpoint  | Auth Required | Description  |
+| ------ | --------- | ------------- | ------------ |
+| GET    | `/health` | No            | Health check |
 
 ---
 
@@ -416,19 +589,22 @@ FRONTEND_URL=http://localhost:3000
 
 The following features are planned for the future:
 
-- Payment processing (Stripe/PayPal integration)
 - AI Meal Suggestions based on Order History
 - Ingredient based filtering/recommendations
 - Review photo uploads
 - Review editing after submission
 - Rate limiting
 - Query caching
+- Payment: Apple Pay, Google Pay, ACH support
+- Payment: Saved cards for returning customers
+- Payment: Split payments for group orders
 
 ---
 
 ## Running the Application
 
 ### Backend Setup
+
 ```bash
 cd Howl2Go_backend
 npm install
@@ -437,6 +613,7 @@ npm run dev              # Start development server
 ```
 
 ### Frontend Setup
+
 ```bash
 cd Howl2Go_frontend
 npm install
@@ -444,6 +621,7 @@ npm run dev              # Start with Turbopack
 ```
 
 ### Run Tests
+
 ```bash
 cd Howl2Go_backend
 npm test
@@ -461,6 +639,6 @@ npm test
 ---
 
 **Document Maintained By:** SE_Project_Grp_27
-**Last Updated:** November 6th, 2025
+**Last Updated:** December 2024
 
-*Crave it. Find it. Instantly.*
+_Crave it. Find it. Instantly._

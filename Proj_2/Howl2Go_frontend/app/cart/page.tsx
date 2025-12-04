@@ -8,7 +8,6 @@ import {
   Minus,
   ShoppingBag,
   ArrowLeft,
-  CheckCircle,
   Loader2,
 } from "lucide-react";
 import Link from "next/link";
@@ -19,6 +18,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import toast from "react-hot-toast";
 import ComboSuggestionsModal from "@/components/ComboSuggestionsModal";
 import { getComboSuggestions } from "@/lib/api/combo";
+import PaymentModal from "@/components/PaymentModal";
 
 export default function CartPage() {
   const router = useRouter();
@@ -36,13 +36,13 @@ export default function CartPage() {
 
   // Order state
   const [isProcessing, setIsProcessing] = useState(false);
-  const [orderPlaced, setOrderPlaced] = useState(false);
-  const [orderSummary, setOrderSummary] = useState({ total: 0, totalItems: 0 });
   const [comboSuggestions, setComboSuggestions] = useState<any[]>([]);
   const [showComboModal, setShowComboModal] = useState(false);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
 
-  // Fetch combo suggestions when user clicks the button
+  // Payment state
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [currentOrderId, setCurrentOrderId] = useState<string | null>(null); // Fetch combo suggestions when user clicks the button
   const handleCompleteYourMeal = async () => {
     if (!cartItems || cartItems.length === 0) {
       toast.error("Add an item to your cart first");
@@ -143,7 +143,7 @@ export default function CartPage() {
   // Destructure summary
   const { totalItems, subtotal, tax, deliveryFee, total } = summary;
 
-  // Place Order handler
+  // Place Order handler - now triggers payment flow
   const handlePlaceOrder = async () => {
     // Check if user is authenticated
     if (!isAuthenticated) {
@@ -161,35 +161,27 @@ export default function CartPage() {
     setIsProcessing(true);
 
     try {
-      // Create order in MongoDB
+      // Create order in MongoDB (status: pending, paymentStatus: pending)
       const order = await createOrder();
 
-      // Save order summary before clearing cart
-      setOrderSummary({
-        total: total,
-        totalItems: totalItems,
-      });
+      console.log("Order created, initiating payment:", order);
 
-      // Clear the cart after successful order
-      await clearCart();
-
-      console.log("Order placed successfully!", order);
-      toast.success("Order placed successfully!");
+      // Save order info
+      setCurrentOrderId(order._id);
 
       setIsProcessing(false);
-      setOrderPlaced(true);
 
-      // Redirect to order history after 3 seconds
-      setTimeout(() => {
-        router.push("/orders");
-      }, 3000);
-    } catch (error: any) {
-      console.error("Failed to place order:", error);
+      // Show payment modal
+      setShowPaymentModal(true);
+    } catch (error: unknown) {
+      console.error("Failed to create order:", error);
       setIsProcessing(false);
 
       // Show user-friendly error message
       const errorMessage =
-        error?.message || "Failed to place order. Please try again.";
+        error instanceof Error
+          ? error.message
+          : "Failed to create order. Please try again.";
       toast.error(errorMessage);
 
       // If authentication error, redirect to login
@@ -204,113 +196,35 @@ export default function CartPage() {
     }
   };
 
-  // Success Animation State
-  if (orderPlaced) {
-    return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: "var(--bg)" }}
-      >
-        <div
-          className="max-w-md w-full mx-4 rounded-2xl p-8 text-center animate-fade-in"
-          style={{
-            backgroundColor: "var(--bg-card)",
-            borderWidth: "1px",
-            borderColor: "var(--border)",
-          }}
-        >
-          {/* Success Icon with pulse animation */}
-          <div className="relative mb-6">
-            <div
-              className="absolute inset-0 w-24 h-24 mx-auto rounded-full animate-ping opacity-20"
-              style={{ backgroundColor: "var(--success)" }}
-            />
-            <CheckCircle
-              className="w-24 h-24 mx-auto relative animate-bounce"
-              style={{ color: "var(--success)" }}
-            />
-          </div>
+  // Payment success handler
+  const handlePaymentSuccess = async () => {
+    try {
+      // Clear the cart after successful payment
+      await clearCart();
 
-          <h1
-            className="text-4xl font-bold mb-3"
-            style={{ color: "var(--text)" }}
-          >
-            Order Placed!
-          </h1>
+      setShowPaymentModal(false);
+      toast.success("Payment successful!");
 
-          <p className="text-lg mb-6" style={{ color: "var(--text-subtle)" }}>
-            Your delicious food is on the way!
-          </p>
+      // Redirect to success page
+      router.push(`/payment/success?orderId=${currentOrderId}`);
+    } catch (error) {
+      console.error("Error after payment success:", error);
+      // Still redirect to success page even if cart clear fails
+      router.push(`/payment/success?orderId=${currentOrderId}`);
+    }
+  };
 
-          <div
-            className="p-6 rounded-xl mb-6"
-            style={{
-              backgroundColor: "var(--bg)",
-              border: "1px solid var(--border)",
-            }}
-          >
-            <p className="text-sm mb-2" style={{ color: "var(--text-muted)" }}>
-              Order Total
-            </p>
-            <p className="text-3xl font-bold" style={{ color: "var(--cream)" }}>
-              ${orderSummary.total.toFixed(2)}
-            </p>
-            <p className="text-sm mt-2" style={{ color: "var(--text-subtle)" }}>
-              {orderSummary.totalItems}{" "}
-              {orderSummary.totalItems === 1 ? "item" : "items"}
-            </p>
-          </div>
+  // Payment failure handler
+  const handlePaymentError = (error: string) => {
+    setShowPaymentModal(false);
+    toast.error("Payment failed");
 
-          <div
-            className="flex items-center justify-center gap-2 text-sm"
-            style={{ color: "var(--text-muted)" }}
-          >
-            <div className="flex gap-1">
-              <span
-                className="w-2 h-2 rounded-full animate-pulse"
-                style={{
-                  backgroundColor: "var(--orange)",
-                  animationDelay: "0s",
-                }}
-              />
-              <span
-                className="w-2 h-2 rounded-full animate-pulse"
-                style={{
-                  backgroundColor: "var(--orange)",
-                  animationDelay: "0.2s",
-                }}
-              />
-              <span
-                className="w-2 h-2 rounded-full animate-pulse"
-                style={{
-                  backgroundColor: "var(--orange)",
-                  animationDelay: "0.4s",
-                }}
-              />
-            </div>
-            <span>Redirecting to home...</span>
-          </div>
-        </div>
-
-        <style jsx>{`
-          @keyframes fade-in {
-            from {
-              opacity: 0;
-              transform: scale(0.9);
-            }
-            to {
-              opacity: 1;
-              transform: scale(1);
-            }
-          }
-
-          .animate-fade-in {
-            animation: fade-in 0.5s ease-out;
-          }
-        `}</style>
-      </div>
+    // Redirect to failure page with error details
+    const errorMessage = encodeURIComponent(error);
+    router.push(
+      `/payment/failed?orderId=${currentOrderId}&error=${errorMessage}`
     );
-  }
+  };
 
   return (
     <div
@@ -764,6 +678,17 @@ export default function CartPage() {
                   }
                 }}
                 onApply={handleApplyPreferences}
+              />
+            )}
+
+            {/* Payment modal */}
+            {showPaymentModal && currentOrderId && (
+              <PaymentModal
+                orderId={currentOrderId}
+                amount={Math.round(total * 100)} // Convert to cents
+                onSuccess={handlePaymentSuccess}
+                onError={handlePaymentError}
+                onClose={() => setShowPaymentModal(false)}
               />
             )}
           </>

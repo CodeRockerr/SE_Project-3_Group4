@@ -8,6 +8,7 @@ import orderRouter from "./order.routes.js";
 import reviewRouter from "./review.routes.js";
 import bugRouter from "./bug.routes.js";
 import adminRouter from "./admin.routes.js";
+import paymentRouter from "./payment.routes.js";
 
 const router = Router();
 
@@ -17,6 +18,7 @@ router.use("/food", comboRouter);
 router.use("/users", userRouter);
 router.use("/cart", cartRouter);
 router.use("/orders", orderRouter);
+router.use("/payments", paymentRouter);
 router.use("/reviews", reviewRouter);
 router.use("/bugs", bugRouter);
 router.use("/admin", adminRouter);
