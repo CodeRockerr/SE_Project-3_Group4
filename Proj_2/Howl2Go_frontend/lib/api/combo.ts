@@ -18,11 +18,18 @@ export interface ComboSuggestion {
 
 export async function getComboSuggestions(
   mainItemId: string,
-  limit: number = 5
+  limit: number = 5,
+  options?: { nutritional_focus?: string; preferences?: Record<string, any> }
 ) {
-  const path = `/api/food/combo-suggestions?mainItemId=${encodeURIComponent(
-    mainItemId
-  )}&limit=${limit}`;
+  const qs = new URLSearchParams();
+  qs.set("mainItemId", mainItemId);
+  qs.set("limit", String(limit));
+  if (options?.nutritional_focus)
+    qs.set("nutritional_focus", options.nutritional_focus);
+  if (options?.preferences)
+    qs.set("preferences", JSON.stringify(options.preferences));
+
+  const path = `/api/food/combo-suggestions?${qs.toString()}`;
 
   const res = await apiFetch(path, { method: "GET", credentials: "include" });
   if (!res.ok)

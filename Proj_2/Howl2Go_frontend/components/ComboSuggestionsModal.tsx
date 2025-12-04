@@ -5,12 +5,38 @@ import { X, Plus } from "lucide-react";
 
 import type { ComboSuggestion } from "@/lib/api/combo";
 
+// Convert backend reason codes to user-friendly labels
+function formatReason(reason?: string): string | null {
+  if (!reason) return null;
+  // Hide technical/internal reason codes (fallbacks, db keys, etc.)
+  // Only show friendly labels for known reasons.
+  const reasonLabels: Record<string, string | null> = {
+    popular_together: "Popular pair",
+    // Show a friendly label for same-company fallback instead of raw code
+    same_company_fallback: "More from this restaurant",
+  };
+
+  // If we have a friendly label, return it
+  if (reasonLabels[reason] !== undefined) return reasonLabels[reason];
+
+  // Defensive: don't show raw codes that look like internal identifiers
+  // (contain underscores or are all-lowercase single-word tokens)
+  if (/[_]/.test(reason) || /^([a-z0-9]+_?)+$/.test(reason)) return null;
+
+  // Otherwise, return as-is (should be already human-friendly)
+  return reason;
+}
+
 type Props = {
   suggestions: ComboSuggestion[];
   onAddOne: (itemId: string) => Promise<void>;
   onAddAll: (
     items: { foodItemId: string; quantity?: number }[]
   ) => Promise<void>;
+  onApply?: (opts: {
+    nutritional_focus?: string;
+    preferences?: Record<string, any>;
+  }) => Promise<ComboSuggestion[]>;
   onClose: () => void;
 };
 
@@ -18,9 +44,43 @@ export default function ComboSuggestionsModal({
   suggestions,
   onAddOne,
   onAddAll,
+  onApply,
   onClose,
 }: Props) {
   if (!suggestions || suggestions.length === 0) return null;
+
+  // DEBUG: Log suggestions to see what the backend returned
+  React.useEffect(() => {
+    console.log("ComboSuggestionsModal received suggestions:", suggestions);
+    suggestions.forEach((s) => {
+      console.log(
+        `  - ${s.item.item}: reason=${s.reason}, formatReason=${formatReason(
+          s.reason
+        )}`
+      );
+    });
+  }, [suggestions]);
+
+  const [nutritionalFocus, setNutritionalFocus] =
+    React.useState<string>("balanced");
+  const [preferences, setPreferences] = React.useState({
+    vegetarian: false,
+    low_sugar: false,
+    low_sodium: false,
+  });
+  const [isApplying, setIsApplying] = React.useState(false);
+
+  const handleApply = async () => {
+    if (!onApply) return;
+    setIsApplying(true);
+    try {
+      await onApply({ nutritional_focus: nutritionalFocus, preferences });
+    } catch (err) {
+      console.error("Failed to apply preferences", err);
+    } finally {
+      setIsApplying(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
@@ -48,6 +108,84 @@ export default function ComboSuggestionsModal({
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="col-span-full mb-2">
+            <div className="flex items-center gap-3">
+              <label
+                className="text-sm font-medium"
+                style={{ color: "var(--text)" }}
+              >
+                Nutritional focus:
+              </label>
+              <select
+                value={nutritionalFocus}
+                onChange={(e) => setNutritionalFocus(e.target.value)}
+                className="px-2 py-1 rounded"
+                style={{ backgroundColor: "var(--bg)", color: "var(--text)" }}
+              >
+                <option value="balanced">Balanced</option>
+                <option value="low_calorie">Low Calorie</option>
+                <option value="high_protein">High Protein</option>
+                <option value="low_sugar">Low Sugar</option>
+              </select>
+
+              <div className="ml-4 flex items-center gap-2">
+                <label className="text-sm" style={{ color: "var(--text)" }}>
+                  <input
+                    type="checkbox"
+                    checked={preferences.vegetarian}
+                    onChange={(e) =>
+                      setPreferences({
+                        ...preferences,
+                        vegetarian: e.target.checked,
+                      })
+                    }
+                    className="mr-1"
+                  />
+                  Veg
+                </label>
+                <label className="text-sm" style={{ color: "var(--text)" }}>
+                  <input
+                    type="checkbox"
+                    checked={preferences.low_sugar}
+                    onChange={(e) =>
+                      setPreferences({
+                        ...preferences,
+                        low_sugar: e.target.checked,
+                      })
+                    }
+                    className="mr-1"
+                  />
+                  Low sugar
+                </label>
+                <label className="text-sm" style={{ color: "var(--text)" }}>
+                  <input
+                    type="checkbox"
+                    checked={preferences.low_sodium}
+                    onChange={(e) =>
+                      setPreferences({
+                        ...preferences,
+                        low_sodium: e.target.checked,
+                      })
+                    }
+                    className="mr-1"
+                  />
+                  Low sodium
+                </label>
+              </div>
+
+              <button
+                onClick={handleApply}
+                disabled={isApplying}
+                className="ml-auto px-3 py-1 rounded font-medium"
+                style={{
+                  backgroundColor: "var(--orange)",
+                  color: "var(--text)",
+                }}
+              >
+                {isApplying ? "Applying..." : "Apply"}
+              </button>
+            </div>
+          </div>
           {suggestions.map((s) => (
             <div
               key={s.item._id}
@@ -73,6 +211,38 @@ export default function ComboSuggestionsModal({
                 >
                   {s.item.calories ? `${s.item.calories} cal · ` : ""}
                   {s.item.protein ? `${s.item.protein}g protein` : ""}
+                </div>
+                {formatReason(s.reason) && (
+                  <div
+                    className="text-xs mt-2 italic"
+                    style={{ color: "var(--text-subtle)" }}
+                  >
+                    {formatReason(s.reason)}
+                  </div>
+                )}
+                <div className="mt-2 flex items-center gap-2">
+                  {typeof s.nutritionalScore === "number" && (
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-full"
+                      style={{
+                        backgroundColor: "var(--bg-chip)",
+                        color: "var(--text)",
+                      }}
+                    >
+                      Nut: {(s.nutritionalScore * 100).toFixed(0)}%
+                    </span>
+                  )}
+                  {typeof s.popularity === "number" && (
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-full"
+                      style={{
+                        backgroundColor: "var(--bg-chip)",
+                        color: "var(--text)",
+                      }}
+                    >
+                      Pop: {(s.popularity * 100).toFixed(0)}%
+                    </span>
+                  )}
                 </div>
               </div>
 

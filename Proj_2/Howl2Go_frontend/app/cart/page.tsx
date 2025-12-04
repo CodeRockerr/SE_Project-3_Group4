@@ -52,7 +52,7 @@ export default function CartPage() {
     setIsLoadingSuggestions(true);
     try {
       const main = cartItems[0];
-      const mainId = main.foodItem._id;
+      const mainId = main.foodItem._id as string;
       const suggestions = await getComboSuggestions(mainId, 5);
 
       if (suggestions && suggestions.length > 0) {
@@ -74,6 +74,41 @@ export default function CartPage() {
     } catch (err) {
       console.error("Failed to load combo suggestions", err);
       toast.error("Failed to load combo suggestions");
+    } finally {
+      setIsLoadingSuggestions(false);
+    }
+  };
+
+  // Apply preferences from the modal (nutritional focus / dietary flags)
+  const handleApplyPreferences = async (opts: {
+    nutritional_focus?: string;
+    preferences?: Record<string, any>;
+  }) => {
+    if (!cartItems || cartItems.length === 0) return [];
+    setIsLoadingSuggestions(true);
+    try {
+      const main = cartItems[0];
+      const mainId = main.foodItem._id;
+      const suggestions = await getComboSuggestions(mainId, 5, opts);
+
+      // Filter out suggestions that are already in the cart
+      const cartItemIds = new Set(cartItems.map((item) => item.foodItem._id));
+      const filteredSuggestions = suggestions.filter(
+        (s) => !cartItemIds.has(s.item._id)
+      );
+
+      if (filteredSuggestions.length > 0) {
+        setComboSuggestions(filteredSuggestions);
+        setShowComboModal(true);
+      } else {
+        toast("All suggested items are already in your cart!");
+      }
+
+      return filteredSuggestions;
+    } catch (err) {
+      console.error("Failed to load combo suggestions", err);
+      toast.error("Failed to load combo suggestions");
+      return [];
     } finally {
       setIsLoadingSuggestions(false);
     }
@@ -728,6 +763,7 @@ export default function CartPage() {
                     toast.error("Failed to add all items to cart");
                   }
                 }}
+                onApply={handleApplyPreferences}
               />
             )}
           </>

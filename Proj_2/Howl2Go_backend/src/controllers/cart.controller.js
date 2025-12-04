@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Cart from "../models/Cart.js";
 import FastFoodItem from "../models/FastFoodItem.js";
 
@@ -67,6 +68,14 @@ export const addItemToCart = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Food item ID is required",
+      });
+    }
+
+    // Validate ObjectId format early to avoid Mongoose CastError
+    if (!mongoose.isValidObjectId(foodItemId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid food item ID format",
       });
     }
 
@@ -161,6 +170,10 @@ export const addItemsToCart = async (req, res) => {
 
     for (const itm of items) {
       const { foodItemId, quantity = 1 } = itm;
+      if (!mongoose.isValidObjectId(foodItemId)) {
+        // skip invalid ids provided in bulk request
+        continue;
+      }
       const foodItem = await FastFoodItem.findById(foodItemId);
       if (!foodItem) continue; // skip missing items
 
