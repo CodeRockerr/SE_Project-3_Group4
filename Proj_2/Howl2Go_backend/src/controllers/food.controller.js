@@ -15,10 +15,10 @@ const calculatePrice = (calories) => {
 
 /**
  * Get food recommendations based on natural language preferences
- * Similar to search but with sorting and better recommendations
+ * Supports conversational refinement with sorting overrides
  *
  * @route POST /api/food/recommend
- * @body { query: string, limit?: number } - Natural language food query
+ * @body { query: string, previousCriteria?: object, limit?: number } - Natural language food query with optional context
  * @returns { success: boolean, query: string, criteria: object, recommendations: array }
  */
 export const recommendFood = async (req, res) => {
@@ -26,11 +26,16 @@ export const recommendFood = async (req, res) => {
         // const limit = parseInt(req.body.limit) || 5;
         const mongoQuery = req.mongoQuery || {};
 
-        // Get recommendations with some intelligence
-        // For example, if they want high protein, sort by protein descending
+        // Get recommendations with intelligent sorting
+        // Default sorting based on primary criteria, can be overridden by LLM sort field
         let sortCriteria = {};
 
-        if (req.parsedCriteria.protein?.min) {
+        // Check for LLM-provided sort override (e.g., price_asc for "show me cheaper options")
+        if (req.parsedCriteria.sort === 'price_asc') {
+            sortCriteria = { price: 1 }; // Sort by price ascending (cheaper first)
+        } else if (req.parsedCriteria.sort === 'price_desc') {
+            sortCriteria = { price: -1 }; // Sort by price descending (expensive first)
+        } else if (req.parsedCriteria.protein?.min) {
             sortCriteria.protein = -1; // High protein first
         } else if (req.parsedCriteria.calories?.max) {
             sortCriteria.calories = 1; // Low calories first
