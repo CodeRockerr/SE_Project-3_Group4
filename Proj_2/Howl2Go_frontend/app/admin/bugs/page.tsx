@@ -77,9 +77,10 @@ export default function AdminBugsPage() {
       });
       setBugs(data.bugs);
       setPagination(data.pagination);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to load bugs:", err);
-      setError(err.message || "Failed to load bug reports");
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error.message || "Failed to load bug reports");
       toast.error("Failed to load bug reports");
     } finally {
       setIsLoading(false);

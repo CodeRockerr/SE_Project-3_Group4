@@ -63,7 +63,7 @@ export default function ItemCard({
   const [reviewCount, setReviewCount] = useState(0);
   const [userReview, setUserReview] = useState<{ rating: number; _id: string } | null>(null);
   const router = useRouter();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
 
   // Fetch rating and user's review if foodItem has _id
@@ -89,16 +89,19 @@ export default function ItemCard({
           // Silently fail - ratings are optional
         });
     }
-  }, [restProps._id, showReviews, isAuthenticated]);
+  }, [restProps._id, showReviews]);
 
   // Listen for review submission events (from order page or elsewhere)
   useEffect(() => {
     if (!restProps._id || !showReviews) return;
 
-    const handleReviewSubmitted = (event: CustomEvent) => {
+    const handleReviewSubmitted = (event: Event) => {
+      const ce = event as CustomEvent<Record<string, unknown> | undefined>;
+      const detail = ce?.detail as Record<string, unknown> | undefined;
+      const foodItemIdInEvent = detail?.foodItemId as string | undefined;
       // Refresh if this item matches the reviewed item
-      if (event.detail?.foodItemId === restProps._id) {
-        getItemReviews(restProps._id, 1, 1, 'recent')
+      if (foodItemIdInEvent && restProps._id && foodItemIdInEvent === String(restProps._id)) {
+        getItemReviews(String(restProps._id), 1, 1, 'recent')
           .then((data) => {
             if (data.stats) {
               setRating(data.stats.averageRating);
@@ -119,9 +122,10 @@ export default function ItemCard({
       }
     };
 
-    window.addEventListener('reviewSubmitted' as any, handleReviewSubmitted);
+    // Use loose Event listener typing but avoid explicit `any`
+    window.addEventListener('reviewSubmitted', handleReviewSubmitted as EventListener);
     return () => {
-      window.removeEventListener('reviewSubmitted' as any, handleReviewSubmitted);
+      window.removeEventListener('reviewSubmitted', handleReviewSubmitted as EventListener);
     };
   }, [restProps._id, showReviews]);
 
@@ -132,7 +136,7 @@ export default function ItemCard({
     calories,
     ...restProps,
     // Ensure _id is included if available in restProps
-    _id: restProps._id || (restProps as any).id || undefined,
+    _id: restProps._id || ((restProps as Record<string, unknown>).id as string | undefined) || undefined,
   };
 
   const handleAdd = () => {

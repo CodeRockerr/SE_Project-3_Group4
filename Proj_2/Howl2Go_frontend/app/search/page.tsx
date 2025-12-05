@@ -47,7 +47,7 @@ function SmartMenuSearchContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [lastCriteria, setLastCriteria] = useState<any>(null);
+  const [lastCriteria, setLastCriteria] = useState<Record<string, unknown> | null>(null);
   
   // Load previous search criteria from localStorage on component mount
   // Enables conversational refinements to survive page reloads

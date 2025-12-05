@@ -125,8 +125,8 @@ export async function getItemReviews(
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Failed to fetch reviews: ${response.status}`);
+      const errorData = await response.json().catch(() => ({})) as Record<string, unknown>;
+      throw new Error((errorData.message as string) || `Failed to fetch reviews: ${response.status}`);
     }
 
     const data: ReviewResponse = await response.json();
@@ -136,7 +136,7 @@ export async function getItemReviews(
     }
 
     return data.data;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error fetching reviews:", error);
     throw error;
   }
@@ -166,8 +166,8 @@ export async function getMyReviews(page: number = 1, limit: number = 20): Promis
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || `Failed to fetch reviews: ${response.status}`);
+      const errorData = await response.json().catch(() => ({})) as Record<string, unknown>;
+      throw new Error((errorData.message as string) || `Failed to fetch reviews: ${response.status}`);
     }
 
     const data = await response.json();
@@ -177,7 +177,7 @@ export async function getMyReviews(page: number = 1, limit: number = 20): Promis
     }
 
     return data.data;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error fetching my reviews:", error);
     throw error;
   }
@@ -192,9 +192,9 @@ export async function updateReview(
   comment?: string
 ): Promise<Review> {
   try {
-    const body: any = {};
-    if (rating !== undefined) body.rating = rating;
-    if (comment !== undefined) body.comment = comment;
+    const body: Record<string, unknown> = {};
+    if (rating !== undefined) (body as Record<string, unknown>).rating = rating;
+    if (comment !== undefined) (body as Record<string, unknown>).comment = comment;
 
     const response = await apiFetch(`/api/reviews/${reviewId}`, {
       method: "PATCH",
