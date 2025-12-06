@@ -64,11 +64,12 @@ export function rankItems(items, include = []) {
  */
 export async function getIngredientRecommendations({ include = [], exclude = [], page = 1, limit = 20 }) {
   const query = buildIngredientQuery(include, exclude);
-  const skip = (page - 1) * limit;
-  const [items, total] = await Promise.all([
-    FastFoodItem.find(query).skip(skip).limit(limit),
-    FastFoodItem.countDocuments(query)
-  ]);
-  const ranked = rankItems(items, include);
-  return { items: ranked, total, page, limit };
+  const skip = Math.max(0, (page - 1) * limit);
+  // To ensure consistent ranking across pages, fetch all matching items,
+  // rank them globally, then slice for pagination.
+  const allItems = await FastFoodItem.find(query);
+  const rankedAll = rankItems(allItems, include);
+  const total = rankedAll.length;
+  const items = rankedAll.slice(skip, skip + limit);
+  return { items, total, page, limit };
 }

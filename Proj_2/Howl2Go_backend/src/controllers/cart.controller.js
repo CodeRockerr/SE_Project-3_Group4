@@ -2,6 +2,24 @@ import mongoose from 'mongoose';
 import Cart from '../models/Cart.js';
 import FastFoodItem from '../models/FastFoodItem.js';
 
+// Helper to ensure session is marked and saved so cookies are sent to client
+const saveSession = (req) => new Promise((resolve) => {
+  try {
+    if (req && req.session) {
+      if (req.cart && req.cart._id) {
+        req.session.cartId = String(req.cart._id);
+      }
+      if (typeof req.session.save === 'function') {
+        req.session.save(() => resolve());
+        return;
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+  resolve();
+});
+
 /**
  * Get or create cart for current session
  */
@@ -29,10 +47,13 @@ const getOrCreateCart = async (sessionId, userId = null) => {
  */
 export const getCart = async (req, res) => {
   try {
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const userId = req.user?.id || null;
 
     const cart = await getOrCreateCart(sessionId, userId);
+    // Ensure session persists (attach cart to req and save session cookie)
+    req.cart = cart;
+    await saveSession(req);
 
     // Populate foodItem references
     const populatedCart = await Cart.findById(cart._id).populate('items.foodItem');
@@ -128,10 +149,17 @@ export const addItemToCart = async (req, res) => {
       });
     }
 
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const userId = req.user?.id || null;
 
+    console.log('[CartController] addItemToCart called', { sessionId, userId, foodItemId, quantity });
+
     const cart = await getOrCreateCart(sessionId, userId);
+    // persist session
+    req.cart = cart;
+    await saveSession(req);
+
+    console.log('[CartController] got cart', { cartId: cart._id, itemsBefore: cart.items.length });
 
     // Calculate price based on calories if not provided
     const calculatePrice = (calories) => {
@@ -154,6 +182,8 @@ export const addItemToCart = async (req, res) => {
       quantity: parsedQty
     });
 
+    const refreshed = await Cart.findById(cart._id).populate('items.foodItem');
+    console.log('[CartController] updated cart after addItem', { id: refreshed._id, totalItems: refreshed.totalItems, items: refreshed.items.length });
     // Reload cart with populated items
     const updatedCart = await Cart.findById(cart._id).populate('items.foodItem');
 
@@ -220,7 +250,7 @@ export const updateCartItemQuantity = async (req, res) => {
       });
     }
 
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const cart = await Cart.findOne({ sessionId });
 
     if (!cart) {
@@ -229,7 +259,9 @@ export const updateCartItemQuantity = async (req, res) => {
         message: 'Cart not found'
       });
     }
-
+    // persist session
+    req.cart = cart;
+    await saveSession(req);
     await cart.updateItemQuantity(foodItemId, parseInt(quantity, 10));
 
     // Reload cart with populated items
@@ -283,7 +315,7 @@ export const removeItemFromCart = async (req, res) => {
   try {
     const { foodItemId } = req.params;
 
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const cart = await Cart.findOne({ sessionId });
 
     if (!cart) {
@@ -292,7 +324,8 @@ export const removeItemFromCart = async (req, res) => {
         message: 'Cart not found'
       });
     }
-
+    req.cart = cart;
+    await saveSession(req);
     await cart.removeItem(foodItemId);
 
     // Reload cart with populated items
@@ -344,7 +377,7 @@ export const removeItemFromCart = async (req, res) => {
  */
 export const clearCart = async (req, res) => {
   try {
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const cart = await Cart.findOne({ sessionId });
 
     if (!cart) {
@@ -353,7 +386,8 @@ export const clearCart = async (req, res) => {
         message: 'Cart not found'
       });
     }
-
+    req.cart = cart;
+    await saveSession(req);
     await cart.clearCart();
 
     res.status(200).json({
@@ -391,7 +425,7 @@ export const mergeCart = async (req, res) => {
       });
     }
 
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const userId = req.user.id;
 
     // Get session cart (guest cart)
@@ -422,6 +456,10 @@ export const mergeCart = async (req, res) => {
         items: []
       });
     }
+
+    // Persist session association
+    req.cart = sessionCart || userCart;
+    await saveSession(req);
 
     // Reload cart with populated items
     const finalCart = await Cart.findById(userCart._id).populate('items.foodItem');

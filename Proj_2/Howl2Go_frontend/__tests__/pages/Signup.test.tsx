@@ -125,15 +125,6 @@ describe('Signup Page', () => {
         json: async () => ({ success: true, user: { name: 'John Doe', email: 'john@example.com' } }),
       })
 
-      // Mock window.location for redirect
-      delete (window as any).location
-      const mockLocation = { href: 'http://localhost/' }
-      Object.defineProperty(window, 'location', {
-        value: mockLocation,
-        writable: true,
-        configurable: true
-      })
-
       render(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name')
@@ -166,15 +157,6 @@ describe('Signup Page', () => {
         json: async () => ({ success: true, user: { name: 'John Doe' } }),
       })
 
-      // Mock window.location with settable href
-      delete (window as any).location
-      const mockLocation = { href: 'http://localhost/' }
-      Object.defineProperty(window, 'location', {
-        value: mockLocation,
-        writable: true,
-        configurable: true
-      })
-
       render(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name')
@@ -189,7 +171,8 @@ describe('Signup Page', () => {
       fireEvent.click(submitButton)
 
       await waitFor(() => {
-        expect(mockLocation.href).toBe('/dashboard')
+        // router push should be called with dashboard route
+        expect((global as any).mockRouterPush).toHaveBeenCalledWith('/dashboard')
       })
     })
   })

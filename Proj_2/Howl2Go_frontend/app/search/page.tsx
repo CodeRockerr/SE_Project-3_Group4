@@ -97,7 +97,8 @@ function SmartMenuSearchContent() {
               "Content-Type": "application/json",
             },
             // Initial search: previousCriteria is null
-            body: JSON.stringify({ query: initialQuery, previousCriteria: null }),
+            // Only send previousCriteria when we actually have it
+            body: JSON.stringify({ query: initialQuery }),
           });
 
           if (!response.ok) {
@@ -132,7 +133,6 @@ function SmartMenuSearchContent() {
                       console.warn('Failed to build refinement suggestions', e);
                       setRefinementSuggestions([]);
                     }
-          }
           }
           await parseAndSetFoodItems(data);
         } catch (error) {
@@ -176,7 +176,7 @@ function SmartMenuSearchContent() {
       items = data.recommendations
         .map((item) => ({
         _id: item._id ? String(item._id) : item.id ? String(item.id) : undefined, // Include MongoDB _id, ensure it's a string
-        restaurant: item.restaurant || "Unknown", // Use restaurant from backend
+        restaurant: item.restaurant || item.company || "Unknown", // Use restaurant/company from backend
         item: item.item || "Unknown Item",
         calories: item.calories || 0,
         caloriesFromFat: item.caloriesFromFat || null,
@@ -198,7 +198,7 @@ function SmartMenuSearchContent() {
       items = data
         .map((item) => ({
         _id: item._id ? String(item._id) : item.id ? String(item.id) : undefined, // Include MongoDB _id, ensure it's a string
-        restaurant: item.restaurant || "Unknown",
+        restaurant: item.restaurant || item.company || "Unknown",
         item: item.item || "Unknown Item",
         calories: item.calories || 0,
         caloriesFromFat: item.caloriesFromFat || null,
@@ -224,7 +224,7 @@ function SmartMenuSearchContent() {
       items = data.results
         .map((item) => ({
         _id: item._id ? String(item._id) : item.id ? String(item.id) : undefined, // Include MongoDB _id, ensure it's a string
-        restaurant: item.restaurant || "Unknown",
+        restaurant: item.restaurant || item.company || "Unknown",
         item: item.item || "Unknown Item",
         calories: item.calories || 0,
         caloriesFromFat: item.caloriesFromFat || null,
@@ -264,7 +264,7 @@ function SmartMenuSearchContent() {
         ([restaurant, itemData]: [string, ApiRecommendation]) => {
           return {
             _id: itemData._id ? String(itemData._id) : itemData.id ? String(itemData.id) : undefined, // Include MongoDB _id, ensure it's a string
-            restaurant,
+            restaurant: (itemData && (itemData.restaurant || itemData.company)) || restaurant,
             item: itemData.item || "Unknown Item",
             calories: extractValue(itemData.calories) || 0,
             caloriesFromFat: extractValue(itemData.caloriesFromFat),
@@ -322,8 +322,8 @@ function SmartMenuSearchContent() {
       const response = await fetch("/api/food/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Send query with previous criteria to enable refinement interpretation
-        body: JSON.stringify({ query: searchQuery, previousCriteria: lastCriteria }),
+        // Send query with previous criteria only when present
+        body: JSON.stringify(lastCriteria ? { query: searchQuery, previousCriteria: lastCriteria } : { query: searchQuery }),
       });
 
       if (!response.ok) {

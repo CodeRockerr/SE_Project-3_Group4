@@ -70,9 +70,9 @@ const cartSchema = new mongoose.Schema({
 
 // Calculate totals before saving
 cartSchema.pre('save', function(next) {
-  this.totalItems = this.items.reduce((sum, item) => sum + item.quantity, 0);
-  this.totalPrice = this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  this.totalCalories = this.items.reduce((sum, item) => sum + ((item.calories || 0) * item.quantity), 0);
+  this.totalItems = this.items.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+  this.totalPrice = this.items.reduce((sum, item) => sum + (Number(item.price || 0) * Number(item.quantity || 0)), 0);
+  this.totalCalories = this.items.reduce((sum, item) => sum + ((Number(item.calories || 0)) * Number(item.quantity || 0)), 0);
   next();
 });
 
@@ -103,21 +103,46 @@ cartSchema.methods.addItem = function(itemData) {
     });
   }
 
-  return this.save();
+  return this.save().then(saved => {
+    try {
+      console.log('[Cart] addItem saved cart totals:', {
+        sessionId: saved.sessionId,
+        totalItems: saved.totalItems,
+        totalPrice: saved.totalPrice,
+        totalCalories: saved.totalCalories,
+        itemsCount: saved.items.length
+      });
+    } catch (e) {
+      // ignore logging errors
+    }
+    return saved;
+  });
 };
 
 cartSchema.methods.removeItem = function(foodItemId) {
   const fid = String(foodItemId);
+  const getItemId = (item) => (item.foodItem && item.foodItem._id) ? String(item.foodItem._id) : String(item.foodItem);
   this.items = this.items.filter(
-    (item) => String(item.foodItem) !== fid
+    (item) => getItemId(item) !== fid
   );
-  return this.save();
+  return this.save().then(saved => {
+    try {
+      console.log('[Cart] removeItem saved cart totals:', {
+        sessionId: saved.sessionId,
+        totalItems: saved.totalItems,
+        totalPrice: saved.totalPrice,
+        itemsCount: saved.items.length
+      });
+    } catch (e) {}
+    return saved;
+  });
 };
 
 cartSchema.methods.updateItemQuantity = function(foodItemId, quantity) {
   const fid = String(foodItemId);
+  const getItemId = (it) => (it.foodItem && it.foodItem._id) ? String(it.foodItem._id) : String(it.foodItem);
   const item = this.items.find(
-    (it) => String(it.foodItem) === fid
+    (it) => getItemId(it) === fid
   );
 
   if (item) {
@@ -125,7 +150,17 @@ cartSchema.methods.updateItemQuantity = function(foodItemId, quantity) {
       return this.removeItem(foodItemId);
     }
     item.quantity = quantity;
-    return this.save();
+    return this.save().then(saved => {
+      try {
+        console.log('[Cart] updateItemQuantity saved cart totals:', {
+          sessionId: saved.sessionId,
+          totalItems: saved.totalItems,
+          totalPrice: saved.totalPrice,
+          itemsCount: saved.items.length
+        });
+      } catch (e) {}
+      return saved;
+    });
   }
 
   throw new Error('Item not found in cart');

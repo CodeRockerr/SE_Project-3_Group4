@@ -68,6 +68,9 @@ jest.mock('lucide-react', () => ({
   ChevronLeft: () => <span data-testid="chevron-left-icon">ChevronLeft Icon</span>,
   ChevronRight: () => <span data-testid="chevron-right-icon">ChevronRight Icon</span>,
   ArrowLeft: () => <span data-testid="arrow-left-icon">ArrowLeft Icon</span>,
+  Loader2: () => <span data-testid="loader-icon">Loader Icon</span>,
+  Star: () => <span data-testid="star-icon">Star Icon</span>,
+  Heart: () => <span data-testid="heart-icon">Heart Icon</span>,
 }))
 
 // Mock useRouter
@@ -117,5 +120,73 @@ global.IntersectionObserver = class IntersectionObserver {
   unobserve() {}
 }
 
-// Mock fetch globally
-global.fetch = jest.fn()
+// Mock fetch globally with a safe default implementation so tests that don't override it
+// A small URL-aware fetch mock so tests that don't override fetch get sensible shapes
+global.fetch = jest.fn(async (input, init) => {
+  const url = typeof input === 'string' ? input : input?.url || ''
+
+  // Orders list should be an array
+  if (url.includes('/api/orders/me')) {
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ([]),
+      text: async () => '[]'
+    }
+  }
+
+  // Food recommendations should be an object with recommendations array
+  if (url.includes('/api/food/recommend')) {
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({ recommendations: [] }),
+      text: async () => JSON.stringify({ recommendations: [] })
+    }
+  }
+
+  // Auth endpoints return a simple object by default
+  if (url.includes('/api/auth') || url.includes('/api/users')) {
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({}),
+      text: async () => '{}'
+    }
+  }
+
+  // Fallback safe shape
+  return {
+    ok: true,
+    status: 200,
+    json: async () => ({}),
+    text: async () => '{}'
+  }
+})
+
+// Do not redefine `window.location` globally here; let individual tests stub it if needed.
+// Make window.location configurable in jsdom so tests can stub/modify it safely
+try {
+  const currentLocation = window.location
+  try {
+    // Attempt to delete then redefine; some environments may not allow deletion
+    // eslint-disable-next-line no-undef
+    delete window.location
+  } catch (e) {
+    // ignore
+  }
+
+  Object.defineProperty(window, 'location', {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    value: {
+      href: currentLocation?.href || 'http://localhost',
+      assign: jest.fn(),
+      replace: jest.fn(),
+      toString: () => currentLocation?.href || 'http://localhost'
+    }
+  })
+} catch (e) {
+  // ignore if jsdom doesn't allow reconfiguring location
+}

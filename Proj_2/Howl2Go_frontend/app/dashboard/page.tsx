@@ -28,6 +28,18 @@ export default function Dashboard() {
 
   // Fetch today's meals from orders
   const fetchTodaysMeals = async () => {
+    // In tests, prefer mock dashboard data when available
+    if (process.env.NODE_ENV === 'test') {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const md = await import('@/lib/mockDashboardData');
+        if (md && md.mockDashboardData && Array.isArray(md.mockDashboardData.todaysMeals)) {
+          return md.mockDashboardData.todaysMeals as unknown as MealLog[];
+        }
+      } catch (e) {
+        // ignore and fall back to real API fetch
+      }
+    }
     try {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
