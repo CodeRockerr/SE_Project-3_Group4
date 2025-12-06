@@ -47,22 +47,16 @@ export const recommendFood = async (req, res) => {
             sortCriteria.totalFat = 1; // Low fat first
         }
 
+        const recommendations = await FastFoodItem.find(mongoQuery)
+            .sort(sortCriteria)
+            // .limit(limit)
+            .lean();
+
         // Add calculated price and normalize fields for the frontend
         let recommendationsWithPrice = recommendations.map(item => ({
-            // .limit(limit)
-            restaurant: item.company || item.restaurant,
-
-<<<<<<< HEAD
-        // Add calculated price to each recommendation
-        let recommendationsWithPrice = recommendations.map(item => ({
-=======
-        // Add calculated price and ensure all fields are present
-        const recommendationsWithPrice = recommendations.map(item => ({
->>>>>>> origin/main
             ...item,
-            restaurant: item.company, // Map company to restaurant for frontend
+            restaurant: item.company || item.restaurant,
             price: calculatePrice(item.calories),
-            // Ensure nutrition fields are included
             totalFat: item.totalFat ?? null,
             saturatedFat: item.saturatedFat ?? null,
             transFat: item.transFat ?? null,
@@ -72,7 +66,7 @@ export const recommendFood = async (req, res) => {
             fiber: item.fiber ?? null,
             sugars: item.sugars ?? null,
             protein: item.protein ?? null,
-            ingredients: item.ingredients || []
+            ingredients: item.ingredients || [],
         }));
 
         // If LLM requested a sort override (e.g., "cheaper options" -> sort: "price_asc"),
