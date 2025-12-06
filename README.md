@@ -57,28 +57,28 @@
 [![Backend Deployment](https://img.shields.io/badge/Backend-Live-brightgreen.svg?style=flat-square&logo=render&logoColor=white)](https://howl2go-backend-service.onrender.com/api/health)
 [![Frontend Deployment](https://img.shields.io/badge/Frontend-Vercel-000000?style=flat-square&logo=vercel&logoColor=white)](https://vercel.com)
 [![Database](https://img.shields.io/badge/Database-MongoDB_Atlas-47A248?style=flat-square&logo=mongodb&logoColor=white)](https://www.mongodb.com/cloud/atlas)
-[![CI/CD](https://img.shields.io/badge/CI/CD-GitHub_Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4/actions)
+[![CI/CD](https://img.shields.io/badge/CI/CD-GitHub_Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4/actions)
 [![Docker](https://img.shields.io/badge/Docker-Supported-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com/)
 [![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.17547804-blue?style=flat-square&logo=zenodo&logoColor=white)](https://doi.org/10.5281/zenodo.17547804)
 
 ### ✅ Build & Quality
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square&logo=github-actions&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![Coverage Status](https://coveralls.io/repos/github/CodeRockerr/SE-Project-3_Group4/badge.svg?branch=main&style=flat-square)](https://coveralls.io/github/CodeRockerr/SE-Project-3_Group4?branch=main)
-[![Tests](https://img.shields.io/badge/tests-404_passing-success?style=flat-square&logo=jest&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![Test Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen?style=flat-square&logo=coveralls&logoColor=white)](https://coveralls.io/github/CodeRockerr/SE-Project-3_Group4)
-[![Code Quality](https://img.shields.io/badge/code_quality-A-green?style=flat-square&logo=code-quality&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square&logo=github-actions&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![Coverage Status](https://coveralls.io/repos/github/CodeRockerr/se_project-3_group4/badge.svg?branch=main&style=flat-square)](https://coveralls.io/github/CodeRockerr/se_project-3_group4?branch=main)
+[![Tests](https://img.shields.io/badge/tests-404_passing-success?style=flat-square&logo=jest&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![Test Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen?style=flat-square&logo=coveralls&logoColor=white)](https://coveralls.io/github/CodeRockerr/se_project-3_group4)
+[![Code Quality](https://img.shields.io/badge/code_quality-A-green?style=flat-square&logo=code-quality&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 [![Code Style](https://img.shields.io/badge/code_style-prettier-F7B93E?style=flat-square&logo=prettier&logoColor=white)](https://prettier.io/)
 [![Linting](https://img.shields.io/badge/linting-eslint-4B32C3?style=flat-square&logo=eslint&logoColor=white)](https://eslint.org/)
 
 ### 🔒 Security & Performance
 
-[![Security](https://img.shields.io/badge/security-audited-green?style=flat-square&logo=security&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![Security](https://img.shields.io/badge/security-audited-green?style=flat-square&logo=security&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 [![Dependencies](https://img.shields.io/badge/dependencies-up_to_date-brightgreen?style=flat-square&logo=npm&logoColor=white)](https://www.npmjs.com/)
-[![Vulnerabilities](https://img.shields.io/badge/vulnerabilities-none-brightgreen?style=flat-square&logo=shield&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![Performance](https://img.shields.io/badge/performance-optimized-green?style=flat-square&logo=speedtest&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![Response Time](https://img.shields.io/badge/response_time-<2s-brightgreen?style=flat-square&logo=clock&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![Uptime](https://img.shields.io/badge/uptime-99.9%25-success?style=flat-square&logo=uptime-robot&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![Vulnerabilities](https://img.shields.io/badge/vulnerabilities-none-brightgreen?style=flat-square&logo=shield&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![Performance](https://img.shields.io/badge/performance-optimized-green?style=flat-square&logo=speedtest&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![Response Time](https://img.shields.io/badge/response_time-<2s-brightgreen?style=flat-square&logo=clock&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![Uptime](https://img.shields.io/badge/uptime-99.9%25-success?style=flat-square&logo=uptime-robot&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 
 ### 💻 Frontend Technologies
 
@@ -107,7 +107,7 @@
 [![Groq](https://img.shields.io/badge/Groq-LLM_API-FF6B6B?style=flat-square&logo=groq&logoColor=white)](https://groq.com/)
 [![Llama](https://img.shields.io/badge/Llama-3.1_8B-FF6B6B?style=flat-square&logo=meta&logoColor=white)](https://llama.meta.com/)
 [![AI Powered](https://img.shields.io/badge/AI-Powered-FF6B6B?style=flat-square&logo=openai&logoColor=white)](https://groq.com/)
-[![Natural Language](https://img.shields.io/badge/Natural_Language-Processing-green?style=flat-square&logo=language&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![Natural Language](https://img.shields.io/badge/Natural_Language-Processing-green?style=flat-square&logo=language&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 
 ### 🧪 Testing & Quality Assurance
 
@@ -123,7 +123,7 @@
 [![Husky](https://img.shields.io/badge/Husky-9.1.7-42B883?style=flat-square&logo=husky&logoColor=white)](https://typicode.github.io/husky/)
 [![Lint Staged](https://img.shields.io/badge/Lint_Staged-16.2.4-FF6B6B?style=flat-square&logo=lint-staged&logoColor=white)](https://github.com/okonet/lint-staged)
 [![Nodemon](https://img.shields.io/badge/Nodemon-3.1.10-76D04B?style=flat-square&logo=nodemon&logoColor=white)](https://nodemon.io/)
-[![Hot Reload](https://img.shields.io/badge/Hot_Reload-Enabled-success?style=flat-square&logo=hot-reload&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![Hot Reload](https://img.shields.io/badge/Hot_Reload-Enabled-success?style=flat-square&logo=hot-reload&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 
 ### 📦 Package Management
 
@@ -133,44 +133,44 @@
 
 ### 🌐 Platform & Browser Support
 
-[![Platform](https://img.shields.io/badge/platform-Windows_%7C_Linux_%7C_macOS-lightgrey?style=flat-square&logo=os&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![Browser Support](https://img.shields.io/badge/browser-Chrome_%7C_Firefox_%7C_Safari_%7C_Edge-blue?style=flat-square&logo=browser&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![Mobile Responsive](https://img.shields.io/badge/mobile-responsive-green?style=flat-square&logo=mobile&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![PWA](https://img.shields.io/badge/PWA-Ready-4285F4?style=flat-square&logo=pwa&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![Platform](https://img.shields.io/badge/platform-Windows_%7C_Linux_%7C_macOS-lightgrey?style=flat-square&logo=os&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![Browser Support](https://img.shields.io/badge/browser-Chrome_%7C_Firefox_%7C_Safari_%7C_Edge-blue?style=flat-square&logo=browser&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![Mobile Responsive](https://img.shields.io/badge/mobile-responsive-green?style=flat-square&logo=mobile&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![PWA](https://img.shields.io/badge/PWA-Ready-4285F4?style=flat-square&logo=pwa&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 
 ### 📊 API & Database
 
-[![API](https://img.shields.io/badge/API-REST-FF6B6B?style=flat-square&logo=api&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![RESTful](https://img.shields.io/badge/RESTful-Yes-green?style=flat-square&logo=rest&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![API](https://img.shields.io/badge/API-REST-FF6B6B?style=flat-square&logo=api&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![RESTful](https://img.shields.io/badge/RESTful-Yes-green?style=flat-square&logo=rest&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 [![GraphQL](https://img.shields.io/badge/GraphQL-No-red?style=flat-square&logo=graphql&logoColor=white)](https://graphql.org/)
 [![WebSocket](https://img.shields.io/badge/WebSocket-No-red?style=flat-square&logo=websocket&logoColor=white)](https://websockets.org/)
 
 ### ✨ Features
 
-[![Shopping Cart](https://img.shields.io/badge/Shopping_Cart-Enabled-green?style=flat-square&logo=shopping-cart&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![Order History](https://img.shields.io/badge/Order_History-Available-green?style=flat-square&logo=history&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![Shopping Cart](https://img.shields.io/badge/Shopping_Cart-Enabled-green?style=flat-square&logo=shopping-cart&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![Order History](https://img.shields.io/badge/Order_History-Available-green?style=flat-square&logo=history&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 [![User Auth](https://img.shields.io/badge/User_Auth-JWT-blue?style=flat-square&logo=auth&logoColor=white)](https://jwt.io/)
 [![Session Management](https://img.shields.io/badge/Session-MongoDB-blue?style=flat-square&logo=session&logoColor=white)](https://www.mongodb.com/)
-[![Admin Dashboard](https://img.shields.io/badge/Admin_Dashboard-Available-purple?style=flat-square&logo=admin&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![Ratings & Reviews](https://img.shields.io/badge/Ratings_%26_Reviews-Enabled-yellow?style=flat-square&logo=star&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![Admin Dashboard](https://img.shields.io/badge/Admin_Dashboard-Available-purple?style=flat-square&logo=admin&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![Ratings & Reviews](https://img.shields.io/badge/Ratings_%26_Reviews-Enabled-yellow?style=flat-square&logo=star&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 
 ### 📈 Project Statistics
 
-[![GitHub Stars](https://img.shields.io/github/stars/CodeRockerr/SE-Project-3_Group4?style=flat-square&logo=github&logoColor=white&label=Stars)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![GitHub Forks](https://img.shields.io/github/forks/CodeRockerr/SE-Project-3_Group4?style=flat-square&logo=github&logoColor=white&label=Forks)](https://github.com/CodeRockerr/SE-Project-3_Group4/fork)
-[![GitHub Issues](https://img.shields.io/github/issues/CodeRockerr/SE-Project-3_Group4?style=flat-square&logo=github&logoColor=white&label=Issues)](https://github.com/CodeRockerr/SE-Project-3_Group4/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/CodeRockerr/SE-Project-3_Group4?style=flat-square&logo=github&logoColor=white&label=PRs)](https://github.com/CodeRockerr/SE-Project-3_Group4/pulls)
-[![GitHub Contributors](https://img.shields.io/github/contributors/CodeRockerr/SE-Project-3_Group4?style=flat-square&logo=github&logoColor=white&label=Contributors)](https://github.com/CodeRockerr/SE-Project-3_Group4/graphs/contributors)
-[![GitHub Last Commit](https://img.shields.io/github/last-commit/CodeRockerr/SE-Project-3_Group4?style=flat-square&logo=github&logoColor=white&label=Last%20Commit)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![GitHub Release](https://img.shields.io/github/release/CodeRockerr/SE-Project-3_Group4?style=flat-square&logo=github&logoColor=white&label=Release)](https://github.com/CodeRockerr/SE-Project-3_Group4/releases)
-[![GitHub Language Count](https://img.shields.io/github/languages/count/CodeRockerr/SE-Project-3_Group4?style=flat-square&logo=github&logoColor=white&label=Languages)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![GitHub Repo Size](https://img.shields.io/github/repo-size/CodeRockerr/SE-Project-3_Group4?style=flat-square&logo=github&logoColor=white&label=Repo%20Size)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![GitHub Stars](https://img.shields.io/github/stars/CodeRockerr/se_project-3_group4?style=flat-square&logo=github&logoColor=white&label=Stars)](https://github.com/CodeRockerr/se_project-3_group4)
+[![GitHub Forks](https://img.shields.io/github/forks/CodeRockerr/se_project-3_group4?style=flat-square&logo=github&logoColor=white&label=Forks)](https://github.com/CodeRockerr/se_project-3_group4/fork)
+[![GitHub Issues](https://img.shields.io/github/issues/CodeRockerr/se_project-3_group4?style=flat-square&logo=github&logoColor=white&label=Issues)](https://github.com/CodeRockerr/se_project-3_group4/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/CodeRockerr/se_project-3_group4?style=flat-square&logo=github&logoColor=white&label=PRs)](https://github.com/CodeRockerr/se_project-3_group4/pulls)
+[![GitHub Contributors](https://img.shields.io/github/contributors/CodeRockerr/se_project-3_group4?style=flat-square&logo=github&logoColor=white&label=Contributors)](https://github.com/CodeRockerr/se_project-3_group4/graphs/contributors)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/CodeRockerr/se_project-3_group4?style=flat-square&logo=github&logoColor=white&label=Last%20Commit)](https://github.com/CodeRockerr/se_project-3_group4)
+[![GitHub Release](https://img.shields.io/github/release/CodeRockerr/se_project-3_group4?style=flat-square&logo=github&logoColor=white&label=Release)](https://github.com/CodeRockerr/se_project-3_group4/releases)
+[![GitHub Language Count](https://img.shields.io/github/languages/count/CodeRockerr/se_project-3_group4?style=flat-square&logo=github&logoColor=white&label=Languages)](https://github.com/CodeRockerr/se_project-3_group4)
+[![GitHub Repo Size](https://img.shields.io/github/repo-size/CodeRockerr/se_project-3_group4?style=flat-square&logo=github&logoColor=white&label=Repo%20Size)](https://github.com/CodeRockerr/se_project-3_group4)
 
 ### 📝 Standards & Compliance
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square&logo=license&logoColor=white)](LICENSE)
-[![Maintained](https://img.shields.io/badge/Maintained-yes-green.svg?style=flat-square&logo=maintained&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![Status](https://img.shields.io/badge/status-active-success.svg?style=flat-square&logo=status&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![Maintained](https://img.shields.io/badge/Maintained-yes-green.svg?style=flat-square&logo=maintained&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![Status](https://img.shields.io/badge/status-active-success.svg?style=flat-square&logo=status&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 [![Semantic Versioning](https://img.shields.io/badge/semantic--versioning-2.0.0-blue?style=flat-square&logo=semver&logoColor=white)](https://semver.org/)
 [![Conventional Commits](https://img.shields.io/badge/Conventional_Commits-1.0.0-yellow?style=flat-square&logo=conventional-commits&logoColor=white)](https://conventionalcommits.org/)
 [![Code of Conduct](https://img.shields.io/badge/Code_of_Conduct-Contributor_Covenant-2ecc71?style=flat-square&logo=code-of-conduct&logoColor=white)](CODE_OF_CONDUCT.md)
@@ -225,13 +225,13 @@ Our AI-powered platform instantly understands your requirements and shows you ex
 
 <div align="center">
 
-| 🎯 Search & Discovery | ⚡ Performance & UX |
-|----------------------|---------------------|
-| 🧠 Natural Language Search | ⚡ Lightning Fast (<2s) |
-| 📊 Smart Nutritional Filtering | 🎨 Beautiful Dark Theme UI |
-| 🏪 Multi-Restaurant Discovery | 📱 Fully Responsive Design |
-| 🛒 Shopping Cart & Orders | 🔍 Real-time Search Results |
-| ⭐ Ratings & Reviews | 💾 Order History Tracking |
+| 🎯 Search & Discovery          | ⚡ Performance & UX         |
+| ----------------------------- | -------------------------- |
+| 🧠 Natural Language Search     | ⚡ Lightning Fast (<2s)     |
+| 📊 Smart Nutritional Filtering | 🎨 Beautiful Dark Theme UI  |
+| 🏪 Multi-Restaurant Discovery  | 📱 Fully Responsive Design  |
+| 🛒 Shopping Cart & Orders      | 🔍 Real-time Search Results |
+| ⭐ Ratings & Reviews           | 💾 Order History Tracking   |
 
 </div>
 
@@ -315,8 +315,8 @@ Complete REST API, TypeScript support, comprehensive docs, pre-commit hooks, and
 #### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/CodeRockerr/SE-Project-3_Group4.git
-cd SE-Project-3_Group4/Proj_2
+git clone https://github.com/CodeRockerr/se_project-3_group4.git
+cd se_project-3_group4/Proj_2
 ```
 
 #### 2️⃣ Setup Backend
@@ -463,14 +463,14 @@ graph LR
 
 </div>
 
-| 📄 Document | 📝 Description |
-|-------------|----------------|
-| [![Getting Started](https://img.shields.io/badge/Getting_Started-Guide-blue?style=flat-square&logo=book&logoColor=white)](Proj_2/docs/GETTING_STARTED.md) | Complete user guide with search examples |
-| [![Developer Setup](https://img.shields.io/badge/Developer_Setup-Guide-green?style=flat-square&logo=code&logoColor=white)](Proj_2/docs/DEVELOPER_SETUP.md) | Development environment setup |
-| [![API Docs](https://img.shields.io/badge/API-Documentation-purple?style=flat-square&logo=api&logoColor=white)](Proj_2/docs/API_DOCUMENTATION.md) | REST API reference |
-| [![Database Schema](https://img.shields.io/badge/Database-Schema-orange?style=flat-square&logo=database&logoColor=white)](Proj_2/docs/DATABASE_SCHEMA.md) | Database structure and models |
-| [![Features](https://img.shields.io/badge/Features-Catalog-yellow?style=flat-square&logo=features&logoColor=white)](Proj_2/docs/FEATURES.md) | Complete feature catalog |
-| [![Testing Guide](https://img.shields.io/badge/Testing-Guide-red?style=flat-square&logo=test&logoColor=white)](Proj_2/docs/TESTING_GUIDE.md) | Testing strategies and examples |
+| 📄 Document                                                                                                                                                 | 📝 Description                            |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| [![Getting Started](https://img.shields.io/badge/Getting_Started-Guide-blue?style=flat-square&logo=book&logoColor=white)](Proj_2/docs/GETTING_STARTED.md)  | Complete user guide with search examples |
+| [![Developer Setup](https://img.shields.io/badge/Developer_Setup-Guide-green?style=flat-square&logo=code&logoColor=white)](Proj_2/docs/DEVELOPER_SETUP.md) | Development environment setup            |
+| [![API Docs](https://img.shields.io/badge/API-Documentation-purple?style=flat-square&logo=api&logoColor=white)](Proj_2/docs/API_DOCUMENTATION.md)          | REST API reference                       |
+| [![Database Schema](https://img.shields.io/badge/Database-Schema-orange?style=flat-square&logo=database&logoColor=white)](Proj_2/docs/DATABASE_SCHEMA.md)  | Database structure and models            |
+| [![Features](https://img.shields.io/badge/Features-Catalog-yellow?style=flat-square&logo=features&logoColor=white)](Proj_2/docs/FEATURES.md)               | Complete feature catalog                 |
+| [![Testing Guide](https://img.shields.io/badge/Testing-Guide-red?style=flat-square&logo=test&logoColor=white)](Proj_2/docs/TESTING_GUIDE.md)               | Testing strategies and examples          |
 
 ---
 
@@ -478,7 +478,7 @@ graph LR
 
 <div align="center">
 
-[![Tests](https://img.shields.io/badge/Tests-404_passing-success?style=for-the-badge&logo=jest&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![Tests](https://img.shields.io/badge/Tests-404_passing-success?style=for-the-badge&logo=jest&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 [![Coverage](https://img.shields.io/badge/Coverage-85%25-brightgreen?style=for-the-badge&logo=coveralls&logoColor=white)](https://coveralls.io/)
 
 </div>
@@ -647,16 +647,16 @@ We welcome contributions! Please see our [Contributing Guide](Proj_2/CONTRIBUTIN
 
 **SE_Project_Grp_4** 👨‍💻👩‍💻
 
-[![Team](https://img.shields.io/badge/👥_Team-4_Members-blue?style=for-the-badge&logo=team&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4/graphs/contributors)
+[![Team](https://img.shields.io/badge/👥_Team-4_Members-blue?style=for-the-badge&logo=team&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4/graphs/contributors)
 
 </div>
 
-| 👤 Member | 🔗 GitHub | 🏷️ Role |
-|-----------|-----------|---------|
+| 👤 Member     | 🔗 GitHub                                                                                                                                      | 🏷️ Role    |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
 | Anandteertha | [![GitHub](https://img.shields.io/badge/@anandteertha-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/anandteertha) | Developer |
-| Pratham | [![GitHub](https://img.shields.io/badge/@pratham2879-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/pratham2879) | Developer |
-| Samarth | [![GitHub](https://img.shields.io/badge/@Samarth061-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/Samarth061) | Developer |
-| Jai | [![GitHub](https://img.shields.io/badge/@JaiRumz-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/JaiRumz) | Developer |
+| Pratham      | [![GitHub](https://img.shields.io/badge/@pratham2879-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/pratham2879)   | Developer |
+| Samarth      | [![GitHub](https://img.shields.io/badge/@Samarth061-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/Samarth061)     | Developer |
+| Jai          | [![GitHub](https://img.shields.io/badge/@JaiRumz-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/JaiRumz)           | Developer |
 
 **📚 Course:** Software Engineering  
 **🏫 Institution:** NC State University (Fall 2025)
@@ -695,14 +695,14 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 <div align="center">
 
 [![Email](https://img.shields.io/badge/📧_Email-support-blue?style=flat-square&logo=email&logoColor=white)](mailto:supp0rt.howl2go@gmail.com)
-[![Issues](https://img.shields.io/badge/🐛_Issues-Report-red?style=flat-square&logo=github&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4/issues)
-[![Discussions](https://img.shields.io/badge/💬_Discussions-Join-green?style=flat-square&logo=discussions&logoColor=white)](https://github.com/CodeRockerr/SE-Project-3_Group4/discussions)
+[![Issues](https://img.shields.io/badge/🐛_Issues-Report-red?style=flat-square&logo=github&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4/issues)
+[![Discussions](https://img.shields.io/badge/💬_Discussions-Join-green?style=flat-square&logo=discussions&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4/discussions)
 
 </div>
 
 - 📧 **Email:** supp0rt.howl2go@gmail.com
-- 🐛 **Issues:** [GitHub Issues](https://github.com/CodeRockerr/SE-Project-3_Group4/issues)
-- 💬 **Discussions:** [GitHub Discussions](https://github.com/CodeRockerr/SE-Project-3_Group4/discussions)
+- 🐛 **Issues:** [GitHub Issues](https://github.com/CodeRockerr/se_project-3_group4/issues)
+- 💬 **Discussions:** [GitHub Discussions](https://github.com/CodeRockerr/se_project-3_group4/discussions)
 
 ---
 
@@ -712,8 +712,8 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 *Crave it. Find it. Instantly.* 🚀
 
-[![Stars](https://img.shields.io/github/stars/CodeRockerr/SE-Project-3_Group4?style=social&label=Star)](https://github.com/CodeRockerr/SE-Project-3_Group4)
-[![Forks](https://img.shields.io/github/forks/CodeRockerr/SE-Project-3_Group4?style=social&label=Fork)](https://github.com/CodeRockerr/SE-Project-3_Group4/fork)
+[![Stars](https://img.shields.io/github/stars/CodeRockerr/se_project-3_group4?style=social&label=Star)](https://github.com/CodeRockerr/se_project-3_group4)
+[![Forks](https://img.shields.io/github/forks/CodeRockerr/se_project-3_group4?style=social&label=Fork)](https://github.com/CodeRockerr/se_project-3_group4/fork)
 
 **[⬆ Back to Top](#-howl2go)**
 
