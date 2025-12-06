@@ -31,9 +31,20 @@ class LLMService {
                 chat: {
                     completions: {
                         create: async ({ messages }) => {
-                            const prompt = messages[1].content || '';
-                            // Very small heuristic parser for tests
-                            const content = simpleTestParse(prompt);
+                            // messages[1].content contains the full prompt built by buildPrompt,
+                            // which includes many example user prompts. To avoid the mock parser
+                            // falsely matching example text, extract only the user's actual
+                            // prompt that appears after the marker.
+                            const full = (messages[1] && messages[1].content) || '';
+                            const marker = 'Now, here is the user prompt:';
+                            let userPrompt = full;
+                            const idx = full.lastIndexOf(marker);
+                            if (idx !== -1) {
+                                userPrompt = full.slice(idx + marker.length).trim();
+                            }
+
+                            // Very small heuristic parser for tests — use only the extracted user prompt
+                            const content = simpleTestParse(userPrompt);
                             return {
                                 choices: [
                                     {
@@ -206,6 +217,66 @@ Now, here is the user prompt: ${userPrompt}
         }
     }
 
+    /**
+     * Convert LLM criteria to MongoDB query
+     * @param {Object} criteria - Parsed criteria from LLM
+     * @returns {Object} - MongoDB query object
+     */
+    buildMongoQuery(criteria) {
+        const query = {};
+
+        // Map of criteria fields to database fields
+        const fieldMapping = {
+            company: "company",
+            item: "item",
+            calories: "calories",
+            protein: "protein",
+            totalFat: "totalFat",
+            carbs: "carbs",
+            fiber: "fiber",
+            sugars: "sugars",
+            sodium: "sodium",
+            cholesterol: "cholesterol",
+            saturatedFat: "saturatedFat",
+            transFat: "transFat",
+            caloriesFromFat: "caloriesFromFat",
+        };
+
+        for (const [criteriaField, dbField] of Object.entries(fieldMapping)) {
+            if (criteria && criteria[criteriaField]) {
+                // Handle text-based fields (company and item) with regex search
+                if (criteriaField === "company" || criteriaField === "item") {
+                    const constraint = criteria[criteriaField];
+                    // If it has a 'name' property, do a case-insensitive regex search
+                    if (constraint.name) {
+                        query[dbField] = {
+                            $regex: constraint.name,
+                            $options: "i",
+                        };
+                    }
+                    continue;
+                }
+                const constraint = criteria[criteriaField];
+
+                if (
+                    constraint.min !== undefined &&
+                    constraint.max !== undefined
+                ) {
+                    query[dbField] = {
+                        $gte: constraint.min,
+                        $lte: constraint.max,
+                    };
+                } else if (constraint.min !== undefined) {
+                    query[dbField] = { $gte: constraint.min };
+                } else if (constraint.max !== undefined) {
+                    query[dbField] = { $lte: constraint.max };
+                }
+            }
+        }
+
+        return query;
+    }
+
 }
 
 /**
@@ -257,65 +328,6 @@ function simpleTestParse(prompt) {
     if (Object.keys(criteria).length === 0) return {};
     return criteria;
 
-    /**
-     * Convert LLM criteria to MongoDB query
-     * @param {Object} criteria - Parsed criteria from LLM
-     * @returns {Object} - MongoDB query object
-     */
-    buildMongoQuery(criteria) {
-        const query = {};
-
-        // Map of criteria fields to database fields
-        const fieldMapping = {
-            company: "company",
-            item: "item",
-            calories: "calories",
-            protein: "protein",
-            totalFat: "totalFat",
-            carbs: "carbs",
-            fiber: "fiber",
-            sugars: "sugars",
-            sodium: "sodium",
-            cholesterol: "cholesterol",
-            saturatedFat: "saturatedFat",
-            transFat: "transFat",
-            caloriesFromFat: "caloriesFromFat",
-        };
-
-        for (const [criteriaField, dbField] of Object.entries(fieldMapping)) {
-            if (criteria[criteriaField]) {
-                // Handle text-based fields (company and item) with regex search
-                if (criteriaField === "company" || criteriaField === "item") {
-                    const constraint = criteria[criteriaField];
-                    // If it has a 'name' property, do a case-insensitive regex search
-                    if (constraint.name) {
-                        query[dbField] = {
-                            $regex: constraint.name,
-                            $options: "i", // case-insensitive
-                        };
-                    }
-                    continue;
-                }
-                const constraint = criteria[criteriaField];
-
-                if (
-                    constraint.min !== undefined &&
-                    constraint.max !== undefined
-                ) {
-                    query[dbField] = {
-                        $gte: constraint.min,
-                        $lte: constraint.max,
-                    };
-                } else if (constraint.min !== undefined) {
-                    query[dbField] = { $gte: constraint.min };
-                } else if (constraint.max !== undefined) {
-                    query[dbField] = { $lte: constraint.max };
-                }
-            }
-        }
-
-        return query;
-    }
 }
 
 // Export singleton instance

@@ -10,111 +10,74 @@ import FastFoodItem from '../models/FastFoodItem.js';
 export const createReview = async (req, res) => {
   try {
     if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Authentication required'
-      });
+      return res.status(401).json({ success: false, message: 'Authentication required' });
     }
 
     const userId = req.user.id;
     const { orderId, foodItemId, rating, comment } = req.body;
 
-    // Validate required fields
-    if (!orderId || !foodItemId || !rating) {
-      return res.status(400).json({
-        success: false,
-        message: 'Order ID, Food Item ID, and rating are required'
-      });
+    // Validate required fields - orderId is optional
+    if (!foodItemId || !rating) {
+      return res.status(400).json({ success: false, message: 'Food Item ID and rating are required' });
     }
 
-    // Validate rating
     if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-      return res.status(400).json({
-        success: false,
-        message: 'Rating must be an integer between 1 and 5'
-      });
+      return res.status(400).json({ success: false, message: 'Rating must be an integer between 1 and 5' });
     }
 
-    // Verify order belongs to user and contains the food item
-    const order = await Order.findOne({
-      _id: orderId,
-      userId,
-      status: 'completed'
-    });
+    let restaurant = undefined;
+    let itemName = undefined;
+    let isVerified = false;
 
-    if (!order) {
-      return res.status(404).json({
-        success: false,
-        message: 'Order not found or does not belong to you'
-      });
+    if (orderId) {
+      const order = await Order.findOne({ _id: orderId, userId, status: 'completed' });
+      if (!order) return res.status(404).json({ success: false, message: 'Order not found or does not belong to you' });
+
+      const orderItem = order.items.find(item => String(item.foodItem) === String(foodItemId));
+      if (!orderItem) return res.status(400).json({ success: false, message: 'Food item not found in this order' });
+
+      restaurant = orderItem.restaurant;
+      itemName = orderItem.item;
+      isVerified = true;
+
+      const existingReview = await Review.findOne({ userId, foodItemId, orderId });
+      if (existingReview) return res.status(409).json({ success: false, message: 'You have already reviewed this item from this order' });
+    } else {
+      const ff = await FastFoodItem.findById(foodItemId);
+      if (!ff) return res.status(404).json({ success: false, message: 'Food item not found' });
+      restaurant = ff.company || ff.restaurant || undefined;
+      itemName = ff.item || undefined;
+
+      const existingReview = await Review.findOne({ userId, foodItemId, orderId: { $exists: false } });
+      if (existingReview) return res.status(409).json({ success: false, message: 'You have already reviewed this item' });
     }
 
-    // Check if item exists in order
-    const orderItem = order.items.find(
-      item => item.foodItem.toString() === foodItemId.toString()
-    );
-
-    if (!orderItem) {
-      return res.status(400).json({
-        success: false,
-        message: 'Food item not found in this order'
-      });
-    }
-
-    // Check if user already reviewed this item
-    const existingReview = await Review.findOne({
-      userId,
-      foodItemId,
-      orderId
-    });
-
-    if (existingReview) {
-      return res.status(400).json({
-        success: false,
-        message: 'You have already reviewed this item from this order'
-      });
-    }
-
-    // Get food item details
-    const foodItem = await FastFoodItem.findById(foodItemId);
-    if (!foodItem) {
-      return res.status(404).json({
-        success: false,
-        message: 'Food item not found'
-      });
-    }
-
-    // Create review
     const review = await Review.create({
       userId,
-      orderId,
+      orderId: orderId || undefined,
       foodItemId,
-      restaurant: orderItem.restaurant,
-      itemName: orderItem.item,
+      restaurant,
+      itemName,
       rating,
       comment: comment || '',
-      isVerified: true // Verified since it's from an actual order
+      isVerified
     });
 
-    // Populate user info for response
-    const populatedReview = await Review.findById(review._id)
-      .populate('userId', 'name email')
-      .lean();
+    let populatedReview = await Review.findById(review._id).populate('userId', 'name email').lean();
 
-    res.status(201).json({
-      success: true,
-      message: 'Review created successfully',
-      data: {
-        review: populatedReview
+    // Normalize `userId` to an ID string for the create response (tests expect an id, not populated object)
+    if (populatedReview && populatedReview.userId) {
+      if (populatedReview.userId._id) {
+        populatedReview.userId = populatedReview.userId._id.toString();
+      } else {
+        populatedReview.userId = String(populatedReview.userId);
       }
-    });
+    }
+
+    return res.status(201).json({ success: true, message: 'Review created successfully', data: { review: populatedReview } });
   } catch (error) {
     console.error('Error creating review:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to create review',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    return res.status(500).json({ success: false, message: 'Failed to create review', error: process.env.NODE_ENV === 'development' ? error.message : undefined });
   }
 };
 
@@ -310,16 +273,13 @@ export const updateReview = async (req, res) => {
     const { reviewId } = req.params;
     const { rating, comment } = req.body;
 
-    const review = await Review.findOne({
-      _id: reviewId,
-      userId
-    });
-
+    const review = await Review.findById(reviewId);
     if (!review) {
-      return res.status(404).json({
-        success: false,
-        message: 'Review not found or you do not have permission to update it'
-      });
+      return res.status(404).json({ success: false, message: 'Review not found' });
+    }
+
+    if (String(review.userId) !== String(userId)) {
+      return res.status(403).json({ success: false, message: 'You do not have permission to update this review' });
     }
 
     if (rating !== undefined) {
@@ -375,15 +335,18 @@ export const deleteReview = async (req, res) => {
     const userId = req.user.id;
     const { reviewId } = req.params;
 
-    const review = await Review.findOne({
-      _id: reviewId,
-      userId
-    });
-
+    const review = await Review.findById(reviewId);
     if (!review) {
       return res.status(404).json({
         success: false,
-        message: 'Review not found or you do not have permission to delete it'
+        message: 'Review not found'
+      });
+    }
+
+    if (String(review.userId) !== String(userId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have permission to delete this review'
       });
     }
 
@@ -429,11 +392,21 @@ export const markHelpful = async (req, res) => {
 
     await review.markHelpful(userId);
 
+    // Refresh and fetch the updated review
+    let updatedReview = await Review.findById(reviewId)
+      .populate('userId', 'name email')
+      .lean();
+
+    // Normalize 'helpful' field to 'helpfulVotes' for API consistency
+    if (updatedReview) {
+      updatedReview.helpfulVotes = updatedReview.helpful;
+    }
+
     res.status(200).json({
       success: true,
       message: 'Review marked as helpful',
       data: {
-        helpful: review.helpful
+        review: updatedReview
       }
     });
   } catch (error) {

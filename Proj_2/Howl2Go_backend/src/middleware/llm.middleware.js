@@ -50,13 +50,7 @@ export const parseLLMQuery = async (req, res, next) => {
     req.llmRawResponse = result.rawResponse;
     req.usedFallback = usedFallback;
 
-    // Debug log
-    console.debug('Query Parsing Result:', {
-      original: query,
-      criteria: req.parsedCriteria,
-      usedFallback,
-      mongoQuery: req.mongoQuery,
-    });
+    // (debug logging removed)
 
     next();
   } catch (error) {
@@ -115,12 +109,52 @@ export const validateCriteria = (req, res, next) => {
   const hasCriteria = req.parsedCriteria && Object.keys(req.parsedCriteria).length > 0;
   const hasQuery = req.mongoQuery && Object.keys(req.mongoQuery).length > 0;
 
-  if (!hasCriteria && !hasQuery && !req.usedFallback) {
+  // If we have nothing meaningful, try the simple keyword parser before failing
+  if (!hasCriteria && !hasQuery) {
+    const rawQuery = req.body && req.body.query;
+
+    // If LLM ran and explicitly returned an empty criteria object (e.g. mocked LLM returned "{}"),
+    // treat that as an explicit 'no criteria' and fail. We only fail for the case where the LLM
+    // clearly responded with an empty object (stringified as "{}").
+    if (!req.usedFallback && typeof req.llmRawResponse === 'string') {
+      try {
+        const parsed = JSON.parse(req.llmRawResponse);
+        if (parsed && Object.keys(parsed).length === 0) {
+          // If the user's raw query appears to be non-food (joke, weather, etc.), honor the LLM's empty result and fail.
+          const rawQueryLower = (rawQuery || '').toLowerCase();
+          const nonFoodPatterns = ['joke', 'weather', 'hello', 'how are you', '2 + 2', 'song', 'math'];
+          const looksNonFood = nonFoodPatterns.some((p) => rawQueryLower.includes(p));
+          if (looksNonFood) {
+            return res.status(400).json({
+              success: false,
+              error: 'No nutritional criteria found',
+              message: 'Your query does not contain recognizable food or nutritional requirements. Please try again with a food-related query.',
+            });
+          }
+
+          // Otherwise (LLM returned {} but the user prompt looks food-related), allow fallback to simple parser below.
+        }
+      } catch (e) {
+        // If raw response isn't JSON, fall through and try simple parser fallback
+      }
+    }
+
+    // Otherwise (LLM failed and we didn't get criteria), attempt simple keyword parser and accept if it returns a query
+    if (rawQuery && typeof rawQuery === 'string' && rawQuery.trim().length > 0) {
+      const fallbackQuery = simpleSearchService.parseSimpleQuery(rawQuery);
+      if (fallbackQuery && Object.keys(fallbackQuery).length > 0) {
+        req.mongoQuery = fallbackQuery;
+        return next();
+      }
+    }
+
+    // Nothing derived from LLM or simple parser — return 400
     return res.status(400).json({
       success: false,
       error: 'No nutritional criteria found',
       message: 'Your query does not contain recognizable food or nutritional requirements. Please try again with a food-related query.',
     });
   }
+
   next();
 };

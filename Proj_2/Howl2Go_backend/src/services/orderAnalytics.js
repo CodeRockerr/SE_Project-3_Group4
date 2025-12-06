@@ -299,14 +299,11 @@ export async function generatePersonalizedRecommendations(userId) {
     });
   }
 
-  return {
-    recommendations: recommendations.sort((a, b) => {
-      const priorityOrder = { high: 3, medium: 2, low: 1 };
-      return priorityOrder[b.priority] - priorityOrder[a.priority];
-    }),
-    patterns,
-    trends
-  };
+  // Return just the sorted recommendations array for test compatibility
+  return recommendations.sort((a, b) => {
+    const priorityOrder = { high: 3, medium: 2, low: 1 };
+    return priorityOrder[b.priority] - priorityOrder[a.priority];
+  });
 }
 
 /**

@@ -78,18 +78,28 @@ cartSchema.pre('save', function(next) {
 
 // Methods
 cartSchema.methods.addItem = function(itemData) {
+  const incomingId = itemData && itemData.foodItem && itemData.foodItem._id ? String(itemData.foodItem._id) : String(itemData.foodItem);
   const existingItemIndex = this.items.findIndex(
-    item => item.foodItem.toString() === itemData.foodItem.toString()
+    (item) => {
+      const existingId = item.foodItem && item.foodItem._id ? String(item.foodItem._id) : String(item.foodItem);
+      return existingId === incomingId;
+    }
   );
 
   if (existingItemIndex > -1) {
     // Update quantity if item already exists
-    this.items[existingItemIndex].quantity += itemData.quantity || 1;
+    const addQty = itemData.quantity || 1;
+    this.items[existingItemIndex].quantity += addQty;
+    // If price provided in incoming data, prefer explicit price when set
+    if (typeof itemData.price === 'number') {
+      this.items[existingItemIndex].price = itemData.price;
+    }
   } else {
     // Add new item
     this.items.push({
       ...itemData,
-      quantity: itemData.quantity || 1
+      quantity: itemData.quantity || 1,
+      price: typeof itemData.price === 'number' ? itemData.price : 0
     });
   }
 
@@ -97,15 +107,17 @@ cartSchema.methods.addItem = function(itemData) {
 };
 
 cartSchema.methods.removeItem = function(foodItemId) {
+  const fid = String(foodItemId);
   this.items = this.items.filter(
-    item => item.foodItem.toString() !== foodItemId.toString()
+    (item) => String(item.foodItem) !== fid
   );
   return this.save();
 };
 
 cartSchema.methods.updateItemQuantity = function(foodItemId, quantity) {
+  const fid = String(foodItemId);
   const item = this.items.find(
-    item => item.foodItem.toString() === foodItemId.toString()
+    (it) => String(it.foodItem) === fid
   );
 
   if (item) {

@@ -12,9 +12,20 @@
  */
 
 import request from 'supertest';
+import mongoose from 'mongoose';
 import app from '../app.js';
+import connectDB from '../config/database.js';
 
 describe('Food Refinement Endpoint Tests', () => {
+  // Ensure tests run against in-memory MongoDB
+  beforeAll(async () => {
+    await connectDB();
+  });
+
+  afterAll(async () => {
+    await mongoose.connection.close();
+  });
+
   describe('POST /api/food/recommend - Parameter Acceptance', () => {
     test('should reject requests without query parameter', async () => {
       const response = await request(app)

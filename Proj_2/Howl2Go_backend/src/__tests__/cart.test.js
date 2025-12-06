@@ -398,7 +398,7 @@ describe("Cart API Tests", () => {
             assert.strictEqual(response.body.data.cart.items.length, 1);
             assert.strictEqual(response.body.data.cart.totalItems, 1);
             assert.strictEqual(
-                response.body.data.cart.items[0].foodItem.toString(),
+                response.body.data.cart.items[0].foodItem._id,
                 secondFoodItem._id.toString()
             );
         });
@@ -665,7 +665,8 @@ describe("Cart API Tests", () => {
             });
 
             assert.strictEqual(response.status, 200);
-            expect(response.body.data.cart.items[0].price).toBe(0);
+            // testFoodItem has 500 calories, so price = 500 * 0.01 = 5.0
+            expect(response.body.data.cart.items[0].price).toBe(5.0);
         });
 
         test("should calculate totalPrice correctly", async () => {
