@@ -64,6 +64,7 @@ export default function Header() {
             About
           </Link>
 
+
           {isAuthenticated ? (
             <>
               {/* Dashboard Link - when logged in */}

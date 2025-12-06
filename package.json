@@ -1,5 +1,5 @@
 {
-  "name": "se_project_grp_27",
+  "name": "SE_Project-3_Group4",
   "version": "1.0.0",
   "description": "- Proj 1   - Proj 1a1 - Problem familiarization   - Proj 1b1 - Problem Anticipation   - Proj 1c1 - Problem Condensation   - Proj 1d1 - Problem Reflection   - Proj 1e1 - Poster",
   "main": "index.js",
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/harsha711/SE_Project_Grp_27.git"
+    "url": "git+https://github.com/CodeRockerr/SE-Project-3_Group4.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/harsha711/SE_Project_Grp_27/issues"
+    "url": "https://github.com/CodeRockerr/SE-Project-3_Group4/issues"
   },
-  "homepage": "https://github.com/harsha711/SE_Project_Grp_27#readme",
+  "homepage": "https://github.com/CodeRockerr/SE-Project-3_Group4#readme",
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "echo 'Checking JavaScript/TypeScript files...'"
@@ -32,5 +32,9 @@
   "devDependencies": {
     "husky": "^9.1.7",
     "lint-staged": "^16.2.4"
+  },
+  "dependencies": {
+    "csv-parser": "^3.2.0",
+    "mongodb": "^7.0.0"
   }
 }

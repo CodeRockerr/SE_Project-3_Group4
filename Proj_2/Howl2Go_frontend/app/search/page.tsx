@@ -28,6 +28,9 @@ interface ApiRecommendation {
   protein?: number | null;
   weightWatchersPoints?: number | null;
   price?: number;
+  ingredients?: string[];
+  _id?: string;
+  id?: string | number;
 }
 
 interface ApiResponse {
@@ -126,6 +129,7 @@ function SmartMenuSearchContent() {
         protein: item.protein || null,
         weightWatchersPoints: item.weightWatchersPoints || null,
         price: item.price,
+        ingredients: Array.isArray(item.ingredients) ? item.ingredients : [],
       }));
     } else if (Array.isArray(data)) {
       // Format 2: Array of items
@@ -147,6 +151,7 @@ function SmartMenuSearchContent() {
         protein: item.protein || null,
         weightWatchersPoints: item.weightWatchersPoints || null,
         price: item.price,
+        ingredients: Array.isArray((item as any).ingredients) ? (item as any).ingredients : [],
       }));
     } else if (
       !Array.isArray(data) &&
@@ -172,6 +177,7 @@ function SmartMenuSearchContent() {
         protein: item.protein || null,
         weightWatchersPoints: item.weightWatchersPoints || null,
         price: item.price,
+        ingredients: Array.isArray((item as any).ingredients) ? (item as any).ingredients : [],
       }));
     } else if (!Array.isArray(data) && "restaurant" in data && "item" in data) {
       // Format 4: Single item
@@ -211,6 +217,7 @@ function SmartMenuSearchContent() {
             protein: extractValue(itemData.protein),
             weightWatchersPoints: extractValue(itemData.weightWatchersPoints),
             price: itemData.price,
+            ingredients: Array.isArray(itemData.ingredients) ? itemData.ingredients : [],
           };
         }
       );

@@ -223,6 +223,20 @@ const sampleFoodItems = [
   }
 ];
 
+// Basic tokenizer for deriving ingredient-like tokens from item names
+function deriveIngredients(name) {
+  if (!name) return [];
+  const stopWords = new Set(['with','and','&','the','a','an','of','on','in','for']);
+  return ([...new Set(
+    name
+      .toLowerCase()
+      .replace(/®|™/g,'')
+      .replace(/[^a-z0-9\s]/g,' ') // remove punctuation
+      .split(/\s+/)
+      .filter(t => t.length > 1 && !stopWords.has(t))
+  )]).slice(0,15); // cap length
+}
+
 async function importFromCSV(csvPath) {
   return new Promise((resolve, reject) => {
     const items = [];
@@ -234,6 +248,7 @@ async function importFromCSV(csvPath) {
         const item = {
           company: row.Company?.trim() || row.company?.trim(),
           item: row.Item?.trim() || row.item?.trim(),
+          ingredients: [],
           calories: parseFloat(row.Calories) || parseFloat(row.calories) || null,
           caloriesFromFat: parseFloat(row['Calories from Fat']) || parseFloat(row['Calories from Fat']) || parseFloat(row.caloriesFromFat) || null,
           totalFat: parseFloat(row['Total Fat (g)']) || parseFloat(row['Total Fat']) || parseFloat(row.totalFat) || null,
@@ -248,6 +263,11 @@ async function importFromCSV(csvPath) {
           weightWatchersPoints: parseFloat(row['Weight Watchers Pnts']) || parseFloat(row['Weight Watchers Points']) || parseFloat(row.weightWatchersPoints) || null,
           price: null // Will be calculated based on calories
         };
+
+        // Derive ingredients from item name (heuristic)
+        if (item.item) {
+          item.ingredients = deriveIngredients(item.item);
+        }
 
         // Calculate price based on calories (if calories exist)
         if (item.calories && item.calories > 0) {
@@ -327,6 +347,7 @@ async function importData() {
     console.log('\nSample items:');
     sampleItems.forEach(item => {
       console.log(`  - ${item.company}: ${item.item}`);
+      console.log(`    Ingredients: ${(item.ingredients || []).join(', ') || 'N/A'}`);
       console.log(`    Calories: ${item.calories || 'N/A'}, Protein: ${item.protein || 'N/A'}g, Carbs: ${item.carbs || 'N/A'}g`);
     });
 

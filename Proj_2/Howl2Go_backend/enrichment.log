@@ -1,0 +1,883 @@
+🚀 Starting continuous ingredient enrichment...
+Up to 50 cycles, processing only remaining items (no reprocessing)
+Each cycle ~2–3 minutes depending on remaining items
+
+========================================
+🔄 Starting enrichment cycle 1/50
+========================================
+Remaining items to enrich: 938
+[dotenv@17.2.3] injecting env (5) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+🔗 Connecting to MongoDB...
+MongoDB Connected: ac-my762bq-shard-00-01.i8kp7lh.mongodb.net
+
+📋 Found 25 items to enrich with LLM-generated ingredients
+
+
+📦 Processing 25 items sequentially (~4s delay between each)...
+
+[1/25] McDonald’s: Big Mac®
+⏳ Rate limit hit for "Big Mac®", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "Big Mac®", waiting 60s (attempt 2/3)...
+  ⚠️  No ingredients found
+
+[2/25] McDonald’s: Salt Packet
+⏳ Rate limit hit for "Salt Packet", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "Salt Packet", waiting 60s (attempt 2/3)...
+  ✓ Found 1 ingredients: salt
+
+[3/25] McDonald’s: Honey
+⏳ Rate limit hit for "Honey", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "Honey", waiting 60s (attempt 2/3)...
+  ✓ Found 7 ingredients: honey, sugar, water, beeswax, pollen...
+
+[4/25] McDonald’s: English Muffin
+⏳ Rate limit hit for "English Muffin", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "English Muffin", waiting 60s (attempt 2/3)...
+  ✓ Found 9 ingredients: wheat flour, water, yeast, salt, sugar...
+
+[5/25] McDonald’s: Kiddie Cone
+⏳ Rate limit hit for "Kiddie Cone", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: beef patty, chocolate ice cream, cone, sugar, caramel sauce...
+
+[6/25] McDonald’s: Peanuts (for Sundaes)
+⏳ Rate limit hit for "Peanuts (for Sundaes)", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "Peanuts (for Sundaes)", waiting 60s (attempt 2/3)...
+❌ Error extracting ingredients for "Peanuts (for Sundaes)": 429 {"error":{"message":"Rate limit reached for model `llama-3.1-8b-instant` in organization `org_01kbdxsrqsejc9gkvxpsxnv9nf` service tier `on_demand` on tokens per day (TPD): Limit 500000, Used 499996, Requested 396. Please try again in 1m7.7376s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+  ⚠️  No ingredients found
+
+[7/25] McDonald’s: Sugar Cookie
+⏳ Rate limit hit for "Sugar Cookie", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: sugar, butter, eggs, flour, baking powder...
+
+[8/25] McDonald’s: Minute Maid® 100% Apple Juice Box
+⏳ Rate limit hit for "Minute Maid® 100% Apple Juice Box", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "Minute Maid® 100% Apple Juice Box", waiting 60s (attempt 2/3)...
+❌ Error extracting ingredients for "Minute Maid® 100% Apple Juice Box": 429 {"error":{"message":"Rate limit reached for model `llama-3.1-8b-instant` in organization `org_01kbdxsrqsejc9gkvxpsxnv9nf` service tier `on_demand` on tokens per day (TPD): Limit 500000, Used 499997, Requested 397. Please try again in 1m8.083199999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+  ⚠️  No ingredients found
+
+[9/25] McDonald’s: Dasani® Water
+⏳ Rate limit hit for "Dasani® Water", waiting 30s (attempt 1/3)...
+  ✓ Found 1 ingredients: water
+
+[10/25] McDonald’s: Minute Maid® Orange Juice (Large)
+⏳ Rate limit hit for "Minute Maid® Orange Juice (Large)", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "Minute Maid® Orange Juice (Large)", waiting 60s (attempt 2/3)...
+  ✓ Found 7 ingredients: orange juice concentrate, water, sugar, ascorbic acid, calcium disodium EDTA...
+
+[11/25] McDonald’s: Diet Coke® (Small)
+⏳ Rate limit hit for "Diet Coke® (Small)", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "Diet Coke® (Small)", waiting 60s (attempt 2/3)...
+  ✓ Found 9 ingredients: carbonated water, sugar, caramel color, natural flavors, caffeine...
+
+[12/25] McDonald’s: POWERade® Mountain Blast (Small)
+⏳ Rate limit hit for "POWERade® Mountain Blast (Small)", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "POWERade® Mountain Blast (Small)", waiting 60s (attempt 2/3)...
+❌ Error extracting ingredients for "POWERade® Mountain Blast (Small)": 429 {"error":{"message":"Rate limit reached for model `llama-3.1-8b-instant` in organization `org_01kbdxsrqsejc9gkvxpsxnv9nf` service tier `on_demand` on tokens per day (TPD): Limit 500000, Used 499999, Requested 395. Please try again in 1m8.083199999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+  ⚠️  No ingredients found
+
+[13/25] McDonald’s: POWERade® Mountain Blast (Medium)
+⏳ Rate limit hit for "POWERade® Mountain Blast (Medium)", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "POWERade® Mountain Blast (Medium)", waiting 60s (attempt 2/3)...
+❌ Error extracting ingredients for "POWERade® Mountain Blast (Medium)": 429 {"error":{"message":"Rate limit reached for model `llama-3.1-8b-instant` in organization `org_01kbdxsrqsejc9gkvxpsxnv9nf` service tier `on_demand` on tokens per day (TPD): Limit 500000, Used 499997, Requested 395. Please try again in 1m7.7376s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+  ⚠️  No ingredients found
+
+[14/25] McDonald’s: POWERade® Mountain Blast (Large)
+⏳ Rate limit hit for "POWERade® Mountain Blast (Large)", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "POWERade® Mountain Blast (Large)", waiting 60s (attempt 2/3)...
+❌ Error extracting ingredients for "POWERade® Mountain Blast (Large)": 429 {"error":{"message":"Rate limit reached for model `llama-3.1-8b-instant` in organization `org_01kbdxsrqsejc9gkvxpsxnv9nf` service tier `on_demand` on tokens per day (TPD): Limit 500000, Used 500000, Requested 395. Please try again in 1m8.256s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+  ⚠️  No ingredients found
+
+[15/25] McDonald’s: Iced Tea (Child)
+⏳ Rate limit hit for "Iced Tea (Child)", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "Iced Tea (Child)", waiting 60s (attempt 2/3)...
+❌ Error extracting ingredients for "Iced Tea (Child)": 429 {"error":{"message":"Rate limit reached for model `llama-3.1-8b-instant` in organization `org_01kbdxsrqsejc9gkvxpsxnv9nf` service tier `on_demand` on tokens per day (TPD): Limit 500000, Used 499996, Requested 393. Please try again in 1m7.2192s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+  ⚠️  No ingredients found
+
+[16/25] McDonald’s: Iced Tea (Small)
+⏳ Rate limit hit for "Iced Tea (Small)", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "Iced Tea (Small)", waiting 60s (attempt 2/3)...
+❌ Error extracting ingredients for "Iced Tea (Small)": 429 {"error":{"message":"Rate limit reached for model `llama-3.1-8b-instant` in organization `org_01kbdxsrqsejc9gkvxpsxnv9nf` service tier `on_demand` on tokens per day (TPD): Limit 500000, Used 499997, Requested 393. Please try again in 1m7.391999999s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+  ⚠️  No ingredients found
+
+[17/25] McDonald’s: Iced Tea (Medium)
+⏳ Rate limit hit for "Iced Tea (Medium)", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "Iced Tea (Medium)", waiting 60s (attempt 2/3)...
+❌ Error extracting ingredients for "Iced Tea (Medium)": 429 {"error":{"message":"Rate limit reached for model `llama-3.1-8b-instant` in organization `org_01kbdxsrqsejc9gkvxpsxnv9nf` service tier `on_demand` on tokens per day (TPD): Limit 500000, Used 499998, Requested 393.❌ Error extracting ingredients for "EQUAL® 0
+Calorie Sweetener": 429 {"error":{"message":"Rate limit reached for model `llama-3.1-8b-instant` in organization `org_01kbdxsrqsejc9gkvxpsxnv9nf
+[20/25]
+[18/25] McDonald’s: Iced Tea (Large)
+⏳ Rate limit hit for "Iced Tea (Large)", waiting 30s (atte  ✓ Found ⏳ Rate limit hit for "Iced Tea (Large)", waiting 60s (at
+[21/25] McDon  ✓ Found 7 ingredients: water, black tea, sugar, citric acid, preservatives...
+
+[19/25] McDonald’s: Coffee (Small)
+⏳ Rate limit hit for "Coffee (Small)  ✓ Found 8 ingredients: sucro⏳ Rate limit hit for "Coffee (Small)", waiting 60s (att
+[22/25] McDo  ✓ Found 6 ingredients: coffee, water, sugar, cream, flavorings...
+
+[20/25] McDonald’s: Coffee (Large)
+⏳ Rate limit hit for "Coffee (Large)", waiting 30s (attempt 1/3)...
+  ✓ Found 6 ingredients:❌ Error extracting ingredients for "EQUAL�
+[21/25] McDonald’s: Sugar Packet
+⏳ Rate limit hit for "Sugar Packet", waiting 30s (attempt 1/3)...
+  ✓ Found 8 ingredients: sucrose, silica, cornstarch, maltodextrin, natural flavors...
+
+[22/25] McDonald’s: EQUAL® 0
+Calorie Sweetener
+⏳ Rate limit hit for "EQUAL® 0
+Calorie Sweetener", waiting 30s (attempt 1/3)...
+  ✓ Found 8 ingredients: sucralose, maltodextrin, dextrose, silica, calcium silicate...
+
+[23/25] McDonald’s: SPLENDA® No
+Calorie Sweetener
+⏳ Rate limit hit for "SPLENDA® No
+Calorie Sweetener", waiting 30s (attempt 1/3)...
+  ✓ Found 8 ingredients: sucralose, dextrose, maltodextrin, corn syrup, sodium citrate...
+
+[24/25] McDonald’s: Iced Coffee– Hazelnut (Small)
+⏳ Rate limit hit for "Iced Coffee– Hazelnut (Small)", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "Iced Coffee– Hazelnut (Small)", waiting 60s (attempt 2/3)...
+  ✓ Found 7 ingredients: coffee, hazelnut syrup, sugar, water, ice...
+
+[25/25] McDonald’s: Iced Coffee– Hazelnut (Large)
+⏳ Rate limit hit for "Iced Coffee– Hazelnut (Large)", waiting 30s (attempt 1/3)...
+⏳ Rate limit hit for "Iced Coffee– Hazelnut (Large)", waiting 60s (attempt 2/3)...
+  ✓ Found 7 ingredients: coffee, hazelnut syrup, sugar, water, ice...
+
+💾 Updating database...
+
+✅ Successfully enriched 16/25 items with ingredients!
+
+📊 Sample enriched items:
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (12 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (16 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (20 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (30 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  McDonald’s: Egg McMuffin®
+  Ingredients: egg, Canadian bacon, milk, butter, salt, sugar, yeast, wheat flour, water, eggs, milk, sugar, yeast, salt, preservatives, emulsifiers, flavor enhancers
+
+🎉 Enrichment completed successfully!
+
+✅ Cycle 1 complete. Waiting 2 minutes before next cycle...
+
+========================================
+🔄 Starting enrichment cycle 2/50
+========================================
+Remaining items to enrich: 19
+[dotenv@17.2.3] injecting env (5) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+🔗 Connecting to MongoDB...
+MongoDB Connected: ac-my762bq-shard-00-02.i8kp7lh.mongodb.net
+
+📋 Found 19 items to enrich with LLM-generated ingredients
+
+
+📦 Processing 19 items sequentially (~4s delay between each)...
+
+[1/19] McDonald’s: Salt Packet
+  ✓ Found 1 ingredients: sodium chloride
+
+[2/19] McDonald’s: Honey
+  ✓ Found 6 ingredients: honey, water, beeswax, pollen, acetic acid...
+
+[3/19] McDonald’s: English Muffin
+⏳ Rate limit hit for "English Muffin", waiting 30s (attempt 1/3)...
+  ✓ Found 6 ingredients: wheat flour, water, yeast, salt, sugar...
+
+[4/19] McDonald’s: Kiddie Cone
+⏳ Rate limit hit for "Kiddie Cone", waiting 30s (attempt 1/3)...
+  ✓ Found 6 ingredients: beef patty, chocolate ice cream, cone, sugar, caramel...
+
+[5/19] McDonald’s: Sugar Cookie
+⏳ Rate limit hit for "Sugar Cookie", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: sugar, butter, eggs, flour, baking powder...
+
+[6/19] McDonald’s: Dasani® Water
+⏳ Rate limit hit for "Dasani® Water", waiting 30s (attempt 1/3)...
+  ✓ Found 1 ingredients: water
+
+[7/19] McDonald’s: Minute Maid® Orange Juice (Large)
+⏳ Rate limit hit for "Minute Maid® Orange Juice (Large)", waiting 30s (attempt 1/3)...
+  ✓ Found 8 ingredients: orange juice concentrate, water, sugar, ascorbic acid, calcium disodium EDTA...
+
+[8/19] McDonald’s: Diet Coke® (Small)
+⏳ Rate limit hit for "Diet Coke® (Small)", waiting 30s (attempt 1/3)...
+  ✓ Found 8 ingredients: carbonated water, sugar, caramel color, natural flavors, caffeine...
+
+[9/19] McDonald’s: Iced Tea (Child)
+⏳ Rate limit hit for "Iced Tea (Child)", waiting 30s (attempt 1/3)...
+  ✓ Found 6 ingredients: black tea, water, sugar, citric acid, preservatives...
+
+[10/19] McDonald’s: Iced Tea (Small)
+⏳ Rate limit hit for "Iced Tea (Small)", waiting 30s (attempt 1/3)...
+./src/scripts/continuousEnrich.sh: line 11: 39548 Hangup: 1               node src/scripts/enrichIngredientsWithLLM.js
+
+✅ Cycle 2 complete. Waiting 2 minutes before next cycle...
+
+========================================
+🔄 Starting enrichment cycle 3/50
+========================================
+Remaining items to enrich: 19
+[dotenv@17.2.3] injecting env (5) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+🔗 Connecting to MongoDB...
+MongoDB Connected: ac-my762bq-shard-00-00.i8kp7lh.mongodb.net
+
+📋 Found 19 items to enrich with LLM-generated ingredients
+
+
+📦 Processing 19 items sequentially (~4s delay between each)...
+
+[1/19] McDonald’s: Salt Packet
+  ✓ Found 1 ingredients: salt
+
+[2/19] McDonald’s: Honey
+  ✓ Found 6 ingredients: honey, sugar, water, beeswax, pollen...
+
+[3/19] McDonald’s: English Muffin
+  ✓ Found 7 ingredients: wheat flour, water, yeast, salt, sugar...
+
+[4/19] McDonald’s: Kiddie Cone
+⏳ Rate limit hit for "Kiddie Cone", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: beef patty, chocolate ice cream, cone, sugar, caramel sauce...
+
+[5/19] McDonald’s: Sugar Cookie
+⏳ Rate limit hit for "Sugar Cookie", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: sugar, butter, eggs, flour, baking powder...
+
+[6/19] McDonald’s: Dasani® Water
+⏳ Rate limit hit for "Dasani® Water", waiting 30s (attempt 1/3)...
+  ✓ Found 1 ingredients: water
+
+[7/19] McDonald’s: Minute Maid® Orange Juice (Large)
+⏳ Rate limit hit for "Minute Maid® Orange Juice (Large)", waiting 30s (attempt 1/3)...
+  ✓ Found 8 ingredients: orange juice concentrate, water, sugar, ascorbic acid, calcium disodium EDTA...
+
+[8/19] McDonald’s: Diet Coke® (Small)
+⏳ Rate limit hit for "Diet Coke® (Small)", waiting 30s (attempt 1/3)...
+  ✓ Found 9 ingredients: carbonated water, sugar, caramel color, natural flavors, caffeine...
+
+[9/19] McDonald’s: Iced Tea (Child)
+⏳ Rate limit hit for "Iced Tea (Child)", waiting 30s (attempt 1/3)...
+  ✓ Found 6 ingredients: black tea, water, sugar, citric acid, preservatives...
+
+[10/19] McDonald’s: Iced Tea (Small)
+⏳ Rate limit hit for "Iced Tea (Small)", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: water, black tea, sugar, citric acid, preservatives...
+
+[11/19] McDonald’s: Iced Tea (Medium)
+⏳ Rate limit hit for "Iced Tea (Medium)", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: water, black tea, sugar, citric acid, preservatives...
+
+[12/19] McDonald’s: Iced Tea (Large)
+⏳ Rate limit hit for "Iced Tea (Large)", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: water, black tea, sugar, citric acid, preservatives...
+
+[13/19] McDonald’s: Coffee (Small)
+⏳ Rate limit hit for "Coffee (Small)", waiting 30s (attempt 1/3)...
+  ✓ Found 6 ingredients: coffee, water, sugar, creamer, flavorings...
+
+[14/19] McDonald’s: Coffee (Large)
+⏳ Rate limit hit for "Coffee (Large)", waiting 30s (attempt 1/3)...
+❌ Error extracting ingredients for "Coffee (Large)": Connection error.
+  ⚠️  No ingredients found
+
+[15/19] McDonald’s: Sugar Packet
+  ✓ Found 8 ingredients: sucrose, silica, cornstarch, maltodextrin, natural flavors...
+
+[16/19] McDonald’s: EQUAL® 0
+Calorie Sweetener
+⏳ Rate limit hit for "EQUAL® 0
+Calorie Sweetener", waiting 30s (attempt 1/3)...
+❌ Error extracting ingredients for "EQUAL® 0
+Calorie Sweetener": Connection error.
+  ⚠️  No ingredients found
+
+[17/19] McDonald’s: SPLENDA® No
+Calorie Sweetener
+  ✓ Found 8 ingredients: sucralose, dextrose, maltodextrin, corn syrup, sodium citrate...
+
+[18/19] McDonald’s: Iced Coffee– Hazelnut (Small)
+⏳ Rate limit hit for "Iced Coffee– Hazelnut (Small)", waiting 30s (attempt 1/3)...
+❌ Error extracting ingredients for "Iced Coffee– Hazelnut (Small)": Connection error.
+  ⚠️  No ingredients found
+
+[19/19] McDonald’s: Iced Coffee– Hazelnut (Large)
+  ✓ Found 6 ingredients: coffee, hazelnut syrup, water, sugar, ice...
+
+💾 Updating database...
+
+✅ Successfully enriched 16/19 items with ingredients!
+
+📊 Sample enriched items:
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (12 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (16 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (20 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (30 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  McDonald’s: Egg McMuffin®
+  Ingredients: egg, Canadian bacon, milk, butter, salt, sugar, yeast, wheat flour, water, eggs, milk, sugar, yeast, salt, preservatives, emulsifiers, flavor enhancers
+
+🎉 Enrichment completed successfully!
+
+✅ Cycle 3 complete. Waiting 2 minutes before next cycle...
+
+========================================
+🔄 Starting enrichment cycle 4/50
+========================================
+Remaining items to enrich: 19
+[dotenv@17.2.3] injecting env (5) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+🔗 Connecting to MongoDB...
+MongoDB Connected: ac-my762bq-shard-00-02.i8kp7lh.mongodb.net
+
+📋 Found 19 items to enrich with LLM-generated ingredients
+
+
+📦 Processing 19 items sequentially (~4s delay between each)...
+
+[1/19] McDonald’s: Salt Packet
+  ✓ Found 1 ingredients: salt
+
+[2/19] McDonald’s: Honey
+  ✓ Found 7 ingredients: honey, sugar, water, beeswax, pollen...
+
+[3/19] McDonald’s: English Muffin
+⏳ Rate limit hit for "English Muffin", waiting 30s (attempt 1/3)...
+  ✓ Found 9 ingredients: wheat flour, water, yeast, salt, sugar...
+
+[4/19] McDonald’s: Kiddie Cone
+⏳ Rate limit hit for "Kiddie Cone", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: beef patty, chocolate ice cream, cone, sugar, caramel sauce...
+
+[5/19] McDonald’s: Sugar Cookie
+⏳ Rate limit hit for "Sugar Cookie", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: sugar, butter, eggs, flour, baking powder...
+
+[6/19] McDonald’s: Dasani® Water
+⏳ Rate limit hit for "Dasani® Water", waiting 30s (attempt 1/3)...
+  ✓ Found 1 ingredients: water
+
+[7/19] McDonald’s: Minute Maid® Orange Juice (Large)
+⏳ Rate limit hit for "Minute Maid® Orange Juice (Large)", waiting 30s (attempt 1/3)...
+  ✓ Found 8 ingredients: orange juice concentrate, water, sugar, ascorbic acid, calcium disodium EDTA...
+
+[8/19] McDonald’s: Diet Coke® (Small)
+⏳ Rate limit hit for "Diet Coke® (Small)", waiting 30s (attempt 1/3)...
+  ✓ Found 8 ingredients: carbonated water, sugar, caramel color, natural flavors, caffeine...
+
+[9/19] McDonald’s: Iced Tea (Child)
+⏳ Rate limit hit for "Iced Tea (Child)", waiting 30s (attempt 1/3)...
+  ✓ Found 6 ingredients: black tea, water, sugar, citric acid, preservatives...
+
+[10/19] McDonald’s: Iced Tea (Small)
+⏳ Rate limit hit for "Iced Tea (Small)", waiting 30s (attempt 1/3)...
+  ✓ Found 6 ingredients: black tea, water, sugar, citric acid, preservatives...
+
+[11/19] McDonald’s: Iced Tea (Medium)
+⏳ Rate limit hit for "Iced Tea (Medium)", waiting 30s (attempt 1/3)...
+  ✓ Found 6 ingredients: black tea, water, sugar, citric acid, preservatives...
+
+[12/19] McDonald’s: Iced Tea (Large)
+⏳ Rate limit hit for "Iced Tea (Large)", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: water, black tea, sugar, citric acid, preservatives...
+
+[13/19] McDonald’s: Coffee (Small)
+⏳ Rate limit hit for "Coffee (Small)", waiting 30s (attempt 1/3)...
+  ✓ Found 6 ingredients: coffee, water, sugar, cream, flavorings...
+
+[14/19] McDonald’s: Coffee (Large)
+⏳ Rate limit hit for "Coffee (Large)", waiting 30s (attempt 1/3)...
+  ✓ Found 6 ingredients: coffee, water, sugar, cream, flavorings...
+
+[15/19] McDonald’s: Sugar Packet
+⏳ Rate limit hit for "Sugar Packet", waiting 30s (attempt 1/3)...
+  ✓ Found 8 ingredients: sucrose, silica, cornstarch, maltodextrin, natural flavors...
+
+[16/19] McDonald’s: EQUAL® 0
+Calorie Sweetener
+⏳ Rate limit hit for "EQUAL® 0
+Calorie Sweetener", waiting 30s (attempt 1/3)...
+  ✓ Found 8 ingredients: sucralose, maltodextrin, dextrose, silica, calcium silicate...
+
+[17/19] McDonald’s: SPLENDA® No
+Calorie Sweetener
+⏳ Rate limit hit for "SPLENDA® No
+Calorie Sweetener", waiting 30s (attempt 1/3)...
+  ✓ Found 8 ingredients: sucralose, dextrose, maltodextrin, corn syrup, sodium citrate...
+
+[18/19] McDonald’s: Iced Coffee– Hazelnut (Small)
+⏳ Rate limit hit for "Iced Coffee– Hazelnut (Small)", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: coffee, hazelnut syrup, sugar, water, ice...
+
+[19/19] McDonald’s: Iced Coffee– Hazelnut (Large)
+⏳ Rate limit hit for "Iced Coffee– Hazelnut (Large)", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: coffee, hazelnut syrup, sugar, water, ice...
+
+💾 Updating database...
+
+✅ Successfully enriched 19/19 items with ingredients!
+
+📊 Sample enriched items:
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (12 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (16 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (20 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (30 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  McDonald’s: Egg McMuffin®
+  Ingredients: egg, Canadian bacon, milk, butter, salt, sugar, yeast, wheat flour, water, eggs, milk, sugar, yeast, salt, preservatives, emulsifiers, flavor enhancers
+
+🎉 Enrichment completed successfully!
+
+✅ Cycle 4 complete. Waiting 2 minutes before next cycle...
+
+========================================
+🔄 Starting enrichment cycle 5/50
+========================================
+Remaining items to enrich: 19
+[dotenv@17.2.3] injecting env (5) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+🔗 Connecting to MongoDB...
+Error: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
+
+✅ Cycle 5 complete. Waiting 2 minutes before next cycle...
+
+========================================
+🔄 Starting enrichment cycle 6/50
+========================================
+Remaining items to enrich: 19
+[dotenv@17.2.3] injecting env (5) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
+🔗 Connecting to MongoDB...
+MongoDB Connected: ac-my762bq-shard-00-01.i8kp7lh.mongodb.net
+
+📋 Found 19 items to enrich with LLM-generated ingredients
+
+
+📦 Processing 19 items sequentially (~4s delay between each)...
+
+[1/19] McDonald’s: Salt Packet
+  ✓ Found 1 ingredients: salt
+
+[2/19] McDonald’s: Honey
+  ✓ Found 4 ingredients: honey, sugar, water, beeswax
+
+[3/19] McDonald’s: English Muffin
+  ✓ Found 7 ingredients: wheat flour, water, yeast, salt, sugar...
+
+[4/19] McDonald’s: Kiddie Cone
+  ✓ Found 7 ingredients: beef patty, chocolate ice cream, cone, sugar, caramel sauce...
+
+[5/19] McDonald’s: Sugar Cookie
+  ✓ Found 8 ingredients: sugar, butter, eggs, flour, baking powder...
+
+[6/19] McDonald’s: Dasani® Water
+  ✓ Found 1 ingredients: water
+
+[7/19] McDonald’s: Minute Maid® Orange Juice (Large)
+  ✓ Found 8 ingredients: orange juice concentrate, water, sugar, ascorbic acid, calcium disodium EDTA...
+
+[8/19] McDonald’s: Diet Coke® (Small)
+❌ Error extracting ingredients for "Diet Coke® (Small)": Connection error.
+  ⚠️  No ingredients found
+
+[9/19] McDonald’s: Iced Tea (Child)
+  ✓ Found 6 ingredients: black tea, water, sugar, citric acid, preservatives...
+
+[10/19] McDonald’s: Iced Tea (Small)
+  ✓ Found 6 ingredients: black tea, water, sugar, citric acid, preservatives...
+
+[11/19] McDonald’s: Iced Tea (Medium)
+  ✓ Found 7 ingredients: water, black tea, sugar, citric acid, preservatives...
+
+[12/19] McDonald’s: Iced Tea (Large)
+  ✓ Found 7 ingredients: water, black tea, sugar, citric acid, preservatives...
+
+[13/19] McDonald’s: Coffee (Small)
+  ✓ Found 6 ingredients: coffee, water, sugar, creamer, flavorings...
+
+[14/19] McDonald’s: Coffee (Large)
+  ✓ Found 6 ingredients: coffee, water, sugar, cream, flavorings...
+
+[15/19] McDonald’s: Sugar Packet
+❌ Error extracting ingredients for "Sugar Packet": Connection error.
+  ⚠️  No ingredients found
+
+[16/19] McDonald’s: EQUAL® 0
+Calorie Sweetener
+  ✓ Found 6 ingredients: sucralose, maltodextrin, dextrose, silica, calcium silicate...
+
+[17/19] McDonald’s: SPLENDA® No
+Calorie Sweetener
+  ✓ Found 9 ingredients: sucralose, dextrose, maltodextrin, corn syrup, sodium citrate...
+
+[18/19] McDonald’s: Iced Coffee– Hazelnut (Small)
+❌ Error extracting ingredients for "Iced Coffee– Hazelnut (Small)": Connection error.
+  ⚠️  No ingredients found
+
+[19/19] McDonald’s: Iced Coffee– Hazelnut (Large)
+  ✓ Found 9 ingredients: coffee, hazelnut syrup, sugar, water, ice...
+
+💾 Updating database...
+
+✅ Successfully enriched 16/19 items with ingredients!
+
+📊 Sample enriched items:
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (12 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (16 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (20 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (30 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  McDonald’s: Egg McMuffin®
+  Ingredients: egg, Canadian bacon, milk, butter, salt, sugar, yeast, wheat flour, water, eggs, milk, sugar, yeast, salt, preservatives, emulsifiers, flavor enhancers
+
+🎉 Enrichment completed successfully!
+
+✅ Cycle 6 complete. Waiting 2 minutes before next cycle...
+
+========================================
+🔄 Starting enrichment cycle 7/50
+========================================
+Remaining items to enrich: 19
+[dotenv@17.2.3] injecting env (5) from .env -- tip: 📡 add observability to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+🔗 Connecting to MongoDB...
+MongoDB Connected: ac-my762bq-shard-00-00.i8kp7lh.mongodb.net
+
+📋 Found 19 items to enrich with LLM-generated ingredients
+
+
+📦 Processing 19 items sequentially (~4s delay between each)...
+
+[1/19] McDonald’s: Salt Packet
+  ✓ Found 1 ingredients: sodium chloride
+
+[2/19] McDonald’s: Honey
+  ✓ Found 7 ingredients: honey, sugar, water, beeswax, pollen...
+
+[3/19] McDonald’s: English Muffin
+  ✓ Found 7 ingredients: wheat flour, water, yeast, salt, sugar...
+
+[4/19] McDonald’s: Kiddie Cone
+  ✓ Found 6 ingredients: beef patty, chocolate ice cream, cone, sugar, caramel...
+
+[5/19] McDonald’s: Sugar Cookie
+  ✓ Found 7 ingredients: sugar, butter, eggs, flour, baking powder...
+
+[6/19] McDonald’s: Dasani® Water
+  ✓ Found 1 ingredients: water
+
+[7/19] McDonald’s: Minute Maid® Orange Juice (Large)
+⏳ Rate limit hit for "Minute Maid® Orange Juice (Large)", waiting 30s (attempt 1/3)...
+❌ Error extracting ingredients for "Minute Maid® Orange Juice (Large)": Connection error.
+  ⚠️  No ingredients found
+
+[8/19] McDonald’s: Diet Coke® (Small)
+  ✓ Found 8 ingredients: carbonated water, sugar, caramel color, natural flavors, caffeine...
+
+[9/19] McDonald’s: Iced Tea (Child)
+⏳ Rate limit hit for "Iced Tea (Child)", waiting 30s (attempt 1/3)...
+❌ Error extracting ingredients for "Iced Tea (Child)": Connection error.
+  ⚠️  No ingredients found
+
+[10/19] McDonald’s: Iced Tea (Small)
+  ✓ Found 6 ingredients: black tea, water, sugar, citric acid, preservatives...
+
+[11/19] McDonald’s: Iced Tea (Medium)
+❌ Error extracting ingredients for "Iced Tea (Medium)": Connection error.
+  ⚠️  No ingredients found
+
+[12/19] McDonald’s: Iced Tea (Large)
+  ✓ Found 7 ingredients: water, black tea, sugar, citric acid, preservatives...
+
+[13/19] McDonald’s: Coffee (Small)
+⏳ Rate limit hit for "Coffee (Small)", waiting 30s (attempt 1/3)...
+❌ Error extracting ingredients for "Coffee (Small)": Connection error.
+  ⚠️  No ingredients found
+
+[14/19] McDonald’s: Coffee (Large)
+  ✓ Found 6 ingredients: coffee, water, sugar, cream, flavorings...
+
+[15/19] McDonald’s: Sugar Packet
+⏳ Rate limit hit for "Sugar Packet", waiting 30s (attempt 1/3)...
+  ✓ Found 8 ingredients: sucrose, silica, cornstarch, maltodextrin, natural flavors...
+
+[16/19] McDonald’s: EQUAL® 0
+Calorie Sweetener
+⏳ Rate limit hit for "EQUAL® 0
+Calorie Sweetener", waiting 30s (attempt 1/3)...
+  ✓ Found 9 ingredients: sucralose, maltodextrin, corn syrup, dextrose, sodium citrate...
+
+[17/19] McDonald’s: SPLENDA® No
+Calorie Sweetener
+❌ Error extracting ingredients for "SPLENDA® No
+Calorie Sweetener": Connection error.
+  ⚠️  No ingredients found
+
+[18/19] McDonald’s: Iced Coffee– Hazelnut (Small)
+  ✓ Found 7 ingredients: coffee, hazelnut syrup, sugar, water, ice...
+
+[19/19] McDonald’s: Iced Coffee– Hazelnut (Large)
+❌ Error extracting ingredients for "Iced Coffee– Hazelnut (Large)": Connection error.
+  ⚠️  No ingredients found
+
+💾 Updating database...
+
+✅ Successfully enriched 13/19 items with ingredients!
+
+📊 Sample enriched items:
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (12 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (16 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (20 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (30 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  McDonald’s: Egg McMuffin®
+  Ingredients: egg, Canadian bacon, milk, butter, salt, sugar, yeast, wheat flour, water, eggs, milk, sugar, yeast, salt, preservatives, emulsifiers, flavor enhancers
+
+🎉 Enrichment completed successfully!
+
+✅ Cycle 7 complete. Waiting 2 minutes before next cycle...
+
+========================================
+🔄 Starting enrichment cycle 8/50
+========================================
+Remaining items to enrich: 19
+[dotenv@17.2.3] injecting env (5) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+🔗 Connecting to MongoDB...
+Error: querySrv ECONNREFUSED _mongodb._tcp.project-3.i8kp7lh.mongodb.net
+
+✅ Cycle 8 complete. Waiting 2 minutes before next cycle...
+
+========================================
+🔄 Starting enrichment cycle 9/50
+========================================
+Remaining items to enrich: 19
+[dotenv@17.2.3] injecting env (5) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ✅ audit secrets and track compliance: https://dotenvx.com/ops
+🔗 Connecting to MongoDB...
+MongoDB Connected: ac-my762bq-shard-00-00.i8kp7lh.mongodb.net
+
+📋 Found 19 items to enrich with LLM-generated ingredients
+
+
+📦 Processing 19 items sequentially (~4s delay between each)...
+
+[1/19] McDonald’s: Salt Packet
+  ✓ Found 1 ingredients: salt
+
+[2/19] McDonald’s: Honey
+  ✓ Found 7 ingredients: honey, sugar, water, beeswax, pollen...
+
+[3/19] McDonald’s: English Muffin
+  ✓ Found 9 ingredients: wheat flour, water, yeast, salt, sugar...
+
+[4/19] McDonald’s: Kiddie Cone
+  ✓ Found 7 ingredients: beef patty, chocolate ice cream, cone, sugar, caramel sauce...
+
+[5/19] McDonald’s: Sugar Cookie
+  ✓ Found 7 ingredients: sugar, butter, eggs, flour, baking powder...
+
+[6/19] McDonald’s: Dasani® Water
+❌ Error extracting ingredients for "Dasani® Water": Connection error.
+  ⚠️  No ingredients found
+
+[7/19] McDonald’s: Minute Maid® Orange Juice (Large)
+  ✓ Found 8 ingredients: orange juice concentrate, water, sugar, ascorbic acid, calcium disodium EDTA...
+
+[8/19] McDonald’s: Diet Coke® (Small)
+  ✓ Found 8 ingredients: carbonated water, high fructose corn syrup, caramel color, natural flavors, caffeine...
+
+[9/19] McDonald’s: Iced Tea (Child)
+  ✓ Found 6 ingredients: black tea, water, sugar, citric acid, preservatives...
+
+[10/19] McDonald’s: Iced Tea (Small)
+  ✓ Found 6 ingredients: black tea, water, sugar, citric acid, preservatives...
+
+[11/19] McDonald’s: Iced Tea (Medium)
+  ✓ Found 7 ingredients: water, black tea, sugar, citric acid, preservatives...
+
+[12/19] McDonald’s: Iced Tea (Large)
+  ✓ Found 7 ingredients: water, black tea, sugar, citric acid, preservatives...
+
+[13/19] McDonald’s: Coffee (Small)
+  ✓ Found 6 ingredients: coffee, water, sugar, cream, flavorings...
+
+[14/19] McDonald’s: Coffee (Large)
+  ✓ Found 6 ingredients: coffee, water, sugar, cream, flavorings...
+
+[15/19] McDonald’s: Sugar Packet
+❌ Error extracting ingredients for "Sugar Packet": Connection error.
+  ⚠️  No ingredients found
+
+[16/19] McDonald’s: EQUAL® 0
+Calorie Sweetener
+  ✓ Found 7 ingredients: sucralose, dextrose, maltodextrin, calcium carbonate, silicon dioxide...
+
+[17/19] McDonald’s: SPLENDA® No
+Calorie Sweetener
+  ✓ Found 8 ingredients: sucralose, dextrose, maltodextrin, corn syrup, sodium citrate...
+
+[18/19] McDonald’s: Iced Coffee– Hazelnut (Small)
+  ✓ Found 6 ingredients: coffee, hazelnut syrup, sugar, cream, water...
+
+[19/19] McDonald’s: Iced Coffee– Hazelnut (Large)
+  ✓ Found 7 ingredients: coffee, hazelnut syrup, sugar, water, ice...
+
+💾 Updating database...
+
+✅ Successfully enriched 17/19 items with ingredients!
+
+📊 Sample enriched items:
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (12 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (16 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (20 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  KFC: Lipton® Brisk® No Calorie Peach Iced Green Tea (30 fl oz)
+  Ingredients: Lipton, Brisk, No, Calorie, Peach, Iced, Green, Tea, fl, oz
+
+  McDonald’s: Egg McMuffin®
+  Ingredients: egg, Canadian bacon, milk, butter, salt, sugar, yeast, wheat flour, water, eggs, milk, sugar, yeast, salt, preservatives, emulsifiers, flavor enhancers
+
+🎉 Enrichment completed successfully!
+
+✅ Cycle 9 complete. Waiting 2 minutes before next cycle...
+
+========================================
+🔄 Starting enrichment cycle 10/50
+========================================
+Remaining items to enrich: 19
+[dotenv@17.2.3] injecting env (5) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔑 add access controls to secrets: https://dotenvx.com/ops
+🔗 Connecting to MongoDB...
+MongoDB Connected: ac-my762bq-shard-00-01.i8kp7lh.mongodb.net
+
+📋 Found 19 items to enrich with LLM-generated ingredients
+
+
+📦 Processing 19 items sequentially (~4s delay between each)...
+
+[1/19] McDonald’s: Salt Packet
+  ✓ Found 1 ingredients: salt
+
+[2/19] McDonald’s: Honey
+  ✓ Found 8 ingredients: honey, high fructose corn syrup, water, beeswax, cottonseed oil...
+
+[3/19] McDonald’s: English Muffin
+  ✓ Found 7 ingredients: wheat flour, water, yeast, salt, sugar...
+
+[4/19] McDonald’s: Kiddie Cone
+  ✓ Found 6 ingredients: beef patty, chocolate ice cream, cone, sugar, caramel sauce...
+
+[5/19] McDonald’s: Sugar Cookie
+  ✓ Found 7 ingredients: sugar, butter, eggs, flour, baking powder...
+
+[6/19] McDonald’s: Dasani® Water
+  ✓ Found 1 ingredients: water
+
+[7/19] McDonald’s: Minute Maid® Orange Juice (Large)
+  ✓ Found 8 ingredients: orange juice concentrate, water, sugar, ascorbic acid, calcium disodium EDTA...
+
+[8/19] McDonald’s: Diet Coke® (Small)
+  ✓ Found 9 ingredients: carbonated water, sugar, caramel color, natural flavors, caffeine...
+
+[9/19] McDonald’s: Iced Tea (Child)
+  ✓ Found 6 ingredients: black tea, water, sugar, citric acid, preservatives...
+
+[10/19] McDonald’s: Iced Tea (Small)
+  ✓ Found 6 ingredients: black tea, water, sugar, citric acid, preservatives...
+
+[11/19] McDonald’s: Iced Tea (Medium)
+  ✓ Found 6 ingredients: black tea, water, sugar, citric acid, preservatives...
+
+[12/19] McDonald’s: Iced Tea (Large)
+⏳ Rate limit hit for "Iced Tea (Large)", waiting 30s (attempt 1/3)...
+  ✓ Found 7 ingredients: water, black tea, sugar, citric acid, preservatives...
+
+[13/19] McDonald’s: Coffee (Small)
+⏳ Rate limit hit for "Coffee (Small)", waiting 30s (attempt 1/3)...
+  ✓ Found 6 ingredients: coffee, water, sugar, flavorings, preservatives...
+
+[14/19] McDonald’s: Coffee (Large)
+⏳ Rate limit hit for "Coffee (Large)", waiting 30s (attempt 1/3)...
+  ✓ Found 6 ingredients: coffee, water, sugar, cream, flavorings...
+
+[15/19] McDonald’s: Sugar Packet
+⏳ Rate limit hit for "Sugar Packet", waiting 30s (attempt 1/3)...
+  ✓ Found 8 ingredients: sucrose, silica, cornstarch, maltodextrin, natural flavors...
+
+[16/19] McDonald’s: EQUAL® 0
+Calorie Sweetener
+⏳ Rate limit hit for "EQUAL® 0
+Calorie Sweetener", waiting 30s (attempt 1/3)...
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              ❌ Error extracting ingredients for "Coffee (Large)": 429 {"error":{"message":"Rate limit reached for model `llama-3.1-8b-instant` in organization `org_01kbdxsrqsejc9gkvxpsxnv9nf` service tier `on_demand` on tokens per day (TPD): Limit 500000, Used 499998, Requested 391. Please try again in 1m7.2192s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing","type":"tokens","code":"rate_limit_exceeded"}}
+  ⚠️  No ingredients found
+
+💾 Updating database...
+
+✅ Successfully enriched 14/20 items with ingredients!
+
+📊 Sample enriched items:
+
+  Wendy’s: All-Natural Lemonade, Large
+  Ingredients: AllNatural, Lemonade, Large
+
+  Wendy’s: All-Natural Lemonade, Medium
+  Ingredients: AllNatural, Lemonade, Medium
+
+  Wendy’s: All-Natural Lemonade, Small
+  Ingredients: AllNatural, Lemonade, Small
+
+  Burger King: American Cheese (slice)
+  Ingredients: American, Cheese, slice
+
+  Burger King: Capri Sun® 100% Apple Juice (6 fl oz)
+  Ingredients: Capri, Sun, Apple, Juice, fl, oz
+
+🎉 Enrichment completed successfully!

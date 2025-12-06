@@ -8,6 +8,7 @@ export interface FoodItem {
   restaurant: string;
   item: string;
   calories: number;
+  matchScore?: number; // number of included ingredients matched (optional)
   caloriesFromFat?: number | null;
   totalFat?: number | null;
   saturatedFat?: number | null;
@@ -20,6 +21,7 @@ export interface FoodItem {
   protein?: number | null;
   weightWatchersPoints?: number | null;
   price?: number;
+  ingredients?: string[];
 }
 
 
