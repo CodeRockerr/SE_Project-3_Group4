@@ -456,13 +456,13 @@ Groq provides free access to the Llama 3.1 LLM model for natural language proces
 4. Click **"Create"**
 5. **Copy the API key immediately** (you won't see it again!)
    ```
-   gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   ***REMOVED***
    ```
 
 ### Step 3: Add to `.env` File
 
 ```env
-GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+GROQ_API_KEY=***REMOVED***
 ```
 
 ### Understanding Groq Rate Limits
@@ -1754,8 +1754,8 @@ ls -la Howl2Go_backend/.env
 cat Howl2Go_backend/.env | grep GROQ_API_KEY
 
 # 3. Ensure no spaces around =
-# ✅ Correct: GROQ_API_KEY=gsk_xxx
-# ❌ Wrong: GROQ_API_KEY = gsk_xxx
+# ✅ Correct: GROQ_API_KEY=***REMOVED***
+# ❌ Wrong: GROQ_API_KEY = ***REMOVED***
 
 # 4. Restart server after editing .env
 npm run dev

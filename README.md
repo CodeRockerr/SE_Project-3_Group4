@@ -17,14 +17,14 @@
 [![Backend Deployment Status](https://img.shields.io/badge/Backend-Live-brightgreen.svg?style=flat&logo=render)](https://howl2go-backend-service.onrender.com/api/health)
 [![Frontend Deployment](https://img.shields.io/badge/Frontend-Vercel-000000?logo=vercel)](https://vercel.com)
 [![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.17547804-blue?style=flat-square)](https://doi.org/10.5281/zenodo.17547804)
-[![Coverage Status](https://coveralls.io/repos/github/harsha711/SE_Project_Grp_27/badge.svg?branch=main)](https://coveralls.io/github/harsha711/SE_Project_Grp_27?branch=main)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/harsha711/SE_Project_Grp_27)
-[![Tests](https://img.shields.io/badge/tests-404%20passing-success)](https://github.com/harsha711/SE_Project_Grp_27)
-[![Test Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)](https://coveralls.io/github/harsha711/SE_Project_Grp_27)
-[![Code Quality](https://img.shields.io/badge/code%20quality-A-green)](https://github.com/harsha711/SE_Project_Grp_27)
+[![Coverage Status](https://coveralls.io/repos/github/CodeRockerr/SE-Project-3_Group4/badge.svg?branch=main)](https://coveralls.io/github/CodeRockerr/SE-Project-3_Group4?branch=main)
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![Tests](https://img.shields.io/badge/tests-404%20passing-success)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![Test Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen)](https://coveralls.io/github/CodeRockerr/SE-Project-3_Group4)
+[![Code Quality](https://img.shields.io/badge/code%20quality-A-green)](https://github.com/CodeRockerr/SE-Project-3_Group4)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Maintained](https://img.shields.io/badge/Maintained-yes-green.svg)](https://github.com/harsha711/SE_Project_Grp_27)
-[![Status](https://img.shields.io/badge/status-active-success.svg)](https://github.com/harsha711/SE_Project_Grp_27)
+[![Maintained](https://img.shields.io/badge/Maintained-yes-green.svg)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![Status](https://img.shields.io/badge/status-active-success.svg)](https://github.com/CodeRockerr/SE-Project-3_Group4)
 
 <!-- Technology Badges -->
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
@@ -58,14 +58,14 @@
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow)](https://conventionalcommits.org/)
 
 <!-- Project Stats -->
-[![GitHub Stars](https://img.shields.io/github/stars/harsha711/SE_Project_Grp_27?style=social)](https://github.com/harsha711/SE_Project_Grp_27)
-[![GitHub Forks](https://img.shields.io/github/forks/harsha711/SE_Project_Grp_27?style=social)](https://github.com/harsha711/SE_Project_Grp_27/fork)
-[![GitHub Issues](https://img.shields.io/github/issues/harsha711/SE_Project_Grp_27)](https://github.com/harsha711/SE_Project_Grp_27/issues)
-[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/harsha711/SE_Project_Grp_27)](https://github.com/harsha711/SE_Project_Grp_27/pulls)
-[![GitHub Contributors](https://img.shields.io/github/contributors/harsha711/SE_Project_Grp_27)](https://github.com/harsha711/SE_Project_Grp_27/graphs/contributors)
-[![GitHub Last Commit](https://img.shields.io/github/last-commit/harsha711/SE_Project_Grp_27)](https://github.com/harsha711/SE_Project_Grp_27)
-[![GitHub Release](https://img.shields.io/github/release/harsha711/SE_Project_Grp_27)](https://github.com/harsha711/SE_Project_Grp_27/releases)
-[![GitHub Language Count](https://img.shields.io/github/languages/count/harsha711/SE_Project_Grp_27)](https://github.com/harsha711/SE_Project_Grp_27)
+[![GitHub Stars](https://img.shields.io/github/stars/CodeRockerr/SE-Project-3_Group4?style=social)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![GitHub Forks](https://img.shields.io/github/forks/CodeRockerr/SE-Project-3_Group4?style=social)](https://github.com/CodeRockerr/SE-Project-3_Group4/fork)
+[![GitHub Issues](https://img.shields.io/github/issues/CodeRockerr/SE-Project-3_Group4)](https://github.com/CodeRockerr/SE-Project-3_Group4/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/CodeRockerr/SE-Project-3_Group4)](https://github.com/CodeRockerr/SE-Project-3_Group4/pulls)
+[![GitHub Contributors](https://img.shields.io/github/contributors/CodeRockerr/SE-Project-3_Group4)](https://github.com/CodeRockerr/SE-Project-3_Group4/graphs/contributors)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/CodeRockerr/SE-Project-3_Group4)](https://github.com/CodeRockerr/SE-Project-3_Group4)
+[![GitHub Release](https://img.shields.io/github/release/CodeRockerr/SE-Project-3_Group4)](https://github.com/CodeRockerr/SE-Project-3_Group4/releases)
+[![GitHub Language Count](https://img.shields.io/github/languages/count/CodeRockerr/SE-Project-3_Group4)](https://github.com/CodeRockerr/SE-Project-3_Group4)
 
 <!-- Performance & Security -->
 [![Security](https://img.shields.io/badge/Security-Audited-green)](https://github.com/harsha711/SE_Project_Grp_27)
@@ -162,8 +162,8 @@ Complete REST API, TypeScript support, comprehensive docs, and pre-commit and po
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/harsha711/SE_Project_Grp_27.git
-cd SE_Project_Grp_27/Proj\ 2
+git clone https://github.com/CodeRockerr/SE-Project-3_Group4.git
+cd SE-Project-3_Group4/Proj_2
 ```
 
 ### 2. Setup Backend
@@ -174,6 +174,8 @@ npm install
 # Create .env file
 echo "GROQ_API_KEY=your_groq_api_key" > .env
 echo "MONGODB_URI=your_mongodb_connection_string" >> .env
+echo "JWT_SECRET=your_32_char_secret" >> .env
+echo "SESSION_SECRET=your_32_char_secret" >> .env
 
 # Import nutrition data
 npm run import:fastfood

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { MessageSquare, CheckCircle } from "lucide-react";
+import { MessageSquare, CheckCircle, Utensils } from "lucide-react";
 import type { FoodItem } from "@/types/food";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
@@ -14,7 +14,7 @@ import StarRating from "./StarRating";
 import ReviewsSection from "./ReviewsSection";
 
 interface ItemCardProps extends Partial<FoodItem> {
-  restaurant: string;
+  restaurant?: string; // Make optional; fallback to company
   item: string;
   calories: number;
   index?: number;
@@ -27,7 +27,10 @@ interface ItemCardProps extends Partial<FoodItem> {
 }
 
 // Get restaurant logo with flexible matching to handle API name variations
-const getRestaurantLogo = (restaurant: string): string => {
+const getRestaurantLogo = (restaurant?: string): string => {
+  if (!restaurant || typeof restaurant !== "string") {
+    return "/fast-food-svgrepo-com.svg";
+  }
   // Normalize restaurant name for matching
   const normalized = restaurant.trim().toLowerCase();
 
@@ -126,8 +129,10 @@ export default function ItemCard({
   }, [restProps._id, showReviews]);
 
   // Construct foodItem ensuring _id is included
+  const resolvedRestaurant = restaurant || (restProps as any).restaurant || (restProps as any).company || "Unknown";
+
   const foodItem: FoodItem = {
-    restaurant,
+    restaurant: resolvedRestaurant,
     item,
     calories,
     ...restProps,
@@ -200,8 +205,8 @@ export default function ItemCard({
       <div className="flex items-start justify-between mb-4">
         <div className="w-16 h-16 relative flex items-center justify-center">
           <Image
-            src={getRestaurantLogo(restaurant)}
-            alt={`${restaurant} logo`}
+            src={getRestaurantLogo(resolvedRestaurant)}
+            alt={`${resolvedRestaurant} logo`}
             width={64}
             height={64}
             className="object-contain"
@@ -218,7 +223,7 @@ export default function ItemCard({
       </h3>
 
       {/* Restaurant Name */}
-      <p className="text-sm text-[var(--text-subtle)] mb-3">{restaurant}</p>
+      <p className="text-sm text-[var(--text-subtle)] mb-3">{resolvedRestaurant}</p>
 
       {/* Rating and User Review Status */}
       {showReviews && restProps._id && (
@@ -261,7 +266,7 @@ export default function ItemCard({
       )}
 
       {/* Nutrition Info */}
-      <div className="mb-4">
+      <div className="mb-4 space-y-2">
         <div className="inline-flex items-center gap-2 bg-[var(--bg-hover)] px-3 py-1.5 rounded-full">
           <svg
             className="w-4 h-4 text-[var(--orange)]"
@@ -279,6 +284,11 @@ export default function ItemCard({
           <span className="text-xs font-medium text-[var(--text)]">
             {calories} cal
           </span>
+          {typeof (restProps as any).matchScore === 'number' && (
+            <span className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-[var(--orange)]">
+              {(restProps as any).matchScore} match{(restProps as any).matchScore === 1 ? '' : 'es'}
+            </span>
+          )}
         </div>
       </div>
 
@@ -314,6 +324,23 @@ export default function ItemCard({
               <div>Fiber: {restProps.fiber}g</div>
             )}
           </div>
+          
+          {/* Full Ingredients List */}
+          {restProps.ingredients && restProps.ingredients.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-[var(--border)]">
+              <h5 className="font-semibold text-[var(--text)] mb-2 text-xs">Ingredients:</h5>
+              <div className="flex flex-wrap gap-1">
+                {restProps.ingredients.map((ingredient, idx) => (
+                  <span
+                    key={idx}
+                    className="text-xs px-2 py-1 rounded-full bg-[var(--cream)]/10 text-[var(--text-subtle)] border border-[var(--border)]"
+                  >
+                    {ingredient}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </motion.div>
       )}
 
