@@ -51,6 +51,7 @@ function SmartMenuSearchContent() {
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [lastCriteria, setLastCriteria] = useState<Record<string, unknown> | null>(null);
+  const [refinementSuggestions, setRefinementSuggestions] = useState<string[]>([]);
   
   // Load previous search criteria from localStorage on component mount
   // Enables conversational refinements to survive page reloads
@@ -115,7 +116,16 @@ function SmartMenuSearchContent() {
           const data = await response.json();
           // Store returned criteria to enable conversational refinements
           if (data && typeof data === 'object' && 'criteria' in data) {
-            setLastCriteria(data.criteria || null);
+                    const criteria = data.criteria || null;
+                    setLastCriteria(criteria);
+                    // Build human-friendly refinement suggestions from criteria
+                    try {
+                      const suggs = buildRefinementSuggestions(criteria as any);
+                      setRefinementSuggestions(suggs);
+                    } catch (e) {
+                      console.warn('Failed to build refinement suggestions', e);
+                      setRefinementSuggestions([]);
+                    }
           }
           await parseAndSetFoodItems(data);
         } catch (error) {
@@ -328,7 +338,15 @@ function SmartMenuSearchContent() {
       
       // Store returned criteria for next refinement iteration
       if (data && typeof data === 'object' && 'criteria' in data) {
-        setLastCriteria(data.criteria || null);
+        const criteria = data.criteria || null;
+        setLastCriteria(criteria);
+        try {
+          const suggs = buildRefinementSuggestions(criteria as any);
+          setRefinementSuggestions(suggs);
+        } catch (e) {
+          console.warn('Failed to build refinement suggestions', e);
+          setRefinementSuggestions([]);
+        }
       }
       
       try {
@@ -346,6 +364,36 @@ function SmartMenuSearchContent() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Build human-friendly suggestion strings from parsed criteria
+  const buildRefinementSuggestions = (criteria: any): string[] => {
+    if (!criteria || typeof criteria !== 'object') return [];
+    const suggestions: string[] = [];
+
+    if (criteria.calories) {
+      const c = criteria.calories;
+      if (c.max !== undefined) suggestions.push(`Would you consider under ${c.max} calories instead?`);
+      else if (c.min !== undefined) suggestions.push(`Prefer meals above ${c.min} calories?`);
+    }
+
+    if (criteria.protein) {
+      const p = criteria.protein;
+      if (p.min !== undefined) suggestions.push(`Looking for at least ${p.min}g protein?`);
+      else if (p.max !== undefined) suggestions.push(`Prefer protein under ${p.max}g?`);
+    }
+
+    if (criteria.totalFat) {
+      const f = criteria.totalFat;
+      if (f.max !== undefined) suggestions.push(`Would you like options under ${f.max}g fat?`);
+    }
+
+    // If no numeric suggestions yet, and there's an item/name criterion, offer a refinement
+    if (suggestions.length === 0 && criteria.item && typeof criteria.item === 'object' && criteria.item.name) {
+      suggestions.push(`Narrow results to items matching "${criteria.item.name}"`);
+    }
+
+    return suggestions.slice(0, 3);
   };
 
   const handleSearchChange = (value: string) => {
@@ -474,6 +522,29 @@ function SmartMenuSearchContent() {
                 >
                   Clear context
                 </button>
+              </div>
+            )}
+            {/* Conversational refinement suggestions (human-friendly) */}
+            {refinementSuggestions && refinementSuggestions.length > 0 && (
+              <div className="mt-4 flex items-center justify-center gap-3">
+                <ul className="flex gap-3 flex-wrap">
+                  {refinementSuggestions.map((sugg, i) => (
+                    <li key={`refine-${i}`}>
+                      <button
+                        onClick={() => {
+                          // apply suggestion as a new search query
+                          setSearchQuery(sugg);
+                          const evt = new Event('submit', { bubbles: true });
+                          // trigger form submit programmatically
+                          document.querySelector('form')?.dispatchEvent(evt);
+                        }}
+                        className="px-3 py-1 text-sm rounded-full bg-[var(--bg-card)] border border-[var(--border)] hover:bg-[var(--bg-hover)]"
+                      >
+                        {sugg}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>
