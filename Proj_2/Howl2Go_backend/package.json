@@ -12,6 +12,7 @@
 		"import:fastfood": "node src/scripts/importFastFoodData.js",
 		"enrich:ingredients": "node src/scripts/enrichIngredientsWithLLM.js",
 		"seed:mealcombos": "node src/scripts/seedMealCombos.js",
+		"setup:database": "node src/scripts/setupDatabase.js",
 		"create:admin": "node src/scripts/createAdmin.js",
 		"prepare": "husky"
 	},

@@ -71,6 +71,11 @@ const fastFoodItemSchema = new mongoose.Schema(
 			type: Number,
 			default: 2,
 		},
+		ingredients: {
+			type: [String],
+			default: [],
+			index: true,
+		},
 	},
 	{
 		timestamps: true,

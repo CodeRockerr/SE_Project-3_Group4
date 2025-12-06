@@ -20,6 +20,7 @@ const sampleFoodItems = [
   {
     company: "McDonald's",
     item: "Big Mac",
+    ingredients: ["beef patty", "lettuce", "american cheese", "pickle", "onion", "sesame seed bun", "special sauce"],
     calories: 540,
     caloriesFromFat: 250,
     totalFat: 28,
@@ -37,6 +38,7 @@ const sampleFoodItems = [
   {
     company: "McDonald's",
     item: "Quarter Pounder with Cheese",
+    ingredients: ["beef patty", "american cheese", "sesame seed bun", "pickle", "onion", "ketchup", "mustard"],
     calories: 520,
     caloriesFromFat: 230,
     totalFat: 26,
@@ -54,6 +56,7 @@ const sampleFoodItems = [
   {
     company: "McDonald's",
     item: "McChicken",
+    ingredients: ["chicken breast", "mayonnaise", "lettuce", "sesame seed bun"],
     calories: 400,
     caloriesFromFat: 180,
     totalFat: 20,
@@ -71,6 +74,7 @@ const sampleFoodItems = [
   {
     company: "Burger King",
     item: "Whopper",
+    ingredients: ["beef patty", "lettuce", "tomato", "onion", "pickle", "mayonnaise", "ketchup", "sesame seed bun"],
     calories: 660,
     caloriesFromFat: 360,
     totalFat: 40,
@@ -88,6 +92,7 @@ const sampleFoodItems = [
   {
     company: "Burger King",
     item: "Chicken Fries",
+    ingredients: ["chicken", "breadcrumbs", "flour", "salt", "pepper", "vegetable oil"],
     calories: 280,
     caloriesFromFat: 140,
     totalFat: 16,
@@ -105,6 +110,7 @@ const sampleFoodItems = [
   {
     company: "Wendy's",
     item: "Classic Single",
+    ingredients: ["beef patty", "lettuce", "tomato", "onion", "pickle", "mayonnaise", "ketchup", "mustard", "bun"],
     calories: 470,
     caloriesFromFat: 220,
     totalFat: 24,
@@ -122,6 +128,7 @@ const sampleFoodItems = [
   {
     company: "Wendy's",
     item: "Spicy Chicken Sandwich",
+    ingredients: ["chicken breast", "lettuce", "tomato", "spicy sauce", "mayonnaise", "bun"],
     calories: 450,
     caloriesFromFat: 180,
     totalFat: 20,
@@ -139,6 +146,7 @@ const sampleFoodItems = [
   {
     company: "KFC",
     item: "Original Recipe Chicken Breast",
+    ingredients: ["chicken breast", "flour", "herbs", "spices", "salt", "pepper", "vegetable oil"],
     calories: 320,
     caloriesFromFat: 180,
     totalFat: 20,
@@ -156,6 +164,7 @@ const sampleFoodItems = [
   {
     company: "KFC",
     item: "Extra Crispy Tender",
+    ingredients: ["chicken", "flour", "breadcrumbs", "herbs", "spices", "salt", "pepper", "vegetable oil"],
     calories: 280,
     caloriesFromFat: 140,
     totalFat: 16,
@@ -173,6 +182,7 @@ const sampleFoodItems = [
   {
     company: "Taco Bell",
     item: "Crunchy Taco",
+    ingredients: ["ground beef", "lettuce", "cheddar cheese", "tomato", "taco shell"],
     calories: 170,
     caloriesFromFat: 90,
     totalFat: 10,
@@ -190,6 +200,7 @@ const sampleFoodItems = [
   {
     company: "Taco Bell",
     item: "Bean Burrito",
+    ingredients: ["refried beans", "cheddar cheese", "onion", "red sauce", "flour tortilla"],
     calories: 380,
     caloriesFromFat: 130,
     totalFat: 14,
@@ -207,6 +218,7 @@ const sampleFoodItems = [
   {
     company: "Taco Bell",
     item: "Chicken Quesadilla",
+    ingredients: ["chicken", "cheddar cheese", "pepper jack cheese", "chipotle sauce", "flour tortilla"],
     calories: 510,
     caloriesFromFat: 250,
     totalFat: 28,
@@ -248,7 +260,6 @@ async function importFromCSV(csvPath) {
         const item = {
           company: row.Company?.trim() || row.company?.trim(),
           item: row.Item?.trim() || row.item?.trim(),
-          ingredients: [],
           calories: parseFloat(row.Calories) || parseFloat(row.calories) || null,
           caloriesFromFat: parseFloat(row['Calories from Fat']) || parseFloat(row['Calories from Fat']) || parseFloat(row.caloriesFromFat) || null,
           totalFat: parseFloat(row['Total Fat (g)']) || parseFloat(row['Total Fat']) || parseFloat(row.totalFat) || null,
@@ -267,6 +278,8 @@ async function importFromCSV(csvPath) {
         // Derive ingredients from item name (heuristic)
         if (item.item) {
           item.ingredients = deriveIngredients(item.item);
+        } else {
+          item.ingredients = [];
         }
 
         // Calculate price based on calories (if calories exist)
