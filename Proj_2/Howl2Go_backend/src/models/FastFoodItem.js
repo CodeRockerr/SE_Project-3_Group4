@@ -4,7 +4,6 @@ const fastFoodItemSchema = new mongoose.Schema(
     {
         company: {
             type: String,
-            required: true,
             trim: true,
             index: true,
         },
@@ -67,7 +66,7 @@ const fastFoodItemSchema = new mongoose.Schema(
         },
         price: {
             type: Number,
-            default: 2,
+            default: undefined,
         },
     },
     {

@@ -51,6 +51,10 @@ const cartSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  totalCalories: {
+    type: Number,
+    default: 0
+  },
   totalPrice: {
     type: Number,
     default: 0
@@ -68,6 +72,7 @@ const cartSchema = new mongoose.Schema({
 cartSchema.pre('save', function(next) {
   this.totalItems = this.items.reduce((sum, item) => sum + item.quantity, 0);
   this.totalPrice = this.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  this.totalCalories = this.items.reduce((sum, item) => sum + ((item.calories || 0) * item.quantity), 0);
   next();
 });
 

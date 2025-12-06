@@ -41,6 +41,7 @@ export const getCart = async (req, res) => {
           items: cart.items,
           totalItems: cart.totalItems,
           totalPrice: cart.totalPrice,
+          totalCalories: cart.totalCalories,
           userId: cart.userId
         }
       }
@@ -101,7 +102,7 @@ export const addItemToCart = async (req, res) => {
       totalFat: foodItem.totalFat || 0,
       protein: foodItem.protein || 0,
       carbohydrates: foodItem.carbs || 0,
-      price: foodItem.price || calculatePrice(foodItem.calories),
+      price: (foodItem.price ?? calculatePrice(foodItem.calories)),
       quantity: parseInt(quantity, 10)
     });
 
@@ -116,7 +117,8 @@ export const addItemToCart = async (req, res) => {
           id: updatedCart._id,
           items: updatedCart.items,
           totalItems: updatedCart.totalItems,
-          totalPrice: updatedCart.totalPrice
+          totalPrice: updatedCart.totalPrice,
+          totalCalories: updatedCart.totalCalories
         }
       }
     });
