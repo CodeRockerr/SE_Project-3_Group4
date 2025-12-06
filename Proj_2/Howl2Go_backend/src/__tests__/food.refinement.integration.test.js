@@ -116,7 +116,7 @@ describe('Food Refinement Endpoint Tests', () => {
 
       if (response.status === 200 && response.body.recommendations?.length > 0) {
         const item = response.body.recommendations[0];
-        expect(item).toHaveProperty('name');
+        expect(item).toHaveProperty('item'); // Food items use 'item' field, not 'name'
         expect(item).toHaveProperty('calories');
         expect(item).toHaveProperty('price');
       }
