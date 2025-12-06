@@ -13,7 +13,7 @@ export const authenticate = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: 'Authentication required. Please provide a valid token.'
+        message: 'Authentication required'
       });
     }
 

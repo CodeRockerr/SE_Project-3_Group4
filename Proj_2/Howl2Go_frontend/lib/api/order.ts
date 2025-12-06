@@ -6,7 +6,7 @@ export interface OrderItem {
     _id: string;
     company: string;
     item: string;
-    [key: string]: any;
+    [key: string]: unknown;
   } | string;
   restaurant: string;
   item: string;

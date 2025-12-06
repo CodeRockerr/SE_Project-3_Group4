@@ -50,11 +50,40 @@ function SmartMenuSearchContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [lastCriteria, setLastCriteria] = useState<Record<string, unknown> | null>(null);
+  
+  // Load previous search criteria from localStorage on component mount
+  // Enables conversational refinements to survive page reloads
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("howl_lastCriteria");
+      if (raw) {
+        setLastCriteria(JSON.parse(raw));
+      }
+    } catch (e) {
+      // Silently ignore parse errors, user can start fresh search
+      console.warn("Failed to load lastCriteria from localStorage", e);
+    }
+  }, []);
+
+  // Synchronize lastCriteria state with localStorage
+  // Keeps search context in sync across page reloads and tabs
+  useEffect(() => {
+    try {
+      if (lastCriteria) {
+        localStorage.setItem("howl_lastCriteria", JSON.stringify(lastCriteria));
+      } else {
+        localStorage.removeItem("howl_lastCriteria");
+      }
+    } catch (e) {
+      console.warn("Failed to persist lastCriteria", e);
+    }
+  }, [lastCriteria]);
 
   // Auto-submit when page loads with initial query from main page
   useEffect(() => {
     if (initialQuery && !foodItems.length && !isLoading && !error) {
-      // Trigger search automatically
+      // Trigger search automatically with no previous criteria (fresh search)
       const submitSearch = async () => {
         setIsLoading(true);
         setError(null);
@@ -66,7 +95,8 @@ function SmartMenuSearchContent() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ query: initialQuery }),
+            // Initial search: previousCriteria is null
+            body: JSON.stringify({ query: initialQuery, previousCriteria: null }),
           });
 
           if (!response.ok) {
@@ -83,6 +113,10 @@ function SmartMenuSearchContent() {
           }
 
           const data = await response.json();
+          // Store returned criteria to enable conversational refinements
+          if (data && typeof data === 'object' && 'criteria' in data) {
+            setLastCriteria(data.criteria || null);
+          }
           await parseAndSetFoodItems(data);
         } catch (error) {
           console.error("Error fetching recommendations:", error);
@@ -235,12 +269,13 @@ function SmartMenuSearchContent() {
     console.log("Parsed food items:", items);
   };
 
-  // Handle search form submission
+  // Handle search form submission with conversational refinement support
+  // Sends current search query with previousCriteria for context-aware results
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
 
-    // ✅ Update URL only when pressing Enter / submitting
+    // Update URL to reflect new search query
     const params = new URLSearchParams();
     params.set("q", searchQuery);
     router.replace(`/search?${params.toString()}`, { scroll: false });
@@ -253,7 +288,8 @@ function SmartMenuSearchContent() {
       const response = await fetch("/api/food/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: searchQuery }),
+        // Send query with previous criteria to enable refinement interpretation
+        body: JSON.stringify({ query: searchQuery, previousCriteria: lastCriteria }),
       });
 
       if (!response.ok) {
@@ -270,6 +306,10 @@ function SmartMenuSearchContent() {
       }
 
       const data = await response.json();
+      // Store returned criteria for next refinement iteration
+      if (data && typeof data === 'object' && 'criteria' in data) {
+        setLastCriteria(data.criteria || null);
+      }
       await parseAndSetFoodItems(data);
     } catch (error) {
       console.error("Error fetching recommendations:", error);
@@ -392,6 +432,23 @@ function SmartMenuSearchContent() {
                 </div>
               </motion.div>
             </form>
+
+            {/* Clear conversational context UI */}
+            {/* Shows when lastCriteria exists, allowing user to reset search history */}
+            {lastCriteria && (
+              <div className="mt-3 flex items-center justify-center gap-3">
+                <div className="text-sm text-[var(--text-subtle)]">
+                  Refining previous search
+                </div>
+                <button
+                  onClick={() => setLastCriteria(null)} // Clears localStorage and state
+                  className="px-3 py-1 text-sm rounded-full bg-[var(--bg-card)] border border-[var(--border)] hover:bg-[var(--bg-hover)]"
+                  aria-label="Clear search context"
+                >
+                  Clear context
+                </button>
+              </div>
+            )}
           </div>
         </motion.div>
 

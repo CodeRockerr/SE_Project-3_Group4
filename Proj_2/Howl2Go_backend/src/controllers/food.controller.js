@@ -1,24 +1,28 @@
 import FastFoodItem from "../models/FastFoodItem.js";
 
 /**
- * Calculate price based on calories
- * Formula: ~$0.01 per calorie, min $2.00, max $15.00
+ * Calculate estimated price based on calorie content
+ * Uses heuristic: ~$0.01 per calorie, with min/max bounds
+ * This enables price-based sorting for refinement queries like "cheaper options"
  *
- * @param {number} calories - Calorie count
- * @returns {number} - Calculated price
+ * @param {number} calories - Calorie count for the food item
+ * @returns {number} - Estimated price in dollars (2.00 - 15.00 range)
  */
 const calculatePrice = (calories) => {
+    // Default to minimum price if calories not available or invalid
     if (!calories || calories <= 0) return 2.0;
+    // Calculate base price: $0.01 per calorie
     const basePrice = calories * 0.01;
+    // Clamp to realistic range: $2.00 minimum, $15.00 maximum
     return Math.min(Math.max(basePrice, 2.0), 15.0);
 };
 
 /**
  * Get food recommendations based on natural language preferences
- * Similar to search but with sorting and better recommendations
+ * Supports conversational refinement with sorting overrides
  *
  * @route POST /api/food/recommend
- * @body { query: string, limit?: number } - Natural language food query
+ * @body { query: string, previousCriteria?: object, limit?: number } - Natural language food query with optional context
  * @returns { success: boolean, query: string, criteria: object, recommendations: array }
  */
 export const recommendFood = async (req, res) => {
@@ -26,11 +30,16 @@ export const recommendFood = async (req, res) => {
         // const limit = parseInt(req.body.limit) || 5;
         const mongoQuery = req.mongoQuery || {};
 
-        // Get recommendations with some intelligence
-        // For example, if they want high protein, sort by protein descending
+        // Get recommendations with intelligent sorting
+        // Default sorting based on primary criteria, can be overridden by LLM sort field
         let sortCriteria = {};
 
-        if (req.parsedCriteria.protein?.min) {
+        // Check for LLM-provided sort override (e.g., price_asc for "show me cheaper options")
+        if (req.parsedCriteria.sort === 'price_asc') {
+            sortCriteria = { price: 1 }; // Sort by price ascending (cheaper first)
+        } else if (req.parsedCriteria.sort === 'price_desc') {
+            sortCriteria = { price: -1 }; // Sort by price descending (expensive first)
+        } else if (req.parsedCriteria.protein?.min) {
             sortCriteria.protein = -1; // High protein first
         } else if (req.parsedCriteria.calories?.max) {
             sortCriteria.calories = 1; // Low calories first
@@ -43,12 +52,11 @@ export const recommendFood = async (req, res) => {
             // .limit(limit)
             .lean();
 
-        // Add calculated price and ensure all fields are present
-        const recommendationsWithPrice = recommendations.map(item => ({
+        // Add calculated price and normalize fields for the frontend
+        let recommendationsWithPrice = recommendations.map(item => ({
             ...item,
-            restaurant: item.company, // Map company to restaurant for frontend
+            restaurant: item.company || item.restaurant,
             price: calculatePrice(item.calories),
-            // Ensure nutrition fields are included
             totalFat: item.totalFat ?? null,
             saturatedFat: item.saturatedFat ?? null,
             transFat: item.transFat ?? null,
@@ -58,8 +66,17 @@ export const recommendFood = async (req, res) => {
             fiber: item.fiber ?? null,
             sugars: item.sugars ?? null,
             protein: item.protein ?? null,
-            ingredients: item.ingredients || []
+            ingredients: item.ingredients || [],
         }));
+
+        // If LLM requested a sort override (e.g., "cheaper options" -> sort: "price_asc"),
+        // apply it on the results after price calculation.
+        const sortOverride = req.parsedCriteria?.sort;
+        if (sortOverride === 'price_asc') {
+            recommendationsWithPrice = recommendationsWithPrice.sort((a, b) => (a.price || 0) - (b.price || 0));
+        } else if (sortOverride === 'price_desc') {
+            recommendationsWithPrice = recommendationsWithPrice.sort((a, b) => (b.price || 0) - (a.price || 0));
+        }
 
         return res.status(200).json({
             success: true,

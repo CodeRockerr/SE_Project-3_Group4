@@ -10,7 +10,6 @@ const reviewSchema = new mongoose.Schema({
   orderId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Order',
-    required: true,
     index: true
   },
   foodItemId: {
@@ -20,12 +19,10 @@ const reviewSchema = new mongoose.Schema({
     index: true
   },
   restaurant: {
-    type: String,
-    required: true
+    type: String
   },
   itemName: {
-    type: String,
-    required: true
+    type: String
   },
   rating: {
     type: Number,

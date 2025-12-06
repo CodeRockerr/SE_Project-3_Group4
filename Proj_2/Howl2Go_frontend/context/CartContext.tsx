@@ -52,7 +52,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addToCart = async (foodItem: FoodItem, quantity: number = 1) => {
     // Require _id to add to cart - try multiple possible fields
-    const foodItemId = foodItem._id || (foodItem as any).id;
+    const foodItemId = foodItem._id || ((foodItem as Record<string, unknown>).id as string | undefined);
     if (!foodItemId) {
       console.error("Cannot add item to cart: missing _id", foodItem);
       const errorMessage = "Unable to add item to cart: missing item ID. Please try searching again.";
@@ -64,14 +64,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const updatedItems = await addItemToCartAPI(foodItemId, quantity);
       setItems(updatedItems);
       toast.success("Item added to cart!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to add item to cart:", error);
+      const err = error instanceof Error ? error : new Error(String(error));
       // Only show error toast if it's not already shown (avoid duplicates)
-      const errorMessage = error?.message || "Failed to add item to cart. Please try again.";
+      const errorMessage = err.message || "Failed to add item to cart. Please try again.";
       if (!errorMessage.includes("already shown")) {
         toast.error(errorMessage);
       }
-      throw error;
+      throw err;
     }
   };
 

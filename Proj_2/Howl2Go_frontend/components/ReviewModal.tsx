@@ -136,7 +136,7 @@ export default function ReviewModal({
           if (onReviewCreated) {
             onReviewCreated();
           }
-        } catch (createError: any) {
+        } catch (createError: unknown) {
           // Check if error is "already reviewed" - catch various error message formats
           const errorMsg = createError.message?.toLowerCase() || "";
           if (errorMsg.includes("already reviewed") || 
@@ -156,7 +156,7 @@ export default function ReviewModal({
               } else {
                 throw createError; // Re-throw if we can't find the review
               }
-            } catch (updateError: any) {
+            } catch (updateError: unknown) {
               // If update also fails, show the original error
               throw createError;
             }
@@ -177,7 +177,7 @@ export default function ReviewModal({
       setRating(0);
       setComment("");
       onClose();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(error.message || (isEditing ? "Failed to update review" : "Failed to submit review"));
     } finally {
       setIsSubmitting(false);

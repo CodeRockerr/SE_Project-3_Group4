@@ -89,12 +89,13 @@ export default function CartPage() {
       setTimeout(() => {
         router.push("/orders");
       }, 3000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to place order:", error);
       setIsProcessing(false);
       
       // Show user-friendly error message
-      const errorMessage = error?.message || "Failed to place order. Please try again.";
+      const err = error instanceof Error ? error : new Error(String(error));
+      const errorMessage = err.message || "Failed to place order. Please try again.";
       toast.error(errorMessage);
       
       // If authentication error, redirect to login

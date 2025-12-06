@@ -7,7 +7,7 @@ interface BackendCartItem {
     company: string;
     item: string;
     calories: number;
-    [key: string]: any;
+    [key: string]: unknown;
   } | string; // Can be ObjectId string or populated object
   restaurant: string;
   item: string;
