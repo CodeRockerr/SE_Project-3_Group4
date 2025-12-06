@@ -22,10 +22,10 @@ Before starting, ensure you have:
 
 ```bash
 # Clone the repository
-git clone https://github.com/harsha711/SE_Project_Grp_27.git
+git clone https://github.com/CodeRockerr/SE-Project-3_Group4.git
 
 # Navigate to the project
-cd SE_Project_Grp_27/Proj_2
+cd SE-Project-3_Group4/Proj_2
 ```
 
 ---
@@ -104,7 +104,7 @@ SESSION_NAME=howl2go.sid
 SESSION_MAX_AGE=86400000
 
 # Groq AI API
-GROQ_API_KEY=your_groq_api_key_here
+***REMOVED***
 
 # Frontend URL (for CORS)
 FRONTEND_URL=http://localhost:3000
@@ -183,7 +183,7 @@ Food Delivery API listening on port 4000 in development mode
 
 ```bash
 # Navigate to frontend directory
-cd SE_Project_Grp_27/Proj_2/Howl2Go_frontend
+cd SE-Project-3_Group4/Proj_2/Howl2Go_frontend
 
 # Install dependencies
 npm install
@@ -448,7 +448,7 @@ Once both servers are running:
 **Need Help?**
 - Check [Troubleshooting](#-troubleshooting) section above
 - Review [Common Issues](DEVELOPER_SETUP.md#14-common-issues--solutions)
-- Open an issue on [GitHub](https://github.com/harsha711/SE_Project_Grp_27/issues)
+- Open an issue on [GitHub](https://github.com/CodeRockerr/SE-Project-3_Group4/issues)
 
 ---
 

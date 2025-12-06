@@ -13,6 +13,10 @@ const fastFoodItemSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
+        ingredients: {
+            type: [String],
+            default: [],
+        },
         calories: {
             type: Number,
             default: null,
@@ -76,6 +80,9 @@ fastFoodItemSchema.index({ company: 1, item: 1 });
 
 // Create text index for searching items
 fastFoodItemSchema.index({ item: "text", company: "text" });
+
+// Ingredient index for recommendation queries
+fastFoodItemSchema.index({ ingredients: 1 });
 
 const FastFoodItem = mongoose.model("FastFoodItem", fastFoodItemSchema);
 

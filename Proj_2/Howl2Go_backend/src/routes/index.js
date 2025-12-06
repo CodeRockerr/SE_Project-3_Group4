@@ -7,6 +7,7 @@ import orderRouter from './order.routes.js';
 import reviewRouter from './review.routes.js';
 import bugRouter from './bug.routes.js';
 import adminRouter from './admin.routes.js';
+import recommendationsRouter from './recommendations.routes.js';
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use('/orders', orderRouter);
 router.use('/reviews', reviewRouter);
 router.use('/bugs', bugRouter);
 router.use('/admin', adminRouter);
+router.use('/recommendations', recommendationsRouter);
 
 export default router;

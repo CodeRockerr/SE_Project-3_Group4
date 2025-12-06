@@ -53,6 +53,15 @@ const userSchema = new mongoose.Schema(
         type: Number,
         default: null
       }
+      ,
+      ingredientsInclude: {
+        type: [String],
+        default: []
+      },
+      ingredientsExclude: {
+        type: [String],
+        default: []
+      }
     },
     lastLogin: {
       type: Date,
