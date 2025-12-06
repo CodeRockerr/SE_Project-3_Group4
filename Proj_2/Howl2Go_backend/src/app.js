@@ -19,29 +19,27 @@ app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 
 // Session middleware configuration
 // Uses in-memory store for tests (no MongoDB required), MongoDB for production
-const sessionStore = env.nodeEnv === 'test'
-  ? undefined // In-memory session store for tests - simplifies test setup
-  : MongoStore.create({
-    mongoUrl: env.mongodbUri,
-    touchAfter: 24 * 3600, // Lazy session update interval in seconds
-    crypto: {
-      secret: env.session.secret
-    }
-  });
+const useInMemoryDb = process.env.USE_IN_MEMORY_DB === 'true';
+const mongoUri = process.env.MONGODB_URI;
 
-app.use(session({
-  secret: env.session.secret,
-  name: env.session.name,
-  resave: false,
-  saveUninitialized: true, // Create session even if not modified (needed for cart persistence)
-  ...(sessionStore && { store: sessionStore }), // Only add MongoDB store if not in test mode
-  cookie: {
-    maxAge: env.session.maxAge,
-    httpOnly: true,
-    secure: env.nodeEnv === 'production', // Use secure cookies only in production
-    sameSite: env.nodeEnv === 'production' ? 'none' : 'lax', // Adjust SameSite policy by environment
-  }
-}));
+if (useInMemoryDb || !mongoUri) {
+  // Use default in-memory session store for dev/test
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'dev-secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 86400000 }
+  }));
+} else {
+  // Use MongoDB-backed session store for production
+  app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key-change-this-in-production',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: mongoUri }),
+    cookie: { maxAge: 86400000 }
+  }));
+}
 
 // Mount API routes under /api prefix
 app.use('/api', routes);

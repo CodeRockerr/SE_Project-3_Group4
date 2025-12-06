@@ -136,6 +136,17 @@ function SmartMenuSearchContent() {
   // Helper function to parse API response
   const parseAndSetFoodItems = async (data: ApiData) => {
     console.log("API Response:", data);
+    console.log("Data type:", typeof data);
+    console.log("Is array?", Array.isArray(data));
+    if (data && typeof data === 'object') {
+      console.log("Data keys:", Object.keys(data as any));
+      console.log("Has recommendations?", "recommendations" in data);
+      if ("recommendations" in data) {
+        console.log("Recommendations type:", typeof (data as any).recommendations);
+        console.log("Is recommendations array?", Array.isArray((data as any).recommendations));
+        console.log("Recommendations value:", (data as any).recommendations);
+      }
+    }
 
     let items: FoodItem[] = [];
 
@@ -148,7 +159,7 @@ function SmartMenuSearchContent() {
       items = data.recommendations
         .map((item) => ({
         _id: item._id ? String(item._id) : item.id ? String(item.id) : undefined, // Include MongoDB _id, ensure it's a string
-        restaurant: item.company || "Unknown", // Map company -> restaurant
+        restaurant: item.restaurant || "Unknown", // Use restaurant from backend
         item: item.item || "Unknown Item",
         calories: item.calories || 0,
         caloriesFromFat: item.caloriesFromFat || null,
@@ -170,7 +181,7 @@ function SmartMenuSearchContent() {
       items = data
         .map((item) => ({
         _id: item._id ? String(item._id) : item.id ? String(item.id) : undefined, // Include MongoDB _id, ensure it's a string
-        restaurant: item.company || item.restaurant || "Unknown",
+        restaurant: item.restaurant || "Unknown",
         item: item.item || "Unknown Item",
         calories: item.calories || 0,
         caloriesFromFat: item.caloriesFromFat || null,
@@ -196,7 +207,7 @@ function SmartMenuSearchContent() {
       items = data.results
         .map((item) => ({
         _id: item._id ? String(item._id) : item.id ? String(item.id) : undefined, // Include MongoDB _id, ensure it's a string
-        restaurant: item.company || item.restaurant || "Unknown",
+        restaurant: item.restaurant || "Unknown",
         item: item.item || "Unknown Item",
         calories: item.calories || 0,
         caloriesFromFat: item.caloriesFromFat || null,
@@ -256,6 +267,12 @@ function SmartMenuSearchContent() {
         }
       );
     } else {
+      console.error("Failed to parse response - no matching format", {
+        isArray: Array.isArray(data),
+        hasRecommendations: data && "recommendations" in data,
+        recommendationsIsArray: data && Array.isArray((data as any).recommendations),
+        dataKeys: data && typeof data === 'object' ? Object.keys(data as any) : 'not an object',
+      });
       setError("Unexpected response format from server.");
       return;
     }
@@ -306,11 +323,21 @@ function SmartMenuSearchContent() {
       }
 
       const data = await response.json();
+      console.log("Response from backend:", data);
+      console.log("Response status:", response.status);
+      
       // Store returned criteria for next refinement iteration
       if (data && typeof data === 'object' && 'criteria' in data) {
         setLastCriteria(data.criteria || null);
       }
-      await parseAndSetFoodItems(data);
+      
+      try {
+        await parseAndSetFoodItems(data);
+      } catch (parseError) {
+        console.error("Error in parseAndSetFoodItems:", parseError);
+        setError("Error processing search results. Check console for details.");
+        throw parseError;
+      }
     } catch (error) {
       console.error("Error fetching recommendations:", error);
       setError(
