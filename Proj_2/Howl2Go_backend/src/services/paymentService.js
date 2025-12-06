@@ -1,10 +1,63 @@
 import Stripe from "stripe";
 import Payment from "../models/Payment.js";
 import Order from "../models/Order.js";
+import User from "../models/User.js";
 import env from "../config/env.js";
 
 // Initialize Stripe with API key
 const stripe = new Stripe(env.stripe.secretKey);
+
+/**
+ * Create or retrieve a Stripe customer for a user and persist on user record
+ * @param {string} userId
+ * @param {Object} [metadata]
+ * @returns {Promise<string>} stripeCustomerId
+ */
+export const ensureStripeCustomerForUser = async (userId, metadata = {}) => {
+  const user = await User.findById(userId);
+  if (!user) throw new Error("User not found");
+
+  if (user.stripeCustomerId) {
+    console.log(
+      `✓ User ${user.email} already has Stripe customer: ${user.stripeCustomerId}`
+    );
+    return user.stripeCustomerId;
+  }
+
+  // Create a new Stripe customer
+  console.log(`→ Creating new Stripe customer for user ${user.email}`);
+  const customer = await stripe.customers.create({
+    email: user.email,
+    name: user.name,
+    metadata,
+  });
+
+  console.log(
+    `✓ Created Stripe customer ${customer.id} for user ${user.email}`
+  );
+
+  user.stripeCustomerId = customer.id;
+  await user.save({ validateBeforeSave: false });
+
+  return customer.id;
+};
+
+/**
+ * List saved payment methods (cards) for a given user
+ * @param {string} userId
+ * @returns {Promise<Array>} array of payment methods
+ */
+export const getSavedPaymentMethodsForUser = async (userId) => {
+  const user = await User.findById(userId);
+  if (!user || !user.stripeCustomerId) return [];
+
+  const methods = await stripe.paymentMethods.list({
+    customer: user.stripeCustomerId,
+    type: "card",
+  });
+
+  return methods.data || [];
+};
 
 /**
  * Create a payment intent for an order
@@ -42,10 +95,17 @@ export const createPaymentIntent = async (orderId, userId) => {
     // Calculate amount in cents (Stripe uses smallest currency unit)
     const amountInCents = Math.round(order.total * 100);
 
-    // Create Stripe payment intent
-    const paymentIntent = await stripe.paymentIntents.create({
+    // Always ensure user has a Stripe customer for payment method scoping
+    const stripeCustomerId = await ensureStripeCustomerForUser(userId);
+
+    console.log(
+      `→ Creating PaymentIntent for order ${orderId} with customer ${stripeCustomerId}`
+    );
+
+    const paymentIntentParams = {
       amount: amountInCents,
       currency: "usd",
+      customer: stripeCustomerId,
       metadata: {
         orderId: orderId.toString(),
         userId: userId.toString(),
@@ -53,7 +113,15 @@ export const createPaymentIntent = async (orderId, userId) => {
       automatic_payment_methods: {
         enabled: true,
       },
-    });
+    };
+
+    const paymentIntent = await stripe.paymentIntents.create(
+      paymentIntentParams
+    );
+
+    console.log(
+      `✓ Created PaymentIntent ${paymentIntent.id} for customer ${stripeCustomerId}`
+    );
 
     // Create payment record in database
     const payment = await Payment.create({

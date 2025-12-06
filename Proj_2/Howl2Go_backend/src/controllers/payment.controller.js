@@ -147,6 +147,31 @@ export const getUserPayments = async (req, res) => {
 };
 
 /**
+ * Get saved payment methods (cards) for current user
+ * GET /api/payments/methods
+ */
+export const getSavedPaymentMethods = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const methods = await paymentService.getSavedPaymentMethodsForUser(userId);
+
+    // Simplify method data for client
+    const simplified = methods.map((m) => ({
+      id: m.id,
+      brand: m.card?.brand,
+      last4: m.card?.last4,
+      exp_month: m.card?.exp_month,
+      exp_year: m.card?.exp_year,
+    }));
+
+    res.status(200).json({ success: true, methods: simplified });
+  } catch (error) {
+    console.error("Error fetching saved payment methods:", error);
+    res.status(500).json({ success: false, methods: [] });
+  }
+};
+
+/**
  * Get payments for a specific order
  * GET /api/payments/order/:orderId
  */
@@ -253,5 +278,6 @@ export default {
   getUserPayments,
   getOrderPayments,
   handleWebhook,
+  getSavedPaymentMethods,
   refundPayment,
 };

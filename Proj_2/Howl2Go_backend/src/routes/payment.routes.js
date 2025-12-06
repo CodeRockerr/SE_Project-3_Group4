@@ -6,6 +6,7 @@ import {
   getPayment,
   getUserPayments,
   getOrderPayments,
+  getSavedPaymentMethods,
   handleWebhook,
   refundPayment,
 } from "../controllers/payment.controller.js";
@@ -60,6 +61,12 @@ router.get("/", authenticate, getUserPayments);
  * @access Private (order owner only)
  */
 router.get("/order/:orderId", authenticate, getOrderPayments);
+
+/**
+ * Get saved payment methods for current user
+ * GET /api/payments/methods
+ */
+router.get("/methods", authenticate, getSavedPaymentMethods);
 
 /**
  * Refund a payment

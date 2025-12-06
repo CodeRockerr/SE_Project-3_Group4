@@ -103,6 +103,8 @@ export default function CheckoutForm({
         <PaymentElement
           options={{
             layout: "tabs",
+            // Ensure payment methods are fetched fresh for this customer
+            wallets: { applePay: "auto", googlePay: "auto" },
           }}
         />
       </div>

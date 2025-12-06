@@ -174,10 +174,13 @@ export default function PaymentModal({
           </div>
         ) : clientSecret && paymentIntentId ? (
           <Elements
+            key={`elements-${clientSecret}`}
             stripe={stripePromise}
             options={{
               clientSecret,
               appearance,
+              // Ensure we fetch fresh payment methods for this payment intent's customer
+              loader: "always",
             }}
           >
             <CheckoutForm

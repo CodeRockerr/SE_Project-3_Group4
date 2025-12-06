@@ -4,6 +4,7 @@ import {
   generateRefreshToken,
   verifyToken,
 } from "../utils/jwt.util.js";
+import { ensureStripeCustomerForUser } from "../services/paymentService.js";
 
 /**
  * Register a new user
@@ -38,6 +39,14 @@ export const register = async (req, res) => {
       email,
       password,
     });
+
+    // Create Stripe customer for the user (for payment methods scoping)
+    try {
+      await ensureStripeCustomerForUser(user._id);
+    } catch (stripeError) {
+      console.error("Failed to create Stripe customer:", stripeError);
+      // Don't block signup if Stripe customer creation fails
+    }
 
     // Generate tokens
     const accessToken = generateAccessToken(user._id, user.email, user.role);

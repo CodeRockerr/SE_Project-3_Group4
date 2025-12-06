@@ -1,74 +1,79 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Name is required'],
+      required: [true, "Name is required"],
       trim: true,
-      minlength: [2, 'Name must be at least 2 characters long'],
-      maxlength: [100, 'Name cannot exceed 100 characters']
+      minlength: [2, "Name must be at least 2 characters long"],
+      maxlength: [100, "Name cannot exceed 100 characters"],
     },
     email: {
       type: String,
-      required: [true, 'Email is required'],
+      required: [true, "Email is required"],
       unique: true,
       lowercase: true,
       trim: true,
       match: [
         /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-        'Please provide a valid email address'
-      ]
+        "Please provide a valid email address",
+      ],
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
-      minlength: [8, 'Password must be at least 8 characters long'],
-      select: false // Don't include password in queries by default
+      required: [true, "Password is required"],
+      minlength: [8, "Password must be at least 8 characters long"],
+      select: false, // Don't include password in queries by default
     },
     role: {
       type: String,
-      enum: ['user', 'admin'],
-      default: 'user'
+      enum: ["user", "admin"],
+      default: "user",
     },
     isActive: {
       type: Boolean,
-      default: true
+      default: true,
     },
     preferences: {
       dietaryRestrictions: {
         type: [String],
-        default: []
+        default: [],
       },
       favoriteRestaurants: {
         type: [String],
-        default: []
+        default: [],
       },
       maxCalories: {
         type: Number,
-        default: null
+        default: null,
       },
       minProtein: {
         type: Number,
-        default: null
-      }
+        default: null,
+      },
     },
     lastLogin: {
       type: Date,
-      default: null
+      default: null,
     },
     passwordChangedAt: {
-      type: Date
+      type: Date,
     },
     passwordResetToken: {
       type: String,
-      select: false
+      select: false,
     },
     passwordResetExpires: {
       type: Date,
-      select: false
-    }
+      select: false,
+    },
+    // Stripe customer id for saved payment methods
+    stripeCustomerId: {
+      type: String,
+      sparse: true,
+    },
   },
   {
     timestamps: true, // Adds createdAt and updatedAt
@@ -77,8 +82,8 @@ const userSchema = new mongoose.Schema(
         delete ret.password;
         delete ret.__v;
         return ret;
-      }
-    }
+      },
+    },
   }
 );
 
@@ -86,9 +91,9 @@ const userSchema = new mongoose.Schema(
 userSchema.index({ email: 1 });
 
 // Pre-save hook to hash password
-userSchema.pre('save', async function (next) {
+userSchema.pre("save", async function (next) {
   // Only hash the password if it has been modified (or is new)
-  if (!this.isModified('password')) return next();
+  if (!this.isModified("password")) return next();
 
   try {
     // Generate salt and hash password
@@ -129,6 +134,6 @@ userSchema.methods.updateLastLogin = async function () {
   await this.save({ validateBeforeSave: false });
 };
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 
 export default User;
