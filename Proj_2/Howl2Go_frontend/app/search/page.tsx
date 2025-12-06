@@ -118,14 +118,21 @@ function SmartMenuSearchContent() {
           if (data && typeof data === 'object' && 'criteria' in data) {
                     const criteria = data.criteria || null;
                     setLastCriteria(criteria);
-                    // Build human-friendly refinement suggestions from criteria
+                    // Compute match count (prefer explicit count, fallback to recommendations length)
+                    const matchCount = (data && typeof data === 'object' && 'count' in data && typeof (data as any).count === 'number')
+                      ? (data as any).count
+                      : (data && typeof data === 'object' && Array.isArray((data as any).recommendations))
+                        ? (data as any).recommendations.length
+                        : 0;
+                    // Build human-friendly refinement suggestions from criteria when results are limited
                     try {
-                      const suggs = buildRefinementSuggestions(criteria as any);
+                      const suggs = buildRefinementSuggestions(criteria as any, matchCount);
                       setRefinementSuggestions(suggs);
                     } catch (e) {
                       console.warn('Failed to build refinement suggestions', e);
                       setRefinementSuggestions([]);
                     }
+          }
           }
           await parseAndSetFoodItems(data);
         } catch (error) {
@@ -340,8 +347,14 @@ function SmartMenuSearchContent() {
       if (data && typeof data === 'object' && 'criteria' in data) {
         const criteria = data.criteria || null;
         setLastCriteria(criteria);
+        // Compute match count (prefer explicit count, fallback to recommendations length)
+        const matchCount = (data && typeof data === 'object' && 'count' in data && typeof (data as any).count === 'number')
+          ? (data as any).count
+          : (data && typeof data === 'object' && Array.isArray((data as any).recommendations))
+            ? (data as any).recommendations.length
+            : 0;
         try {
-          const suggs = buildRefinementSuggestions(criteria as any);
+          const suggs = buildRefinementSuggestions(criteria as any, matchCount);
           setRefinementSuggestions(suggs);
         } catch (e) {
           console.warn('Failed to build refinement suggestions', e);
@@ -367,25 +380,55 @@ function SmartMenuSearchContent() {
   };
 
   // Build human-friendly suggestion strings from parsed criteria
-  const buildRefinementSuggestions = (criteria: any): string[] => {
+  // Only produce suggestions when matchCount is below a small threshold
+  const buildRefinementSuggestions = (criteria: any, matchCount: number = 0): string[] => {
+    const LIMIT_THRESHOLD = 3; // only show suggestions when results are limited
     if (!criteria || typeof criteria !== 'object') return [];
+    if (typeof matchCount !== 'number') matchCount = Number(matchCount) || 0;
+    if (matchCount > LIMIT_THRESHOLD) return [];
+
     const suggestions: string[] = [];
+
+    const relaxMax = (max: number) => {
+      if (typeof max !== 'number' || Number.isNaN(max)) return max;
+      const byPercent = Math.round(max * 1.2);
+      const byPlus = max + 100;
+      return Math.max(byPercent, byPlus);
+    };
+
+    const relaxMin = (min: number) => {
+      if (typeof min !== 'number' || Number.isNaN(min)) return min;
+      return Math.max(0, Math.floor(min * 0.8));
+    };
 
     if (criteria.calories) {
       const c = criteria.calories;
-      if (c.max !== undefined) suggestions.push(`Would you consider under ${c.max} calories instead?`);
-      else if (c.min !== undefined) suggestions.push(`Prefer meals above ${c.min} calories?`);
+      if (c.max !== undefined && typeof c.max === 'number') {
+        const relaxed = relaxMax(c.max);
+        suggestions.push(`Would you consider under ${relaxed} calories instead?`);
+      } else if (c.min !== undefined && typeof c.min === 'number') {
+        const relaxed = relaxMin(c.min);
+        suggestions.push(`Prefer meals above ${relaxed} calories?`);
+      }
     }
 
     if (criteria.protein) {
       const p = criteria.protein;
-      if (p.min !== undefined) suggestions.push(`Looking for at least ${p.min}g protein?`);
-      else if (p.max !== undefined) suggestions.push(`Prefer protein under ${p.max}g?`);
+      if (p.min !== undefined && typeof p.min === 'number') {
+        const relaxed = relaxMin(p.min);
+        suggestions.push(`Looking for at least ${relaxed}g protein?`);
+      } else if (p.max !== undefined && typeof p.max === 'number') {
+        const relaxed = relaxMax(p.max);
+        suggestions.push(`Prefer protein under ${relaxed}g?`);
+      }
     }
 
     if (criteria.totalFat) {
       const f = criteria.totalFat;
-      if (f.max !== undefined) suggestions.push(`Would you like options under ${f.max}g fat?`);
+      if (f.max !== undefined && typeof f.max === 'number') {
+        const relaxed = relaxMax(f.max);
+        suggestions.push(`Would you like options under ${relaxed}g fat?`);
+      }
     }
 
     // If no numeric suggestions yet, and there's an item/name criterion, offer a refinement
