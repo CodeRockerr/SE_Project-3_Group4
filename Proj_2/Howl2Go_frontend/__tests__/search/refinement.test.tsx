@@ -1,31 +1,29 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import SmartMenuSearch from '../app/search/page';
+import SmartMenuSearch from '../../app/search/page';
 
 /**
  * Unit tests for frontend conversational refinement
  * Tests localStorage persistence and Clear context button
  */
 
-vi.mock('next/navigation', () => ({
+jest.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams('q=test'),
   useRouter: () => ({
-    replace: vi.fn(),
-    push: vi.fn()
+    replace: jest.fn(),
+    push: jest.fn()
   })
 }));
 
-// Mock fetch globally
-global.fetch = vi.fn();
+// Mock fetch globally - will be configured in beforeEach
 
 describe('Frontend - Conversational Refinement', () => {
   beforeEach(() => {
     // Clear localStorage before each test
     localStorage.clear();
-    vi.clearAllMocks();
+    jest.clearAllMocks();
 
     // Mock successful API response
-    global.fetch.mockResolvedValue({
+    (global.fetch as jest.Mock) = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         recommendations: [],
@@ -39,7 +37,7 @@ describe('Frontend - Conversational Refinement', () => {
 
   afterEach(() => {
     localStorage.clear();
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   describe('localStorage persistence', () => {
@@ -92,7 +90,7 @@ describe('Frontend - Conversational Refinement', () => {
       localStorage.setItem('howl_lastCriteria', 'invalid json {');
 
       // Should not throw, just warn
-      const consoleSpy = vi.spyOn(console, 'warn');
+      const consoleSpy = jest.spyOn(console, 'warn');
 
       render(<SmartMenuSearch />);
 
@@ -119,7 +117,7 @@ describe('Frontend - Conversational Refinement', () => {
       });
 
       // Click "Clear context" button
-      const clearButton = screen.getByRole('button', { name: /Clear context/i });
+      const clearButton = screen.getByRole('button', { name: /Clear search context/i });
       fireEvent.click(clearButton);
 
       // Verify localStorage is cleared
@@ -139,11 +137,14 @@ describe('Frontend - Conversational Refinement', () => {
       render(<SmartMenuSearch />);
 
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: /Clear context/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Clear search context/i })).toBeInTheDocument();
       });
     });
 
     it('should not display "Clear context" button when lastCriteria is null', async () => {
+      // Mock useSearchParams to return empty query so no auto-submit happens
+      jest.spyOn(require('next/navigation'), 'useSearchParams').mockReturnValue(new URLSearchParams(''));
+      
       render(<SmartMenuSearch />);
 
       await waitFor(() => {
@@ -151,7 +152,7 @@ describe('Frontend - Conversational Refinement', () => {
       });
 
       // Button should not be present initially
-      expect(screen.queryByRole('button', { name: /Clear context/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Clear search context/i })).not.toBeInTheDocument();
     });
 
     it('should clear lastCriteria state when Clear context button is clicked', async () => {
@@ -169,7 +170,7 @@ describe('Frontend - Conversational Refinement', () => {
       });
 
       // Click Clear context
-      const clearButton = screen.getByRole('button', { name: /Clear context/i });
+      const clearButton = screen.getByRole('button', { name: /Clear search context/i });
       fireEvent.click(clearButton);
 
       // Wait for button to disappear
@@ -212,6 +213,9 @@ describe('Frontend - Conversational Refinement', () => {
     });
 
     it('should send null previousCriteria on initial search', async () => {
+      // Mock useSearchParams to return empty query so no auto-submit happens
+      jest.spyOn(require('next/navigation'), 'useSearchParams').mockReturnValue(new URLSearchParams(''));
+      
       render(<SmartMenuSearch />);
 
       await waitFor(() => {
@@ -227,15 +231,15 @@ describe('Frontend - Conversational Refinement', () => {
         expect(global.fetch).toHaveBeenCalled();
       });
 
-      // Find the search request (not the initial auto-submit)
-      const searchCalls = global.fetch.mock.calls.filter(call =>
-        JSON.parse(call[1].body).query === 'high protein'
+      // Find the search request 
+      const searchCalls = (global.fetch as jest.Mock).mock.calls.filter(call =>
+        call[1] && call[1].body && JSON.parse(call[1].body).query === 'high protein'
       );
 
       const requestBody = JSON.parse(searchCalls[searchCalls.length - 1][1].body);
 
-      // previousCriteria should be null or undefined initially
-      expect(requestBody.previousCriteria == null).toBe(true);
+      // previousCriteria should not be in the body initially (we only send it when it exists)
+      expect(requestBody.previousCriteria).toBeUndefined();
     });
   });
 
@@ -256,6 +260,9 @@ describe('Frontend - Conversational Refinement', () => {
     });
 
     it('should not display context message when no previous search', async () => {
+      // Mock useSearchParams to return empty query so no auto-submit happens
+      jest.spyOn(require('next/navigation'), 'useSearchParams').mockReturnValue(new URLSearchParams(''));
+      
       render(<SmartMenuSearch />);
 
       await waitFor(() => {
@@ -268,10 +275,10 @@ describe('Frontend - Conversational Refinement', () => {
 
   describe('Error handling', () => {
     it('should handle localStorage write errors silently', async () => {
-      const consoleWarnSpy = vi.spyOn(console, 'warn');
+      const consoleWarnSpy = jest.spyOn(console, 'warn');
 
       // Mock localStorage.setItem to throw
-      const setItemSpy = vi.spyOn(Storage.prototype, 'setItem').mockImplementationOnce(() => {
+      const setItemSpy = jest.spyOn(Storage.prototype, 'setItem').mockImplementationOnce(() => {
         throw new Error('QuotaExceededError');
       });
 

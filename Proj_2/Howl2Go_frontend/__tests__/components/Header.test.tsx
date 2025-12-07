@@ -1,6 +1,22 @@
 import { render, screen } from '@testing-library/react'
 import Header from '@/components/Header'
 
+// Mock the useAuth hook
+jest.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({
+    user: null,
+    isAuthenticated: false,
+    logout: jest.fn(),
+  }),
+}))
+
+// Mock the useCart hook
+jest.mock('@/context/CartContext', () => ({
+  useCart: () => ({
+    summary: { count: 0, total: 0 },
+  }),
+}))
+
 describe('Header Component', () => {
   it('renders the header component', () => {
     render(<Header />)

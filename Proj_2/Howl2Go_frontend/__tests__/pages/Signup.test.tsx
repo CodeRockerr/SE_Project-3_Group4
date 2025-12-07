@@ -278,19 +278,11 @@ describe('Signup Page', () => {
         json: async () => ({ success: true }),
       })
 
-      delete (window as any).location
-      const mockLocation = { href: 'http://localhost/' }
-      Object.defineProperty(window, 'location', {
-        value: mockLocation,
-        writable: true,
-        configurable: true
-      })
-
       await userEvent.clear(emailInput)
       await userEvent.type(emailInput, 'newemail@example.com')
       fireEvent.click(submitButton)
 
-      // Error should be cleared
+      // Error should be cleared and form submission should succeed
       await waitFor(() => {
         expect(screen.queryByText('Email already exists')).not.toBeInTheDocument()
       })
@@ -329,14 +321,6 @@ describe('Signup Page', () => {
       ;(global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true }),
-      })
-
-      delete (window as any).location
-      const mockLocation = { href: 'http://localhost/' }
-      Object.defineProperty(window, 'location', {
-        value: mockLocation,
-        writable: true,
-        configurable: true
       })
 
       render(<Signup />)
@@ -487,14 +471,6 @@ describe('Signup Page', () => {
       ;(global.fetch as jest.Mock).mockResolvedValue({
         ok: true,
         json: async () => ({ success: true }),
-      })
-
-      delete (window as any).location
-      const mockLocation = { href: 'http://localhost/' }
-      Object.defineProperty(window, 'location', {
-        value: mockLocation,
-        writable: true,
-        configurable: true
       })
 
       render(<Signup />)

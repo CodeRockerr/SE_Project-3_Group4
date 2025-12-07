@@ -294,11 +294,8 @@ function SmartMenuSearchContent() {
       return;
     }
 
-    if (items.length === 0) {
-      setError("No results found. Try a different search.");
-      return;
-    }
-
+    // Don't set error for empty results - let the UI show suggestions instead
+    // The empty state will be handled by the conditional rendering below
     setFoodItems(items);
     console.log("Parsed food items:", items);
   };
@@ -669,14 +666,33 @@ function SmartMenuSearchContent() {
               exit={{ opacity: 0 }}
               className="text-center py-20"
             >
-              <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-2xl font-bold text-[var(--text)] mb-2">
-                Start Your Search
-              </h3>
-              <p className="text-[var(--text-subtle)]">
-                Try searching for something like &quot;100 calories food&quot;
-                or &quot;burger under 300 calories&quot;
-              </p>
+              {initialQuery ? (
+                <>
+                  <div className="text-6xl mb-4">😔</div>
+                  <h3 className="text-2xl font-bold text-[var(--text)] mb-2">
+                    No Results Found
+                  </h3>
+                  <p className="text-[var(--text-subtle)] mb-4">
+                    We couldn&apos;t find any items matching your search.
+                    {refinementSuggestions && refinementSuggestions.length > 0 && (
+                      <span className="block mt-2">
+                        Try one of the suggestions above to broaden your search!
+                      </span>
+                    )}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="text-6xl mb-4">🔍</div>
+                  <h3 className="text-2xl font-bold text-[var(--text)] mb-2">
+                    Start Your Search
+                  </h3>
+                  <p className="text-[var(--text-subtle)]">
+                    Try searching for something like &quot;100 calories food&quot;
+                    or &quot;burger under 300 calories&quot;
+                  </p>
+                </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
