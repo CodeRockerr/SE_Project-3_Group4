@@ -23,6 +23,7 @@ interface ItemCardProps extends Partial<FoodItem> {
   onAdd?: (item: FoodItem) => void;
   onShowDescription?: (item: FoodItem) => void;
   price?: number;
+  hidePrice?: boolean;
   showReviews?: boolean;
 }
 
@@ -50,6 +51,7 @@ const getRestaurantLogo = (restaurant?: string): string => {
 export default function ItemCard({
   restaurant,
   price,
+  hidePrice = false,
   item,
   calories,
   index = 0,
@@ -216,9 +218,15 @@ export default function ItemCard({
             className="object-contain"
           />
         </div>
-        <span className="text-xl font-bold text-[var(--cream)]">
-          ${typeof price === "number" ? price.toFixed(2) : "—"}
-        </span>
+            {/* Price (hidden when `hidePrice` is true). Show placeholder "$ —" when price is missing. */}
+            {!hidePrice && (
+              <div className="ml-4 text-sm font-semibold text-[var(--text)]">
+                <span className="text-[var(--text-subtle)] mr-1">$</span>
+                <span className="text-[var(--text)]">
+                  {typeof price === 'number' ? price.toFixed(2) : '—'}
+                </span>
+              </div>
+            )}
       </div>
 
       {/* Item Name */}

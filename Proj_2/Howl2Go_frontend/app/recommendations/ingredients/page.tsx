@@ -170,7 +170,7 @@ export default function IngredientRecommendationsPage() {
         {typeof total === 'number' && <div className="ml-auto text-[var(--text-subtle)]">Total matches: {total}</div>}
       </div>
 
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {data
           .slice() // shallow copy for client sorting
           .sort((a: FoodItem, b: FoodItem) => {
@@ -183,14 +183,26 @@ export default function IngredientRecommendationsPage() {
             }
             return (b.matchScore || 0) - (a.matchScore || 0);
           })
-          .map((food: FoodItem) => {
-          const key = food._id || `${food.restaurant}-${food.item}`;
+          .map((food: FoodItem, idx: number) => {
+          const key = food._id || `${food.restaurant}-${food.item}-${idx}`;
           return (
-            <div key={key} className="space-y-2">
-              <ItemCard {...food} />
+            <div
+              key={key}
+              className="opacity-0 animate-[fadeInUp_0.5s_ease-out_forwards]"
+              style={{
+                animationDelay: `${idx * 100}ms`,
+              }}
+            >
+              <ItemCard 
+                {...food}
+                disableAnimation={true}
+                variant="default"
+                showReviews={true}
+                hidePrice={true}
+              />
               {/* Matched ingredients chips */}
               {include.length > 0 && (
-                <div className="flex flex-wrap gap-1 text-[10px]">
+                <div className="flex flex-wrap gap-1 text-[10px] mt-3">
                   {(food.ingredients || []).filter(ing => 
                     include.some(inc => ing.toLowerCase().includes(inc.toLowerCase()))
                   ).map(ing => (
@@ -201,6 +213,18 @@ export default function IngredientRecommendationsPage() {
             </div>
           );
         })}
+        <style jsx>{`
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}</style>
         {!loading && data.length === 0 && <p className="text-sm text-gray-500 col-span-full">No results found for current filters.</p>}
       </div>
 

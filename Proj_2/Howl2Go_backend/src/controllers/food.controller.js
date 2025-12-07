@@ -8,12 +8,19 @@ import FastFoodItem from "../models/FastFoodItem.js";
  * @param {number} calories - Calorie count for the food item
  * @returns {number} - Estimated price in dollars (2.00 - 15.00 range)
  */
+const toNumber = (value) => {
+    if (typeof value === "number") return value;
+    if (typeof value === "string") {
+        const parsed = parseFloat(value.replace(/[^0-9.-]+/g, ""));
+        return Number.isNaN(parsed) ? null : parsed;
+    }
+    return null;
+};
+
 const calculatePrice = (calories) => {
-    // Default to minimum price if calories not available or invalid
-    if (!calories || calories <= 0) return 2.0;
-    // Calculate base price: $0.01 per calorie
-    const basePrice = calories * 0.01;
-    // Clamp to realistic range: $2.00 minimum, $15.00 maximum
+    const caloriesNum = toNumber(calories);
+    if (!caloriesNum || caloriesNum <= 0) return 2.0;
+    const basePrice = caloriesNum * 0.01;
     return Math.min(Math.max(basePrice, 2.0), 15.0);
 };
 
@@ -53,21 +60,25 @@ export const recommendFood = async (req, res) => {
             .lean();
 
         // Add calculated price and normalize fields for the frontend
-        let recommendationsWithPrice = recommendations.map(item => ({
-            ...item,
-            restaurant: item.company || item.restaurant,
-            price: calculatePrice(item.calories),
-            totalFat: item.totalFat ?? null,
-            saturatedFat: item.saturatedFat ?? null,
-            transFat: item.transFat ?? null,
-            cholesterol: item.cholesterol ?? null,
-            sodium: item.sodium ?? null,
-            carbs: item.carbs ?? null,
-            fiber: item.fiber ?? null,
-            sugars: item.sugars ?? null,
-            protein: item.protein ?? null,
-            ingredients: item.ingredients || [],
-        }));
+        let recommendationsWithPrice = recommendations.map(item => {
+            const normalizedPrice = toNumber(item.price);
+            return {
+                ...item,
+                restaurant: item.company || item.restaurant,
+                // Prefer stored price; fall back to calorie-based estimate to stay consistent with ingredient page
+                price: normalizedPrice ?? calculatePrice(item.calories),
+                totalFat: item.totalFat ?? null,
+                saturatedFat: item.saturatedFat ?? null,
+                transFat: item.transFat ?? null,
+                cholesterol: item.cholesterol ?? null,
+                sodium: item.sodium ?? null,
+                carbs: item.carbs ?? null,
+                fiber: item.fiber ?? null,
+                sugars: item.sugars ?? null,
+                protein: item.protein ?? null,
+                ingredients: item.ingredients || [],
+            };
+        });
 
         // If LLM requested a sort override (e.g., "cheaper options" -> sort: "price_asc"),
         // apply it on the results after price calculation.

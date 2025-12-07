@@ -153,19 +153,6 @@ function SmartMenuSearchContent() {
 
   // Helper function to parse API response
   const parseAndSetFoodItems = async (data: ApiData) => {
-    console.log("API Response:", data);
-    console.log("Data type:", typeof data);
-    console.log("Is array?", Array.isArray(data));
-    if (data && typeof data === 'object') {
-      console.log("Data keys:", Object.keys(data as Record<string, unknown>));
-      console.log("Has recommendations?", "recommendations" in data);
-      if ("recommendations" in data) {
-        console.log("Recommendations type:", typeof (data as Record<string, unknown>).recommendations);
-        console.log("Is recommendations array?", Array.isArray((data as Record<string, unknown>).recommendations));
-        console.log("Recommendations value:", (data as Record<string, unknown>).recommendations);
-      }
-    }
-
     let items: FoodItem[] = [];
 
     // Format 1: API returns recommendations array (ACTUAL FORMAT)
@@ -298,7 +285,6 @@ function SmartMenuSearchContent() {
     // Don't set error for empty results - let the UI show suggestions instead
     // The empty state will be handled by the conditional rendering below
     setFoodItems(items);
-    console.log("Parsed food items:", items);
   };
 
   // Handle search form submission with conversational refinement support
@@ -647,6 +633,7 @@ function SmartMenuSearchContent() {
                     disableAnimation={true}
                     variant="default"
                     showReviews={true}
+                    hidePrice={false}
                   />
                 </div>
               ))}

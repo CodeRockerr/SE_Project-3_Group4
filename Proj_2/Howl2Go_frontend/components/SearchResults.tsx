@@ -9,6 +9,7 @@ const demoDishes: FoodItem[] = [
     restaurant: "McDonald's",
     item: "Big Mac",
     calories: 550,
+    price: 6.49,
     ingredients: ["beef patty", "american cheese", "lettuce", "pickles", "onions", "sesame bun", "big mac sauce"],
     caloriesFromFat: null,
     totalFat: null,
@@ -26,6 +27,7 @@ const demoDishes: FoodItem[] = [
     restaurant: "Taco Bell",
     item: "Crunchy Taco",
     calories: 170,
+    price: 2.29,
     ingredients: ["seasoned beef", "shredded lettuce", "shredded cheese", "crunchy taco shell"],
     caloriesFromFat: null,
     totalFat: null,
@@ -43,6 +45,7 @@ const demoDishes: FoodItem[] = [
     restaurant: "KFC",
     item: "Chicken Breast",
     calories: 390,
+    price: 5.99,
     ingredients: ["chicken breast", "seasoned breading", "spices", "oil"],
     caloriesFromFat: null,
     totalFat: null,
@@ -98,6 +101,7 @@ export default function SearchResults({
                 restaurant={dish.restaurant}
                 item={dish.item}
                 calories={dish.calories}
+                price={dish.price}
                 disableAnimation={true}
               />
             </div>
