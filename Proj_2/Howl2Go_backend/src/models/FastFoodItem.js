@@ -7,6 +7,12 @@ const fastFoodItemSchema = new mongoose.Schema(
             trim: true,
             index: true,
         },
+        // legacy field used in some tests and older code: map `restaurant` -> `company`
+        restaurant: {
+            type: String,
+            trim: true,
+            select: false,
+        },
         item: {
             type: String,
             required: true,
@@ -15,6 +21,7 @@ const fastFoodItemSchema = new mongoose.Schema(
         ingredients: {
             type: [String],
             default: [],
+            index: true,
         },
         calories: {
             type: Number,
@@ -80,6 +87,13 @@ fastFoodItemSchema.index({ company: 1, item: 1 });
 // Create text index for searching items
 fastFoodItemSchema.index({ item: "text", company: "text" });
 
+// Before validation, if tests or older fixtures provided `restaurant`, map it to `company`.
+fastFoodItemSchema.pre("validate", function (next) {
+	if (!this.company && this.restaurant) {
+		this.company = this.restaurant;
+	}
+	next();
+});
 // Ingredient index for recommendation queries
 fastFoodItemSchema.index({ ingredients: 1 });
 

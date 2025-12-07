@@ -234,6 +234,97 @@ export const addItemToCart = async (req, res) => {
 };
 
 /**
+ * Add multiple items to cart in bulk
+ * POST /api/cart/items/bulk
+ */
+export const addItemsToCart = async (req, res) => {
+  try {
+    const { items } = req.body; // items should be an array of { foodItemId, quantity }
+
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Items array is required'
+      });
+    }
+
+    const userId = req.user?.id ?? undefined;
+    const sessionId = req.sessionID;
+
+    let cart = await Cart.findOne(userId ? { userId } : { sessionId }).populate('items.foodItem');
+    
+    if (!cart) {
+      cart = new Cart({
+        userId,
+        sessionId,
+        items: []
+      });
+    }
+
+    // Process each item
+    for (const item of items) {
+      const { foodItemId, quantity } = item;
+      
+      if (!foodItemId || !quantity || quantity <= 0) {
+        continue; // Skip invalid items
+      }
+
+      const foodItem = await FastFoodItem.findById(foodItemId);
+      if (!foodItem) {
+        continue; // Skip items not found
+      }
+
+      const existingItem = cart.items.find(
+        (it) => String(it.foodItem._id || it.foodItem) === String(foodItemId)
+      );
+
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.items.push({
+          foodItem: foodItemId,
+          quantity,
+          company: foodItem.company,
+          item: foodItem.item,
+          calories: foodItem.calories,
+          totalFat: foodItem.totalFat,
+          protein: foodItem.protein,
+          carbohydrates: foodItem.carbs,
+          price: foodItem.price
+        });
+      }
+    }
+
+    const updatedCart = await cart.save();
+    await updatedCart.populate('items.foodItem');
+
+    const normalizedItems = updatedCart.items.map(mapItem);
+
+    res.status(200).json({
+      success: true,
+      message: `${items.length} items added to cart`,
+      data: {
+        cart: {
+          id: String(updatedCart._id),
+          items: normalizedItems,
+          totalItems: updatedCart.totalItems,
+          totalPrice: updatedCart.totalPrice,
+          totalCalories: updatedCart.totalCalories,
+          userId: updatedCart.userId ?? undefined
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error adding items to cart:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to add items to cart',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+/**
  * Update item quantity in cart
  * PATCH /api/cart/items/:foodItemId
  */

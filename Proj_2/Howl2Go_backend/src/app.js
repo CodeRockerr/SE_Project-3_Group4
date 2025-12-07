@@ -25,19 +25,31 @@ const mongoUri = process.env.MONGODB_URI;
 if (useInMemoryDb || !mongoUri) {
   // Use default in-memory session store for dev/test
   app.use(session({
-    secret: process.env.SESSION_SECRET || 'dev-secret',
+    secret: env.session.secret,
+    name: env.session.name,
     resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 86400000 }
+    saveUninitialized: true, // Create session even if not modified (needed for cart)
+    cookie: {
+      maxAge: env.session.maxAge,
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+    }
   }));
 } else {
   // Use MongoDB-backed session store for production
   app.use(session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key-change-this-in-production',
+    secret: env.session.secret,
+    name: env.session.name,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true, // Create session even if not modified (needed for cart)
     store: MongoStore.create({ mongoUrl: mongoUri }),
-    cookie: { maxAge: 86400000 }
+    cookie: {
+      maxAge: env.session.maxAge,
+      httpOnly: true,
+      secure: env.nodeEnv === 'production',
+      sameSite: env.nodeEnv === 'production' ? 'none' : 'lax',
+    }
   }));
 }
 

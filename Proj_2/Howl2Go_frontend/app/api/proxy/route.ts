@@ -1,102 +1,116 @@
 import { cookies } from "next/headers";
 
+// Force dynamic rendering to prevent cookie caching
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function handleRequest(req: Request) {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("accessToken")?.value;
-  const url = req.url.split("?path=")[1];
-  
-  // Get cookie header from request to forward session cookies
-  const cookieHeader = req.headers.get('Cookie') || '';
+	const cookieStore = await cookies();
+	const accessToken = cookieStore.get("accessToken")?.value;
+	const url = req.url.split("?path=")[1];
 
-  const headers: HeadersInit = {};
+	// Get cookie header from request to forward session cookies
+	const cookieHeader = req.headers.get("Cookie") || "";
 
-  // Forward cookies for session management
-  if (cookieHeader) {
-    headers['Cookie'] = cookieHeader;
-  }
+	// Check for retry token in headers (bypasses cookie caching)
+	const retryToken = req.headers.get("X-Retry-Token");
 
-  // Add authorization token if available
-  if (accessToken) {
-    headers['Authorization'] = `Bearer ${accessToken}`;
-  }
+	const headers: HeadersInit = {};
 
-  // Get request body if present
-  let body: BodyInit | undefined;
-  if (req.method !== 'GET' && req.method !== 'HEAD') {
-    body = await req.text();
-    const contentType = req.headers.get('Content-Type');
-    if (contentType) {
-      headers['Content-Type'] = contentType;
-    }
-  }
+	// Forward cookies for session management
+	if (cookieHeader) {
+		headers["Cookie"] = cookieHeader;
+	}
 
-  if (!url) {
-    return new Response(JSON.stringify({ error: 'Missing path parameter' }), { status: 400 });
-  }
+	// Add authorization token - prefer retry token over cookie
+	const token = retryToken || accessToken;
+	if (token) {
+		headers["Authorization"] = `Bearer ${token}`;
+	}
 
-  // Determine base URL. Prefer BACKEND_URL; fallback to NEXT_PUBLIC_API_BASE (strip trailing /api)
-  // Default to http://localhost:3001 (backend dev server)
-  const rawBackend = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:3001';
-  const baseUrl = rawBackend.replace(/\/?api\/?$/i, '');
-  const target = `${baseUrl}${decodeURIComponent(url)}`;
+	// Get request body if present
+	let body: BodyInit | undefined;
+	if (req.method !== "GET" && req.method !== "HEAD") {
+		body = await req.text();
+		const contentType = req.headers.get("Content-Type");
+		if (contentType) {
+			headers["Content-Type"] = contentType;
+		}
+	}
 
-  let backendReq: Response;
-  try {
-    backendReq = await fetch(target, {
-      method: req.method,
-      headers,
-      body,
-    });
-  } catch (e) {
-    return new Response(
-      JSON.stringify({
-        error: 'Upstream fetch failed',
-        detail: (e as Error).message,
-        target,
-        backendBase: baseUrl,
-        method: req.method,
-      }),
-      { status: 502 }
-    );
-  }
+	if (!url) {
+		return new Response(
+			JSON.stringify({ error: "Missing path parameter" }),
+			{ status: 400 }
+		);
+	}
 
-  // Create response and forward Set-Cookie headers for session management
-  const responseHeaders = new Headers(backendReq.headers);
-  
-  // Forward Set-Cookie headers to client
-  const setCookieHeaders = backendReq.headers.getSetCookie();
-  if (setCookieHeaders.length > 0) {
-    responseHeaders.delete('Set-Cookie');
-    setCookieHeaders.forEach(cookie => {
-      responseHeaders.append('Set-Cookie', cookie);
-    });
-  }
+	// Determine base URL. Prefer BACKEND_URL; fallback to NEXT_PUBLIC_API_BASE (strip trailing /api)
+	// Default to http://localhost:3001 (backend dev server)
+	const rawBackend =
+		process.env.BACKEND_URL ||
+		process.env.NEXT_PUBLIC_API_BASE ||
+		"http://localhost:3001";
+	const baseUrl = rawBackend.replace(/\/?api\/?$/i, "");
+	const target = `${baseUrl}${decodeURIComponent(url)}`;
 
-  const response = new Response(backendReq.body, {
-    status: backendReq.status,
-    statusText: backendReq.statusText,
-    headers: responseHeaders,
-  });
+	let backendReq: Response;
+	try {
+		backendReq = await fetch(target, {
+			method: req.method,
+			headers,
+			body,
+		});
+	} catch (e) {
+		return new Response(
+			JSON.stringify({
+				error: "Upstream fetch failed",
+				detail: (e as Error).message,
+				target,
+				backendBase: baseUrl,
+				method: req.method,
+			}),
+			{ status: 502 }
+		);
+	}
 
-  return response;
+	// Create response and forward Set-Cookie headers for session management
+	const responseHeaders = new Headers(backendReq.headers);
+
+	// Forward Set-Cookie headers to client
+	const setCookieHeaders = backendReq.headers.getSetCookie();
+	if (setCookieHeaders.length > 0) {
+		responseHeaders.delete("Set-Cookie");
+		setCookieHeaders.forEach((cookie) => {
+			responseHeaders.append("Set-Cookie", cookie);
+		});
+	}
+
+	const response = new Response(backendReq.body, {
+		status: backendReq.status,
+		statusText: backendReq.statusText,
+		headers: responseHeaders,
+	});
+
+	return response;
 }
 
 export async function GET(req: Request) {
-  return handleRequest(req);
+	return handleRequest(req);
 }
 
 export async function POST(req: Request) {
-  return handleRequest(req);
+	return handleRequest(req);
 }
 
 export async function PATCH(req: Request) {
-  return handleRequest(req);
+	return handleRequest(req);
 }
 
 export async function PUT(req: Request) {
-  return handleRequest(req);
+	return handleRequest(req);
 }
 
 export async function DELETE(req: Request) {
-  return handleRequest(req);
+	return handleRequest(req);
 }

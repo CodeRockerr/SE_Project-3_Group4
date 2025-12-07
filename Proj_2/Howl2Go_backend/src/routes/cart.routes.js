@@ -1,13 +1,14 @@
-import { Router } from 'express';
+import { Router } from "express";
 import {
   getCart,
   addItemToCart,
+  addItemsToCart,
   updateCartItemQuantity,
   removeItemFromCart,
   clearCart,
-  mergeCart
-} from '../controllers/cart.controller.js';
-import { optionalAuth, authenticate } from '../middleware/auth.middleware.js';
+  mergeCart,
+} from "../controllers/cart.controller.js";
+import { optionalAuth, authenticate } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
@@ -16,41 +17,48 @@ const router = Router();
  * @desc    Get current cart (works for both authenticated and guest users)
  * @access  Public
  */
-router.get('/', optionalAuth, getCart);
+router.get("/", optionalAuth, getCart);
 
 /**
  * @route   POST /api/cart/items
  * @desc    Add item to cart
  * @access  Public
  */
-router.post('/items', optionalAuth, addItemToCart);
+router.post("/items", optionalAuth, addItemToCart);
+
+/**
+ * @route   POST /api/cart/items/bulk
+ * @desc    Add multiple items to cart in one request
+ * @access  Public
+ */
+router.post("/items/bulk", optionalAuth, addItemsToCart);
 
 /**
  * @route   PATCH /api/cart/items/:foodItemId
  * @desc    Update item quantity in cart
  * @access  Public
  */
-router.patch('/items/:foodItemId', optionalAuth, updateCartItemQuantity);
+router.patch("/items/:foodItemId", optionalAuth, updateCartItemQuantity);
 
 /**
  * @route   DELETE /api/cart/items/:foodItemId
  * @desc    Remove item from cart
  * @access  Public
  */
-router.delete('/items/:foodItemId', optionalAuth, removeItemFromCart);
+router.delete("/items/:foodItemId", optionalAuth, removeItemFromCart);
 
 /**
  * @route   DELETE /api/cart
  * @desc    Clear entire cart
  * @access  Public
  */
-router.delete('/', optionalAuth, clearCart);
+router.delete("/", optionalAuth, clearCart);
 
 /**
  * @route   POST /api/cart/merge
  * @desc    Merge guest cart with user cart on login
  * @access  Private (requires authentication)
  */
-router.post('/merge', authenticate, mergeCart);
+router.post("/merge", authenticate, mergeCart);
 
 export default router;
