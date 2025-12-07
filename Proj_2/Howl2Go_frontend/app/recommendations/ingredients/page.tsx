@@ -177,20 +177,17 @@ export default function IngredientRecommendationsPage() {
             if (sortMode === 'calories') {
               return (a.calories || 0) - (b.calories || 0);
             } else if (sortMode === 'price-asc') {
-              return ((a as unknown as {price: number}).price || 0) - ((b as unknown as {price: number}).price || 0);
+              return (a.price || 0) - (b.price || 0);
             } else if (sortMode === 'price-desc') {
-              return ((b as unknown as {price: number}).price || 0) - ((a as unknown as {price: number}).price || 0);
+              return (b.price || 0) - (a.price || 0);
             }
-            return ((b as unknown as {matchScore: number}).matchScore || 0) - ((a as unknown as {matchScore: number}).matchScore || 0);
+            return (b.matchScore || 0) - (a.matchScore || 0);
           })
           .map((food: FoodItem) => {
-          const key = food._id || `${food.restaurant || (food as unknown as {company: string}).company}-${food.item}`;
+          const key = food._id || `${food.restaurant}-${food.item}`;
           return (
             <div key={key} className="space-y-2">
-              <ItemCard
-                price={(food as unknown as {price: number}).price}
-                {...food}
-              />
+              <ItemCard {...food} />
               {/* Matched ingredients chips */}
               {include.length > 0 && (
                 <div className="flex flex-wrap gap-1 text-[10px]">
