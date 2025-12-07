@@ -44,11 +44,9 @@ export default function AnimatedHeadline({
     },
   };
   const words = [
-    t("headline.word1", "Crave"),
-    t("headline.word2", "it."),
-    t("headline.word3", "Find"),
-    t("headline.word4", "it."),
-    t("headline.word5", "Instantly."),
+    t("headline.word1", "Crave it."),
+    t("headline.word2", "Find it."),
+    t("headline.word3", "Instantly."),
   ];
   const highlightIndex = words.length - 1;
 
