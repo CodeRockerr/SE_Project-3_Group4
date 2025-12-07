@@ -120,14 +120,15 @@ function SmartMenuSearchContent() {
                     const criteria = data.criteria || null;
                     setLastCriteria(criteria);
                     // Compute match count (prefer explicit count, fallback to recommendations length)
-                    const matchCount = (data && typeof data === 'object' && 'count' in data && typeof (data as any).count === 'number')
-                      ? (data as any).count
-                      : (data && typeof data === 'object' && Array.isArray((data as any).recommendations))
-                        ? (data as any).recommendations.length
+                    interface RecommendationData { count?: number; recommendations?: Array<unknown> }
+                    const matchCount = (data && typeof data === 'object' && 'count' in data && typeof (data as RecommendationData).count === 'number')
+                      ? (data as RecommendationData).count
+                      : (data && typeof data === 'object' && Array.isArray((data as RecommendationData).recommendations))
+                        ? (data as RecommendationData).recommendations?.length || 0
                         : 0;
                     // Build human-friendly refinement suggestions from criteria when results are limited
                     try {
-                      const suggs = buildRefinementSuggestions(criteria as any, matchCount);
+                      const suggs = buildRefinementSuggestions(criteria as Record<string, unknown>, matchCount);
                       setRefinementSuggestions(suggs);
                     } catch (e) {
                       console.warn('Failed to build refinement suggestions', e);
@@ -156,12 +157,12 @@ function SmartMenuSearchContent() {
     console.log("Data type:", typeof data);
     console.log("Is array?", Array.isArray(data));
     if (data && typeof data === 'object') {
-      console.log("Data keys:", Object.keys(data as any));
+      console.log("Data keys:", Object.keys(data as Record<string, unknown>));
       console.log("Has recommendations?", "recommendations" in data);
       if ("recommendations" in data) {
-        console.log("Recommendations type:", typeof (data as any).recommendations);
-        console.log("Is recommendations array?", Array.isArray((data as any).recommendations));
-        console.log("Recommendations value:", (data as any).recommendations);
+        console.log("Recommendations type:", typeof (data as Record<string, unknown>).recommendations);
+        console.log("Is recommendations array?", Array.isArray((data as Record<string, unknown>).recommendations));
+        console.log("Recommendations value:", (data as Record<string, unknown>).recommendations);
       }
     }
 
@@ -213,7 +214,7 @@ function SmartMenuSearchContent() {
         protein: item.protein || null,
         weightWatchersPoints: item.weightWatchersPoints || null,
         price: item.price,
-        ingredients: Array.isArray((item as any).ingredients) ? (item as any).ingredients : [],
+        ingredients: Array.isArray((item as unknown as {ingredients: string[]}).ingredients) ? (item as unknown as {ingredients: string[]}).ingredients : [],
       }));
     } else if (
       !Array.isArray(data) &&
@@ -239,7 +240,7 @@ function SmartMenuSearchContent() {
         protein: item.protein || null,
         weightWatchersPoints: item.weightWatchersPoints || null,
         price: item.price,
-        ingredients: Array.isArray((item as any).ingredients) ? (item as any).ingredients : [],
+        ingredients: Array.isArray((item as unknown as {ingredients: string[]}).ingredients) ? (item as unknown as {ingredients: string[]}).ingredients : [],
       }));
     } else if (!Array.isArray(data) && "restaurant" in data && "item" in data) {
       // Format 4: Single item
@@ -287,8 +288,8 @@ function SmartMenuSearchContent() {
       console.error("Failed to parse response - no matching format", {
         isArray: Array.isArray(data),
         hasRecommendations: data && "recommendations" in data,
-        recommendationsIsArray: data && Array.isArray((data as any).recommendations),
-        dataKeys: data && typeof data === 'object' ? Object.keys(data as any) : 'not an object',
+        recommendationsIsArray: data && Array.isArray((data as Record<string, unknown>).recommendations),
+        dataKeys: data && typeof data === 'object' ? Object.keys(data as Record<string, unknown>) : 'not an object',
       });
       setError("Unexpected response format from server.");
       return;
@@ -345,13 +346,14 @@ function SmartMenuSearchContent() {
         const criteria = data.criteria || null;
         setLastCriteria(criteria);
         // Compute match count (prefer explicit count, fallback to recommendations length)
-        const matchCount = (data && typeof data === 'object' && 'count' in data && typeof (data as any).count === 'number')
-          ? (data as any).count
-          : (data && typeof data === 'object' && Array.isArray((data as any).recommendations))
-            ? (data as any).recommendations.length
+        const dataRec = data as Record<string, unknown>;
+        const matchCount = (data && typeof data === 'object' && 'count' in data && typeof dataRec.count === 'number')
+          ? (dataRec.count as number)
+          : (data && typeof data === 'object' && Array.isArray(dataRec.recommendations))
+            ? (dataRec.recommendations as unknown[]).length
             : 0;
         try {
-          const suggs = buildRefinementSuggestions(criteria as any, matchCount);
+          const suggs = buildRefinementSuggestions(criteria as Record<string, unknown>, matchCount);
           setRefinementSuggestions(suggs);
         } catch (e) {
           console.warn('Failed to build refinement suggestions', e);
@@ -378,7 +380,7 @@ function SmartMenuSearchContent() {
 
   // Build human-friendly suggestion strings from parsed criteria
   // Only produce suggestions when matchCount is below a small threshold
-  const buildRefinementSuggestions = (criteria: any, matchCount: number = 0): string[] => {
+  const buildRefinementSuggestions = (criteria: Record<string, unknown>, matchCount: number = 0): string[] => {
     const LIMIT_THRESHOLD = 3; // only show suggestions when results are limited
     if (!criteria || typeof criteria !== 'object') return [];
     if (typeof matchCount !== 'number') matchCount = Number(matchCount) || 0;
@@ -399,7 +401,7 @@ function SmartMenuSearchContent() {
     };
 
     if (criteria.calories) {
-      const c = criteria.calories;
+      const c = criteria.calories as Record<string, unknown>;
       if (c.max !== undefined && typeof c.max === 'number') {
         const relaxed = relaxMax(c.max);
         suggestions.push(`Would you consider under ${relaxed} calories instead?`);
@@ -410,7 +412,7 @@ function SmartMenuSearchContent() {
     }
 
     if (criteria.protein) {
-      const p = criteria.protein;
+      const p = criteria.protein as Record<string, unknown>;
       if (p.min !== undefined && typeof p.min === 'number') {
         const relaxed = relaxMin(p.min);
         suggestions.push(`Looking for at least ${relaxed}g protein?`);
@@ -421,7 +423,7 @@ function SmartMenuSearchContent() {
     }
 
     if (criteria.totalFat) {
-      const f = criteria.totalFat;
+      const f = criteria.totalFat as Record<string, unknown>;
       if (f.max !== undefined && typeof f.max === 'number') {
         const relaxed = relaxMax(f.max);
         suggestions.push(`Would you like options under ${relaxed}g fat?`);
@@ -429,8 +431,11 @@ function SmartMenuSearchContent() {
     }
 
     // If no numeric suggestions yet, and there's an item/name criterion, offer a refinement
-    if (suggestions.length === 0 && criteria.item && typeof criteria.item === 'object' && criteria.item.name) {
-      suggestions.push(`Narrow results to items matching "${criteria.item.name}"`);
+    if (suggestions.length === 0 && criteria.item && typeof criteria.item === 'object') {
+      const item = criteria.item as Record<string, unknown>;
+      if (item.name) {
+        suggestions.push(`Narrow results to items matching "${item.name}"`);
+      }
     }
 
     return suggestions.slice(0, 3);

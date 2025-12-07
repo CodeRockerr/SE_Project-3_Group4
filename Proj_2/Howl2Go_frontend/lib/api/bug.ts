@@ -29,6 +29,7 @@ export interface Bug {
 
 export interface BugReportsResponse {
   success: boolean;
+  message?: string;
   data: {
     bugs: Bug[];
     pagination: {

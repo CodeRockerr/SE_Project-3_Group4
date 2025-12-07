@@ -19,6 +19,11 @@ export interface FoodItem {
   fiber?: number | null;
   sugars?: number | null;
   protein?: number | null;
+    potassium?: number | null;
+    vitaminA?: number | null;
+    vitaminC?: number | null;
+    calcium?: number | null;
+    iron?: number | null;
   weightWatchersPoints?: number | null;
   price?: number;
   ingredients?: string[];

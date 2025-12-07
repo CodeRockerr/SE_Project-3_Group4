@@ -12,6 +12,7 @@ import LoadingSpinner from "./LoadingSpinner";
 interface ReviewsSectionProps {
   foodItemId: string;
   itemName: string;
+  onReviewUpdated?: () => void;
 }
 
 export default function ReviewsSection({

@@ -38,7 +38,10 @@ export default function BugReportPage() {
 
     setIsSubmitting(true);
     try {
-      await submitBugReport(formData);
+      await submitBugReport({
+        ...formData,
+        severity: formData.severity as "low" | "medium" | "high" | "critical",
+      } as Parameters<typeof submitBugReport>[0]);
       toast.success("Bug report submitted successfully!");
       setFormData({
         title: "",

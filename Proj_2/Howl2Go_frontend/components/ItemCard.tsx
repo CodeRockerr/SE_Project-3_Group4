@@ -133,7 +133,7 @@ export default function ItemCard({
   }, [restProps._id, showReviews]);
 
   // Construct foodItem ensuring _id is included
-  const resolvedRestaurant = restaurant || (restProps as any).restaurant || (restProps as any).company || "Unknown";
+  const resolvedRestaurant = restaurant || (restProps as unknown as {restaurant: string}).restaurant || (restProps as unknown as {company: string}).company || "Unknown";
 
   const foodItem: FoodItem = {
     restaurant: resolvedRestaurant,
@@ -288,9 +288,9 @@ export default function ItemCard({
           <span className="text-xs font-medium text-[var(--text)]">
             {calories} cal
           </span>
-          {typeof (restProps as any).matchScore === 'number' && (
+          {typeof (restProps as Record<string, unknown>).matchScore === 'number' && (
             <span className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-[var(--orange)]">
-              {(restProps as any).matchScore} match{(restProps as any).matchScore === 1 ? '' : 'es'}
+              {(restProps as Record<string, unknown>).matchScore as number} match{((restProps as Record<string, unknown>).matchScore as number) === 1 ? '' : 'es'}
             </span>
           )}
         </div>

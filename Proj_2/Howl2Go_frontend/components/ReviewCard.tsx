@@ -21,7 +21,7 @@ export default function ReviewCard({
 }: ReviewCardProps) {
   const { isAuthenticated, user } = useAuth();
   const [isHelpful, setIsHelpful] = useState(
-    isAuthenticated && review.helpfulUsers.includes(user?.id || "")
+    isAuthenticated && review.helpfulUsers.includes(user?._id || "")
   );
   const [helpfulCount, setHelpfulCount] = useState(review.helpful);
   const [isMarking, setIsMarking] = useState(false);
@@ -82,7 +82,6 @@ export default function ReviewCard({
                 <CheckCircle
                   size={14}
                   className="text-green-500 fill-green-500"
-                  title="Verified Purchase"
                 />
               )}
             </div>

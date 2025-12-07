@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Bug, Filter, Search, AlertCircle, CheckCircle, Clock, XCircle, BarChart3 } from "lucide-react";
+import { ArrowLeft, Bug as BugIcon, Filter, Search, AlertCircle, CheckCircle, Clock, XCircle, BarChart3 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getBugReports, type Bug } from "@/lib/api/bug";
@@ -135,7 +135,7 @@ export default function AdminBugsPage() {
               </Link>
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-lg bg-[var(--orange)]/10">
-                  <Bug className="h-6 w-6 text-[var(--orange)]" />
+                  <BugIcon className="h-6 w-6 text-[var(--orange)]" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-[var(--text)]">
@@ -274,7 +274,7 @@ export default function AdminBugsPage() {
           </div>
         ) : filteredBugs.length === 0 ? (
           <div className="rounded-2xl p-12 border text-center" style={{ borderColor: "var(--border)", backgroundColor: "var(--bg-card)" }}>
-            <Bug className="h-16 w-16 mx-auto mb-4 text-[var(--text-subtle)]" />
+            <BugIcon className="h-16 w-16 mx-auto mb-4 text-[var(--text-subtle)]" />
             <h3 className="text-xl font-bold text-[var(--text)] mb-2">No Bugs Found</h3>
             <p className="text-[var(--text-subtle)]">
               {searchQuery || Object.values(filters).some(f => f) 

@@ -22,6 +22,7 @@ export default function OrderHistoryPage() {
 	const [insights, setInsights] = useState<OrderInsights | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isLoadingInsights, setIsLoadingInsights] = useState(true);
+	const [isLoadingReviews, setIsLoadingReviews] = useState(true);
 
 	const [timeRange, setTimeRange] = useState<
 		"all" | "week" | "month" | "year"
@@ -682,7 +683,7 @@ export default function OrderHistoryPage() {
 																	</div>
 																	{reviewData.comment && (
 																		<p className="text-xs text-[var(--text-subtle)] mt-1 italic">
-																			"{reviewData.comment}"
+																			&quot;{reviewData.comment}&quot;
 																		</p>
 																	)}
 																	<p className="text-xs text-[var(--text-subtle)] mt-1">

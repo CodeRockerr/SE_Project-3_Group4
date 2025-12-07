@@ -138,7 +138,8 @@ export default function ReviewModal({
           }
         } catch (createError: unknown) {
           // Check if error is "already reviewed" - catch various error message formats
-          const errorMsg = createError.message?.toLowerCase() || "";
+          const error = createError as { message?: string };
+          const errorMsg = error.message?.toLowerCase() || "";
           if (errorMsg.includes("already reviewed") || 
               errorMsg.includes("already reviewed this item") ||
               errorMsg.includes("already reviewed this item from this order")) {
@@ -178,7 +179,8 @@ export default function ReviewModal({
       setComment("");
       onClose();
     } catch (error: unknown) {
-      toast.error(error.message || (isEditing ? "Failed to update review" : "Failed to submit review"));
+      const err = error as { message?: string };
+      toast.error(err.message || (isEditing ? "Failed to update review" : "Failed to submit review"));
     } finally {
       setIsSubmitting(false);
     }

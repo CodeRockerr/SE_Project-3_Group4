@@ -55,6 +55,7 @@ export interface Order {
 
 export interface OrderHistoryResponse {
   success: boolean;
+  message?: string;
   data: {
     orders: Order[];
     pagination: {

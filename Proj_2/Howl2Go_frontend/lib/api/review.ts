@@ -34,6 +34,7 @@ export interface ReviewStats {
 
 export interface ReviewResponse {
   success: boolean;
+    message?: string;
   data: {
     reviews: Review[];
     stats: ReviewStats;

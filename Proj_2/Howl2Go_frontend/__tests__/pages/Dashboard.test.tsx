@@ -39,27 +39,33 @@ jest.mock('@/lib/mockDashboardData', () => ({
     todaysMeals: [
       {
         id: '1',
-        item: 'Grilled Chicken',
-        calories: 300,
-        protein: 30,
-        restaurant: 'Subway',
-        time: '12:00 PM',
+        timestamp: new Date(),
+        mealType: 'lunch',
+        foodItem: {
+          restaurant: 'Subway',
+          item: 'Grilled Chicken',
+          calories: 300,
+          protein: 30,
+        },
       },
       {
         id: '2',
-        item: 'Greek Salad',
-        calories: 150,
-        protein: 5,
-        restaurant: 'Panera',
-        time: '6:00 PM',
+        timestamp: new Date(),
+        mealType: 'dinner',
+        foodItem: {
+          restaurant: 'Panera',
+          item: 'Greek Salad',
+          calories: 150,
+          protein: 5,
+        },
       },
     ],
   },
   calculateDailyProgress: (meals: any[], goal: number) => ({
-    consumed: meals.reduce((sum, meal) => sum + meal.calories, 0),
+    consumed: meals.reduce((sum, meal) => sum + (meal.foodItem?.calories || 0), 0),
     goal: goal,
-    remaining: goal - meals.reduce((sum, meal) => sum + meal.calories, 0),
-    percentage: (meals.reduce((sum, meal) => sum + meal.calories, 0) / goal) * 100,
+    remaining: goal - meals.reduce((sum, meal) => sum + (meal.foodItem?.calories || 0), 0),
+    percentage: (meals.reduce((sum, meal) => sum + (meal.foodItem?.calories || 0), 0) / goal) * 100,
   }),
 }))
 

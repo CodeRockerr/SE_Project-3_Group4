@@ -52,7 +52,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addToCart = async (foodItem: FoodItem, quantity: number = 1) => {
     // Require _id to add to cart - try multiple possible fields
-    const foodItemId = foodItem._id || ((foodItem as Record<string, unknown>).id as string | undefined);
+    const foodItemId = foodItem._id || (foodItem as unknown as { id?: string }).id;
     if (!foodItemId) {
       console.error("Cannot add item to cart: missing _id", foodItem);
       const errorMessage = "Unable to add item to cart: missing item ID. Please try searching again.";

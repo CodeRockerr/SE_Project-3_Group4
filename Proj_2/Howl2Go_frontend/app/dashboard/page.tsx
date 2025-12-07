@@ -20,7 +20,7 @@ export default function Dashboard() {
 
   // Calculate daily progress from meals
   const calculateDailyProgress = (meals: MealLog[], goal: number): DailyProgress => {
-    const consumed = meals.reduce((sum, meal) => sum + (meal.calories || 0), 0);
+    const consumed = meals.reduce((sum, meal) => sum + (meal.foodItem?.calories || 0), 0);
     const remaining = Math.max(0, goal - consumed);
     const percentage = Math.min(100, Math.round((consumed / goal) * 100));
     return { consumed, goal, remaining, percentage };
@@ -50,30 +50,63 @@ export default function Dashboard() {
         return [];
       }
       
-      const orders = await res.json();
+      interface OrderItem {
+        _id: string;
+        item: string;
+        restaurant: string;
+        calories?: number;
+        price?: number;
+        caloriesFromFat?: number | null;
+        totalFat?: number | null;
+        saturatedFat?: number | null;
+        transFat?: number | null;
+        cholesterol?: number | null;
+        sodium?: number | null;
+        carbohydrates?: number | null;
+        fiber?: number | null;
+        sugars?: number | null;
+        protein?: number | null;
+        ingredients?: string[];
+      }
+      
+      interface Order {
+        _id: string;
+        createdAt: string;
+        items: OrderItem[];
+      }
+      const orders: Order[] = await res.json();
       
       // Filter today's orders and convert to meal logs
-      const todayOrders = orders.filter((order: any) => {
+      const todayOrders = orders.filter((order: Order) => {
         const orderDate = new Date(order.createdAt);
         orderDate.setHours(0, 0, 0, 0);
         return orderDate.getTime() === today.getTime();
       });
       
       // Convert orders to meal logs
-      const meals: MealLog[] = todayOrders.flatMap((order: any) => 
-        order.items.map((item: any) => ({
+      const meals: MealLog[] = todayOrders.flatMap((order: Order) => 
+        order.items.map((item) => ({
           id: item._id || `${order._id}-${item.item}`,
-          foodName: item.item,
-          restaurant: item.restaurant,
-          calories: item.calories || 0,
-          time: new Date(order.createdAt).toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true 
-          }),
-          protein: item.protein,
-          carbs: item.carbohydrates,
-          fat: item.totalFat,
+          timestamp: new Date(order.createdAt),
+          mealType: 'lunch' as const, // Default to lunch for orders
+          foodItem: {
+            _id: item._id,
+            restaurant: item.restaurant,
+            item: item.item,
+            calories: item.calories || 0,
+            price: item.price,
+            caloriesFromFat: item.caloriesFromFat,
+            totalFat: item.totalFat,
+            saturatedFat: item.saturatedFat,
+            transFat: item.transFat,
+            cholesterol: item.cholesterol,
+            sodium: item.sodium,
+            carbs: item.carbohydrates,
+            fiber: item.fiber,
+            sugars: item.sugars,
+            protein: item.protein,
+            ingredients: item.ingredients,
+          },
         }))
       );
       
