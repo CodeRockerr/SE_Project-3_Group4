@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom'
 import React, { useEffect, useState } from 'react'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { LanguageProvider, useLanguage } from '@/context/LanguageContext'

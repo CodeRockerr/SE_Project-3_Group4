@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import Header from '@/components/Header'
 import { LanguageProvider } from '@/context/LanguageContext'
