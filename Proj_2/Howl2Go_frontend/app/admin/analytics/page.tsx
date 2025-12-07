@@ -53,7 +53,7 @@ export default function AdminAnalyticsPage() {
       }
       loadDashboard();
     }
-  }, [isAuthenticated, isAuthLoading, user, timeRange]);
+  }, [isAuthenticated, isAuthLoading, user, timeRange, router]);
 
   const loadDashboard = async () => {
     try {
@@ -61,9 +61,10 @@ export default function AdminAnalyticsPage() {
       setError(null);
       const dashboardData = await getAdminDashboard(timeRange);
       setData(dashboardData);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to load dashboard:", err);
-      setError(err.message || "Failed to load analytics dashboard");
+      const error = err instanceof Error ? err : new Error(String(err));
+      setError(error.message || "Failed to load analytics dashboard");
       toast.error("Failed to load analytics dashboard");
     } finally {
       setIsLoading(false);

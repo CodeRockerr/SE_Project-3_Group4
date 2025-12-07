@@ -22,7 +22,8 @@ export default function OrderHistoryPage() {
 	const [insights, setInsights] = useState<OrderInsights | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isLoadingInsights, setIsLoadingInsights] = useState(true);
-	const [isLoadingReviews, setIsLoadingReviews] = useState(false);
+	const [isLoadingReviews, setIsLoadingReviews] = useState(true);
+
 	const [timeRange, setTimeRange] = useState<
 		"all" | "week" | "month" | "year"
 	>("all");
@@ -61,7 +62,7 @@ export default function OrderHistoryPage() {
 		loadOrders();
 		loadInsights();
 		// Reviews are now loaded within loadOrders() to ensure they're available when orders render
-	}, [isAuthenticated, timeRange, page]);
+	}, [isAuthenticated, timeRange, page, router]);
 
 	const loadUserReviews = async () => {
 		try {
@@ -78,17 +79,19 @@ export default function OrderHistoryPage() {
 			
 			data.reviews.forEach((review) => {
 				// Handle different possible ID formats (ObjectId, string, or populated object)
-				const extractId = (id: any): string => {
-					if (!id) return '';
-					if (typeof id === 'string') return id;
-					if (typeof id === 'object') {
-						// Handle ObjectId or populated object
-						if (id._id) return String(id._id);
-						if (id.toString) return String(id.toString());
-						return String(id);
-					}
-					return String(id);
-				};
+														const extractId = (id: unknown): string => {
+														if (!id) return '';
+														if (typeof id === 'string') return id;
+														if (typeof id === 'object') {
+															const obj = id as Record<string, unknown>;
+															if (obj._id) return String(obj._id);
+															if (typeof (obj as { toString?: unknown }).toString === 'function') {
+																return String((obj as { toString: () => string }).toString());
+															}
+															return String(obj);
+														}
+														return String(id);
+													};
 				
 				const orderId = extractId(review.orderId);
 				const foodItemId = extractId(review.foodItemId);
@@ -680,7 +683,7 @@ export default function OrderHistoryPage() {
 																	</div>
 																	{reviewData.comment && (
 																		<p className="text-xs text-[var(--text-subtle)] mt-1 italic">
-																			"{reviewData.comment}"
+																			&quot;{reviewData.comment}&quot;
 																		</p>
 																	)}
 																	<p className="text-xs text-[var(--text-subtle)] mt-1">

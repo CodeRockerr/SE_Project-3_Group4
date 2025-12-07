@@ -35,13 +35,13 @@ const getRestaurantLogo = (restaurant?: string): string => {
   const normalized = restaurant.trim().toLowerCase();
 
   // Direct mappings with multiple variants
-  // if (normalized.includes("mcdonald")) return "/mcdonalds-5.svg";
-  // if (normalized.includes("burger king")) return "/burger-king-4.svg";
-  // if (normalized.includes("wendy")) return "/wendys-logo-1.svg";
-  // if (normalized.includes("kfc") || normalized.includes("kentucky"))
-  //   return "/kfc-4.svg";
-  // if (normalized.includes("taco bell") || normalized.includes("tacobell"))
-  //   return "/taco-bell-1.svg";
+  if (normalized.includes("mcdonald")) return "/mcdonalds-5.svg";
+  if (normalized.includes("burger king")) return "/burger-king-4.svg";
+  if (normalized.includes("wendy")) return "/wendys-logo-1.svg";
+  if (normalized.includes("kfc") || normalized.includes("kentucky"))
+    return "/kfc-4.svg";
+  if (normalized.includes("taco bell") || normalized.includes("tacobell"))
+    return "/taco-bell-1.svg";
 
   // Fallback to generic fast food icon
   return "/fast-food-svgrepo-com.svg";
@@ -66,7 +66,7 @@ export default function ItemCard({
   const [reviewCount, setReviewCount] = useState(0);
   const [userReview, setUserReview] = useState<{ rating: number; _id: string } | null>(null);
   const router = useRouter();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
 
   // Fetch rating and user's review if foodItem has _id
@@ -92,16 +92,19 @@ export default function ItemCard({
           // Silently fail - ratings are optional
         });
     }
-  }, [restProps._id, showReviews, isAuthenticated]);
+  }, [restProps._id, showReviews]);
 
   // Listen for review submission events (from order page or elsewhere)
   useEffect(() => {
     if (!restProps._id || !showReviews) return;
 
-    const handleReviewSubmitted = (event: CustomEvent) => {
+    const handleReviewSubmitted = (event: Event) => {
+      const ce = event as CustomEvent<Record<string, unknown> | undefined>;
+      const detail = ce?.detail as Record<string, unknown> | undefined;
+      const foodItemIdInEvent = detail?.foodItemId as string | undefined;
       // Refresh if this item matches the reviewed item
-      if (event.detail?.foodItemId === restProps._id) {
-        getItemReviews(restProps._id, 1, 1, 'recent')
+      if (foodItemIdInEvent && restProps._id && foodItemIdInEvent === String(restProps._id)) {
+        getItemReviews(String(restProps._id), 1, 1, 'recent')
           .then((data) => {
             if (data.stats) {
               setRating(data.stats.averageRating);
@@ -122,14 +125,15 @@ export default function ItemCard({
       }
     };
 
-    window.addEventListener('reviewSubmitted' as any, handleReviewSubmitted);
+    // Use loose Event listener typing but avoid explicit `any`
+    window.addEventListener('reviewSubmitted', handleReviewSubmitted as EventListener);
     return () => {
-      window.removeEventListener('reviewSubmitted' as any, handleReviewSubmitted);
+      window.removeEventListener('reviewSubmitted', handleReviewSubmitted as EventListener);
     };
   }, [restProps._id, showReviews]);
 
   // Construct foodItem ensuring _id is included
-  const resolvedRestaurant = restaurant || (restProps as any).restaurant || (restProps as any).company || "Unknown";
+  const resolvedRestaurant = restaurant || (restProps as unknown as {restaurant: string}).restaurant || (restProps as unknown as {company: string}).company || "Unknown";
 
   const foodItem: FoodItem = {
     restaurant: resolvedRestaurant,
@@ -137,7 +141,7 @@ export default function ItemCard({
     calories,
     ...restProps,
     // Ensure _id is included if available in restProps
-    _id: restProps._id || (restProps as any).id || undefined,
+    _id: restProps._id || ((restProps as Record<string, unknown>).id as string | undefined) || undefined,
   };
 
   const handleAdd = () => {
@@ -284,9 +288,9 @@ export default function ItemCard({
           <span className="text-xs font-medium text-[var(--text)]">
             {calories} cal
           </span>
-          {typeof (restProps as any).matchScore === 'number' && (
+          {typeof (restProps as Record<string, unknown>).matchScore === 'number' && (
             <span className="ml-2 inline-flex items-center gap-1 text-xs font-semibold text-[var(--orange)]">
-              {(restProps as any).matchScore} match{(restProps as any).matchScore === 1 ? '' : 'es'}
+              {(restProps as Record<string, unknown>).matchScore as number} match{((restProps as Record<string, unknown>).matchScore as number) === 1 ? '' : 'es'}
             </span>
           )}
         </div>

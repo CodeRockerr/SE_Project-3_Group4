@@ -68,6 +68,21 @@ jest.mock('lucide-react', () => ({
   ChevronLeft: () => <span data-testid="chevron-left-icon">ChevronLeft Icon</span>,
   ChevronRight: () => <span data-testid="chevron-right-icon">ChevronRight Icon</span>,
   ArrowLeft: () => <span data-testid="arrow-left-icon">ArrowLeft Icon</span>,
+  ArrowRight: () => <span data-testid="arrow-right-icon">ArrowRight Icon</span>,
+  Loader2: () => <span data-testid="loader-icon">Loader Icon</span>,
+  Star: () => <span data-testid="star-icon">Star Icon</span>,
+  Heart: () => <span data-testid="heart-icon">Heart Icon</span>,
+  ShoppingCart: () => <span data-testid="shopping-cart-icon">ShoppingCart Icon</span>,
+  User: () => <span data-testid="user-icon">User Icon</span>,
+  LogOut: () => <span data-testid="logout-icon">LogOut Icon</span>,
+  Bug: () => <span data-testid="bug-icon">Bug Icon</span>,
+  UtensilsCrossed: () => <span data-testid="utensils-crossed-icon">UtensilsCrossed Icon</span>,
+  Calendar: () => <span data-testid="calendar-icon">Calendar Icon</span>,
+  Clock: () => <span data-testid="clock-icon">Clock Icon</span>,
+  MapPin: () => <span data-testid="map-pin-icon">MapPin Icon</span>,
+  Phone: () => <span data-testid="phone-icon">Phone Icon</span>,
+  Mail: () => <span data-testid="mail-icon">Mail Icon</span>,
+  X: () => <span data-testid="x-icon">X Icon</span>,
 }))
 
 // Mock useRouter
@@ -117,5 +132,99 @@ global.IntersectionObserver = class IntersectionObserver {
   unobserve() {}
 }
 
-// Mock fetch globally
-global.fetch = jest.fn()
+// Mock fetch globally with a safe default implementation so tests that don't override it
+// A small URL-aware fetch mock so tests that don't override fetch get sensible shapes
+global.fetch = jest.fn(async (input, init) => {
+  const url = typeof input === 'string' ? input : input?.url || ''
+
+  // Orders list should be an array
+  if (url.includes('/api/orders/me')) {
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ([]),
+      text: async () => '[]'
+    }
+  }
+
+  // Food recommendations should be an object with recommendations array
+  if (url.includes('/api/food/recommend')) {
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({ recommendations: [] }),
+      text: async () => JSON.stringify({ recommendations: [] })
+    }
+  }
+
+  // Auth endpoints return a simple object by default
+  if (url.includes('/api/auth') || url.includes('/api/users')) {
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({}),
+      text: async () => '{}'
+    }
+  }
+
+  // Fallback safe shape
+  return {
+    ok: true,
+    status: 200,
+    json: async () => ({}),
+    text: async () => '{}'
+  }
+})
+
+// Do not redefine `window.location` globally here; let individual tests stub it if needed.
+// Make window.location configurable in jsdom so tests can stub/modify it safely
+try {
+  const currentLocation = window.location
+  try {
+    // Attempt to delete then redefine; some environments may not allow deletion
+    // eslint-disable-next-line no-undef
+    delete window.location
+  } catch (e) {
+    // ignore
+  }
+
+  Object.defineProperty(window, 'location', {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    value: {
+      href: currentLocation?.href || 'http://localhost',
+      assign: jest.fn(),
+      replace: jest.fn(),
+      toString: () => currentLocation?.href || 'http://localhost'
+    }
+  })
+} catch (e) {
+  // ignore if jsdom doesn't allow reconfiguring location
+}
+
+// Mock useAuth globally for all tests that need it
+jest.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({
+    user: null,
+    isAuthenticated: false,
+    logout: jest.fn(),
+  }),
+  AuthContext: require('react').createContext(null),
+  AuthProvider: ({ children }) => children,
+}))
+
+// Mock useCart globally for all tests that need it
+jest.mock('@/context/CartContext', () => ({
+  useCart: () => ({
+    items: [],
+    addToCart: jest.fn(),
+    removeFromCart: jest.fn(),
+    updateQuantity: jest.fn(),
+    clearCart: jest.fn(),
+    summary: { count: 0, total: 0, totalItems: 0, subtotal: 0, tax: 0, deliveryFee: 0 },
+    isLoading: false,
+  }),
+  CartContext: require('react').createContext(null),
+  CartProvider: ({ children }) => children,
+}))

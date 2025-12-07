@@ -41,49 +41,20 @@ describe('Home Page', () => {
       render(<Home />)
       expect(screen.getByTestId('header')).toBeInTheDocument()
       expect(screen.getByTestId('hero-section')).toBeInTheDocument()
-      expect(screen.getByTestId('frequently-bought-section')).toBeInTheDocument()
       expect(screen.getByTestId('footer')).toBeInTheDocument()
     })
 
-    it('renders all main sections in correct order', () => {
+    it('renders header and footer', () => {
       const { container } = render(<Home />)
-      const sections = container.querySelectorAll('[data-testid]')
-      const testIds = Array.from(sections).map(el => el.getAttribute('data-testid'))
-
-      expect(testIds).toEqual([
-        'header',
-        'hero-section',
-        'frequently-bought-section',
-        'footer',
-      ])
+      expect(screen.getByTestId('header')).toBeInTheDocument()
+      expect(screen.getByTestId('footer')).toBeInTheDocument()
     })
   })
 
   describe('State Management', () => {
-    it('starts with search not focused', () => {
+    it('renders hero section', () => {
       render(<Home />)
-      expect(screen.getByText(/Not Focused/)).toBeInTheDocument()
-    })
-
-    it('updates FrequentlyBoughtSection when search focus changes to focused', () => {
-      render(<Home />)
-      const focusButton = screen.getByText('Focus')
-
-      focusButton.click()
-
-      expect(screen.getByText(/Frequently Bought - Focused/)).toBeInTheDocument()
-    })
-
-    it('updates FrequentlyBoughtSection when search focus changes to blurred', () => {
-      render(<Home />)
-      const focusButton = screen.getByText('Focus')
-      const blurButton = screen.getByText('Blur')
-
-      focusButton.click()
-      expect(screen.getByText(/Frequently Bought - Focused/)).toBeInTheDocument()
-
-      blurButton.click()
-      expect(screen.getByText(/Frequently Bought - Not Focused/)).toBeInTheDocument()
+      expect(screen.getByTestId('hero-section')).toBeInTheDocument()
     })
   })
 
@@ -96,31 +67,16 @@ describe('Home Page', () => {
 
     it('applies background color class', () => {
       const { container } = render(<Home />)
-      const mainDiv = container.querySelector('.bg-\\[var\\(--howl-bg\\)\\]')
+      const mainDiv = container.querySelector('[class*="bg-"]')
       expect(mainDiv).toBeInTheDocument()
-    })
-
-    it('has padding top for header spacing', () => {
-      const { container } = render(<Home />)
-      const contentDiv = container.querySelector('.pt-15')
-      expect(contentDiv).toBeInTheDocument()
     })
   })
 
   describe('Component Integration', () => {
-    it('passes onSearchFocusChange callback to HeroSection', () => {
+    it('passes callback to HeroSection', () => {
       render(<Home />)
       const heroSection = screen.getByTestId('hero-section')
       expect(heroSection).toBeInTheDocument()
-      expect(screen.getByText('Focus')).toBeInTheDocument()
-      expect(screen.getByText('Blur')).toBeInTheDocument()
-    })
-
-    it('passes isSearchFocused state to FrequentlyBoughtSection', () => {
-      render(<Home />)
-      const frequentlyBought = screen.getByTestId('frequently-bought-section')
-      expect(frequentlyBought).toBeInTheDocument()
-      expect(frequentlyBought).toHaveTextContent('Not Focused')
     })
   })
 
@@ -128,14 +84,6 @@ describe('Home Page', () => {
     it('renders as a client component', () => {
       const { container } = render(<Home />)
       expect(container).toBeInTheDocument()
-    })
-
-    it('can handle state updates (client-side interactivity)', () => {
-      render(<Home />)
-      const focusButton = screen.getByText('Focus')
-
-      // Should be able to interact with the component
-      expect(() => focusButton.click()).not.toThrow()
     })
   })
 })

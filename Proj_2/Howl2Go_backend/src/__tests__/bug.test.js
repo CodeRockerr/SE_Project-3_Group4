@@ -76,16 +76,16 @@ describe("Bug Report API Tests", () => {
         .send({
           title: "Test Bug",
           description: "This is a test bug description",
-          severity: "Medium",
+          severity: "medium",
           assignedTo: "Anandteertha",
         });
 
       assert.equal(response.status, 201);
       assert.equal(response.body.success, true);
-      assert.ok(response.body.data.bugReport);
-      assert.equal(response.body.data.bugReport.title, "Test Bug");
-      assert.equal(response.body.data.bugReport.status, "Open");
-      assert.equal(response.body.data.bugReport.reporterId.toString(), testUser._id.toString());
+      assert.ok(response.body.data.bug);
+      assert.equal(response.body.data.bug.title, "Test Bug");
+      assert.equal(response.body.data.bug.status, "open");
+      assert.equal(response.body.data.bug.reportedBy.toString(), testUser._id.toString());
     });
 
     test("should submit a bug report anonymously (not authenticated)", async () => {
@@ -94,16 +94,14 @@ describe("Bug Report API Tests", () => {
         .send({
           title: "Anonymous Bug",
           description: "This is an anonymous bug report",
-          severity: "Low",
-          reporterEmail: "anonymous@example.com",
-          reporterName: "Anonymous User",
+          severity: "low",
         });
 
       assert.equal(response.status, 201);
       assert.equal(response.body.success, true);
-      assert.ok(response.body.data.bugReport);
-      assert.equal(response.body.data.bugReport.reporterName, "Anonymous User");
-      assert.equal(response.body.data.bugReport.reporterId, null);
+      assert.ok(response.body.data.bug);
+      assert.equal(response.body.data.bug.reportedByName, "Anonymous");
+      assert.equal(response.body.data.bug.reportedBy, null);
     });
 
     test("should return 400 if title is missing", async () => {
@@ -161,14 +159,14 @@ describe("Bug Report API Tests", () => {
       await Bug.create({
         title: "Bug 1",
         description: "Description 1",
-        severity: "High",
-        reporterId: testUser._id,
+        severity: "high",
+        reportedBy: testUser._id,
       });
 
       await Bug.create({
         title: "Bug 2",
         description: "Description 2",
-        severity: "Medium",
+        severity: "medium",
       });
 
       const response = await request(app)
@@ -177,9 +175,9 @@ describe("Bug Report API Tests", () => {
 
       assert.equal(response.status, 200);
       assert.equal(response.body.success, true);
-      assert.ok(response.body.data.bugReports);
-      assert.ok(Array.isArray(response.body.data.bugReports));
-      assert.ok(response.body.data.bugReports.length >= 2);
+      assert.ok(response.body.data.bugs);
+      assert.ok(Array.isArray(response.body.data.bugs));
+      assert.ok(response.body.data.bugs.length >= 2);
     });
 
     test("should return 403 if non-admin tries to access", async () => {

@@ -50,11 +50,41 @@ function SmartMenuSearchContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [foodItems, setFoodItems] = useState<FoodItem[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [lastCriteria, setLastCriteria] = useState<Record<string, unknown> | null>(null);
+  const [refinementSuggestions, setRefinementSuggestions] = useState<string[]>([]);
+  
+  // Load previous search criteria from localStorage on component mount
+  // Enables conversational refinements to survive page reloads
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("howl_lastCriteria");
+      if (raw) {
+        setLastCriteria(JSON.parse(raw));
+      }
+    } catch (e) {
+      // Silently ignore parse errors, user can start fresh search
+      console.warn("Failed to load lastCriteria from localStorage", e);
+    }
+  }, []);
+
+  // Synchronize lastCriteria state with localStorage
+  // Keeps search context in sync across page reloads and tabs
+  useEffect(() => {
+    try {
+      if (lastCriteria) {
+        localStorage.setItem("howl_lastCriteria", JSON.stringify(lastCriteria));
+      } else {
+        localStorage.removeItem("howl_lastCriteria");
+      }
+    } catch (e) {
+      console.warn("Failed to persist lastCriteria", e);
+    }
+  }, [lastCriteria]);
 
   // Auto-submit when page loads with initial query from main page
   useEffect(() => {
     if (initialQuery && !foodItems.length && !isLoading && !error) {
-      // Trigger search automatically
+      // Trigger search automatically with no previous criteria (fresh search)
       const submitSearch = async () => {
         setIsLoading(true);
         setError(null);
@@ -66,6 +96,8 @@ function SmartMenuSearchContent() {
             headers: {
               "Content-Type": "application/json",
             },
+            // Initial search: previousCriteria is null
+            // Only send previousCriteria when we actually have it
             body: JSON.stringify({ query: initialQuery }),
           });
 
@@ -83,6 +115,26 @@ function SmartMenuSearchContent() {
           }
 
           const data = await response.json();
+          // Store returned criteria to enable conversational refinements
+          if (data && typeof data === 'object' && 'criteria' in data) {
+                    const criteria = data.criteria || null;
+                    setLastCriteria(criteria);
+                    // Compute match count (prefer explicit count, fallback to recommendations length)
+                    interface RecommendationData { count?: number; recommendations?: Array<unknown> }
+                    const matchCount = (data && typeof data === 'object' && 'count' in data && typeof (data as RecommendationData).count === 'number')
+                      ? (data as RecommendationData).count
+                      : (data && typeof data === 'object' && Array.isArray((data as RecommendationData).recommendations))
+                        ? (data as RecommendationData).recommendations?.length || 0
+                        : 0;
+                    // Build human-friendly refinement suggestions from criteria when results are limited
+                    try {
+                      const suggs = buildRefinementSuggestions(criteria as Record<string, unknown>, matchCount);
+                      setRefinementSuggestions(suggs);
+                    } catch (e) {
+                      console.warn('Failed to build refinement suggestions', e);
+                      setRefinementSuggestions([]);
+                    }
+          }
           await parseAndSetFoodItems(data);
         } catch (error) {
           console.error("Error fetching recommendations:", error);
@@ -102,6 +154,17 @@ function SmartMenuSearchContent() {
   // Helper function to parse API response
   const parseAndSetFoodItems = async (data: ApiData) => {
     console.log("API Response:", data);
+    console.log("Data type:", typeof data);
+    console.log("Is array?", Array.isArray(data));
+    if (data && typeof data === 'object') {
+      console.log("Data keys:", Object.keys(data as Record<string, unknown>));
+      console.log("Has recommendations?", "recommendations" in data);
+      if ("recommendations" in data) {
+        console.log("Recommendations type:", typeof (data as Record<string, unknown>).recommendations);
+        console.log("Is recommendations array?", Array.isArray((data as Record<string, unknown>).recommendations));
+        console.log("Recommendations value:", (data as Record<string, unknown>).recommendations);
+      }
+    }
 
     let items: FoodItem[] = [];
 
@@ -114,7 +177,7 @@ function SmartMenuSearchContent() {
       items = data.recommendations
         .map((item) => ({
         _id: item._id ? String(item._id) : item.id ? String(item.id) : undefined, // Include MongoDB _id, ensure it's a string
-        restaurant: item.company || "Unknown", // Map company -> restaurant
+        restaurant: item.restaurant || item.company || "Unknown", // Use restaurant/company from backend
         item: item.item || "Unknown Item",
         calories: item.calories || 0,
         caloriesFromFat: item.caloriesFromFat || null,
@@ -136,7 +199,7 @@ function SmartMenuSearchContent() {
       items = data
         .map((item) => ({
         _id: item._id ? String(item._id) : item.id ? String(item.id) : undefined, // Include MongoDB _id, ensure it's a string
-        restaurant: item.company || item.restaurant || "Unknown",
+        restaurant: item.restaurant || item.company || "Unknown",
         item: item.item || "Unknown Item",
         calories: item.calories || 0,
         caloriesFromFat: item.caloriesFromFat || null,
@@ -151,7 +214,7 @@ function SmartMenuSearchContent() {
         protein: item.protein || null,
         weightWatchersPoints: item.weightWatchersPoints || null,
         price: item.price,
-        ingredients: Array.isArray((item as any).ingredients) ? (item as any).ingredients : [],
+        ingredients: Array.isArray((item as unknown as {ingredients: string[]}).ingredients) ? (item as unknown as {ingredients: string[]}).ingredients : [],
       }));
     } else if (
       !Array.isArray(data) &&
@@ -162,7 +225,7 @@ function SmartMenuSearchContent() {
       items = data.results
         .map((item) => ({
         _id: item._id ? String(item._id) : item.id ? String(item.id) : undefined, // Include MongoDB _id, ensure it's a string
-        restaurant: item.company || item.restaurant || "Unknown",
+        restaurant: item.restaurant || item.company || "Unknown",
         item: item.item || "Unknown Item",
         calories: item.calories || 0,
         caloriesFromFat: item.caloriesFromFat || null,
@@ -177,7 +240,7 @@ function SmartMenuSearchContent() {
         protein: item.protein || null,
         weightWatchersPoints: item.weightWatchersPoints || null,
         price: item.price,
-        ingredients: Array.isArray((item as any).ingredients) ? (item as any).ingredients : [],
+        ingredients: Array.isArray((item as unknown as {ingredients: string[]}).ingredients) ? (item as unknown as {ingredients: string[]}).ingredients : [],
       }));
     } else if (!Array.isArray(data) && "restaurant" in data && "item" in data) {
       // Format 4: Single item
@@ -202,7 +265,7 @@ function SmartMenuSearchContent() {
         ([restaurant, itemData]: [string, ApiRecommendation]) => {
           return {
             _id: itemData._id ? String(itemData._id) : itemData.id ? String(itemData.id) : undefined, // Include MongoDB _id, ensure it's a string
-            restaurant,
+            restaurant: (itemData && (itemData.restaurant || itemData.company)) || restaurant,
             item: itemData.item || "Unknown Item",
             calories: extractValue(itemData.calories) || 0,
             caloriesFromFat: extractValue(itemData.caloriesFromFat),
@@ -222,25 +285,29 @@ function SmartMenuSearchContent() {
         }
       );
     } else {
+      console.error("Failed to parse response - no matching format", {
+        isArray: Array.isArray(data),
+        hasRecommendations: data && "recommendations" in data,
+        recommendationsIsArray: data && Array.isArray((data as Record<string, unknown>).recommendations),
+        dataKeys: data && typeof data === 'object' ? Object.keys(data as Record<string, unknown>) : 'not an object',
+      });
       setError("Unexpected response format from server.");
       return;
     }
 
-    if (items.length === 0) {
-      setError("No results found. Try a different search.");
-      return;
-    }
-
+    // Don't set error for empty results - let the UI show suggestions instead
+    // The empty state will be handled by the conditional rendering below
     setFoodItems(items);
     console.log("Parsed food items:", items);
   };
 
-  // Handle search form submission
+  // Handle search form submission with conversational refinement support
+  // Sends current search query with previousCriteria for context-aware results
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
 
-    // ✅ Update URL only when pressing Enter / submitting
+    // Update URL to reflect new search query
     const params = new URLSearchParams();
     params.set("q", searchQuery);
     router.replace(`/search?${params.toString()}`, { scroll: false });
@@ -253,7 +320,8 @@ function SmartMenuSearchContent() {
       const response = await fetch("/api/food/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: searchQuery }),
+        // Send query with previous criteria only when present
+        body: JSON.stringify(lastCriteria ? { query: searchQuery, previousCriteria: lastCriteria } : { query: searchQuery }),
       });
 
       if (!response.ok) {
@@ -270,7 +338,36 @@ function SmartMenuSearchContent() {
       }
 
       const data = await response.json();
-      await parseAndSetFoodItems(data);
+      console.log("Response from backend:", data);
+      console.log("Response status:", response.status);
+      
+      // Store returned criteria for next refinement iteration
+      if (data && typeof data === 'object' && 'criteria' in data) {
+        const criteria = data.criteria || null;
+        setLastCriteria(criteria);
+        // Compute match count (prefer explicit count, fallback to recommendations length)
+        const dataRec = data as Record<string, unknown>;
+        const matchCount = (data && typeof data === 'object' && 'count' in data && typeof dataRec.count === 'number')
+          ? (dataRec.count as number)
+          : (data && typeof data === 'object' && Array.isArray(dataRec.recommendations))
+            ? (dataRec.recommendations as unknown[]).length
+            : 0;
+        try {
+          const suggs = buildRefinementSuggestions(criteria as Record<string, unknown>, matchCount);
+          setRefinementSuggestions(suggs);
+        } catch (e) {
+          console.warn('Failed to build refinement suggestions', e);
+          setRefinementSuggestions([]);
+        }
+      }
+      
+      try {
+        await parseAndSetFoodItems(data);
+      } catch (parseError) {
+        console.error("Error in parseAndSetFoodItems:", parseError);
+        setError("Error processing search results. Check console for details.");
+        throw parseError;
+      }
     } catch (error) {
       console.error("Error fetching recommendations:", error);
       setError(
@@ -279,6 +376,69 @@ function SmartMenuSearchContent() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Build human-friendly suggestion strings from parsed criteria
+  // Only produce suggestions when matchCount is below a small threshold
+  const buildRefinementSuggestions = (criteria: Record<string, unknown>, matchCount: number = 0): string[] => {
+    const LIMIT_THRESHOLD = 3; // only show suggestions when results are limited
+    if (!criteria || typeof criteria !== 'object') return [];
+    if (typeof matchCount !== 'number') matchCount = Number(matchCount) || 0;
+    if (matchCount > LIMIT_THRESHOLD) return [];
+
+    const suggestions: string[] = [];
+
+    const relaxMax = (max: number) => {
+      if (typeof max !== 'number' || Number.isNaN(max)) return max;
+      const byPercent = Math.round(max * 1.2);
+      const byPlus = max + 100;
+      return Math.max(byPercent, byPlus);
+    };
+
+    const relaxMin = (min: number) => {
+      if (typeof min !== 'number' || Number.isNaN(min)) return min;
+      return Math.max(0, Math.floor(min * 0.8));
+    };
+
+    if (criteria.calories) {
+      const c = criteria.calories as Record<string, unknown>;
+      if (c.max !== undefined && typeof c.max === 'number') {
+        const relaxed = relaxMax(c.max);
+        suggestions.push(`Would you consider under ${relaxed} calories instead?`);
+      } else if (c.min !== undefined && typeof c.min === 'number') {
+        const relaxed = relaxMin(c.min);
+        suggestions.push(`Prefer meals above ${relaxed} calories?`);
+      }
+    }
+
+    if (criteria.protein) {
+      const p = criteria.protein as Record<string, unknown>;
+      if (p.min !== undefined && typeof p.min === 'number') {
+        const relaxed = relaxMin(p.min);
+        suggestions.push(`Looking for at least ${relaxed}g protein?`);
+      } else if (p.max !== undefined && typeof p.max === 'number') {
+        const relaxed = relaxMax(p.max);
+        suggestions.push(`Prefer protein under ${relaxed}g?`);
+      }
+    }
+
+    if (criteria.totalFat) {
+      const f = criteria.totalFat as Record<string, unknown>;
+      if (f.max !== undefined && typeof f.max === 'number') {
+        const relaxed = relaxMax(f.max);
+        suggestions.push(`Would you like options under ${relaxed}g fat?`);
+      }
+    }
+
+    // If no numeric suggestions yet, and there's an item/name criterion, offer a refinement
+    if (suggestions.length === 0 && criteria.item && typeof criteria.item === 'object') {
+      const item = criteria.item as Record<string, unknown>;
+      if (item.name) {
+        suggestions.push(`Narrow results to items matching "${item.name}"`);
+      }
+    }
+
+    return suggestions.slice(0, 3);
   };
 
   const handleSearchChange = (value: string) => {
@@ -392,6 +552,46 @@ function SmartMenuSearchContent() {
                 </div>
               </motion.div>
             </form>
+
+            {/* Clear conversational context UI */}
+            {/* Shows when lastCriteria exists, allowing user to reset search history */}
+            {lastCriteria && (
+              <div className="mt-3 flex items-center justify-center gap-3">
+                <div className="text-sm text-[var(--text-subtle)]">
+                  Refining previous search
+                </div>
+                <button
+                  onClick={() => setLastCriteria(null)} // Clears localStorage and state
+                  className="px-3 py-1 text-sm rounded-full bg-[var(--bg-card)] border border-[var(--border)] hover:bg-[var(--bg-hover)]"
+                  aria-label="Clear search context"
+                >
+                  Clear context
+                </button>
+              </div>
+            )}
+            {/* Conversational refinement suggestions (human-friendly) */}
+            {refinementSuggestions && refinementSuggestions.length > 0 && (
+              <div className="mt-4 flex items-center justify-center gap-3">
+                <ul className="flex gap-3 flex-wrap">
+                  {refinementSuggestions.map((sugg, i) => (
+                    <li key={`refine-${i}`}>
+                      <button
+                        onClick={() => {
+                          // apply suggestion as a new search query
+                          setSearchQuery(sugg);
+                          const evt = new Event('submit', { bubbles: true });
+                          // trigger form submit programmatically
+                          document.querySelector('form')?.dispatchEvent(evt);
+                        }}
+                        className="px-3 py-1 text-sm rounded-full bg-[var(--bg-card)] border border-[var(--border)] hover:bg-[var(--bg-hover)]"
+                      >
+                        {sugg}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </motion.div>
 
@@ -471,14 +671,33 @@ function SmartMenuSearchContent() {
               exit={{ opacity: 0 }}
               className="text-center py-20"
             >
-              <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-2xl font-bold text-[var(--text)] mb-2">
-                Start Your Search
-              </h3>
-              <p className="text-[var(--text-subtle)]">
-                Try searching for something like &quot;100 calories food&quot;
-                or &quot;burger under 300 calories&quot;
-              </p>
+              {initialQuery ? (
+                <>
+                  <div className="text-6xl mb-4">😔</div>
+                  <h3 className="text-2xl font-bold text-[var(--text)] mb-2">
+                    No Results Found
+                  </h3>
+                  <p className="text-[var(--text-subtle)] mb-4">
+                    We couldn&apos;t find any items matching your search.
+                    {refinementSuggestions && refinementSuggestions.length > 0 && (
+                      <span className="block mt-2">
+                        Try one of the suggestions above to broaden your search!
+                      </span>
+                    )}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="text-6xl mb-4">🔍</div>
+                  <h3 className="text-2xl font-bold text-[var(--text)] mb-2">
+                    Start Your Search
+                  </h3>
+                  <p className="text-[var(--text-subtle)]">
+                    Try searching for something like &quot;100 calories food&quot;
+                    or &quot;burger under 300 calories&quot;
+                  </p>
+                </>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

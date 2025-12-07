@@ -17,18 +17,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 
-// Session middleware
+// Session middleware configuration
 // Uses in-memory store for tests (no MongoDB required), MongoDB for production
 const useInMemoryDb = process.env.USE_IN_MEMORY_DB === 'true';
 const mongoUri = process.env.MONGODB_URI;
 
 if (useInMemoryDb || !mongoUri) {
-  // In-memory session store for tests
+  // Use default in-memory session store for dev/test
   app.use(session({
     secret: env.session.secret,
     name: env.session.name,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: true, // Create session even if not modified (needed for cart)
     cookie: {
       maxAge: env.session.maxAge,
       httpOnly: true,
@@ -42,7 +42,7 @@ if (useInMemoryDb || !mongoUri) {
     secret: env.session.secret,
     name: env.session.name,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: true, // Create session even if not modified (needed for cart)
     store: MongoStore.create({ mongoUrl: mongoUri }),
     cookie: {
       maxAge: env.session.maxAge,
@@ -53,10 +53,10 @@ if (useInMemoryDb || !mongoUri) {
   }));
 }
 
-// API routes
+// Mount API routes under /api prefix
 app.use('/api', routes);
 
-// Health check fallback for root requests
+// Health check endpoint for load balancers and monitoring
 app.get('/', (req, res) => {
   res.json({
     status: 'ok',

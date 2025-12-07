@@ -48,7 +48,8 @@ describe('About Page', () => {
 
     it('renders the page title', () => {
       render(<About />)
-      expect(screen.getByText(/About.*Wolf2Go/i)).toBeInTheDocument()
+      expect(screen.getByText('About')).toBeInTheDocument()
+      expect(screen.getByText('Howl2Go')).toBeInTheDocument()
     })
 
     it('renders the tagline', () => {
@@ -69,9 +70,9 @@ describe('About Page', () => {
   })
 
   describe('What is Wolf2Go Section', () => {
-    it('renders the "What is Wolf2Go?" heading', () => {
+    it('renders the "What is Howl2Go?" heading', () => {
       render(<About />)
-      expect(screen.getByText('What is Wolf2Go?')).toBeInTheDocument()
+      expect(screen.getByText(/What is Howl2Go/i)).toBeInTheDocument()
     })
 
     it('explains the platform concept', () => {

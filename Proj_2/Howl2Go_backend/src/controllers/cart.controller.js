@@ -1,18 +1,36 @@
-import mongoose from "mongoose";
-import Cart from "../models/Cart.js";
-import FastFoodItem from "../models/FastFoodItem.js";
+import mongoose from 'mongoose';
+import Cart from '../models/Cart.js';
+import FastFoodItem from '../models/FastFoodItem.js';
+
+// Helper to ensure session is marked and saved so cookies are sent to client
+const saveSession = (req) => new Promise((resolve) => {
+  try {
+    if (req && req.session) {
+      if (req.cart && req.cart._id) {
+        req.session.cartId = String(req.cart._id);
+      }
+      if (typeof req.session.save === 'function') {
+        req.session.save(() => resolve());
+        return;
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+  resolve();
+});
 
 /**
  * Get or create cart for current session
  */
 const getOrCreateCart = async (sessionId, userId = null) => {
-  let cart = await Cart.findOne({ sessionId }).populate("items.foodItem");
+  let cart = await Cart.findOne({ sessionId }).populate('items.foodItem');
 
   if (!cart) {
     cart = await Cart.create({
       sessionId,
       userId,
-      items: [],
+      items: []
     });
   } else if (userId && !cart.userId) {
     // Associate cart with user if they log in
@@ -29,29 +47,55 @@ const getOrCreateCart = async (sessionId, userId = null) => {
  */
 export const getCart = async (req, res) => {
   try {
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const userId = req.user?.id || null;
 
     const cart = await getOrCreateCart(sessionId, userId);
+    // Ensure session persists (attach cart to req and save session cookie)
+    req.cart = cart;
+    await saveSession(req);
+
+    // Populate foodItem references
+    const populatedCart = await Cart.findById(cart._id).populate('items.foodItem');
+
+    // Normalize items for response: ensure foodItem is returned as full object when populated
+    const mapItem = (it) => ({
+      foodItem: it.foodItem && typeof it.foodItem === 'object' ? {
+        _id: String(it.foodItem._id),
+        company: it.foodItem.company,
+        item: it.foodItem.item,
+        calories: it.foodItem.calories,
+        price: it.foodItem.price
+      } : (it.foodItem ? String(it.foodItem) : it.foodItem),
+      restaurant: it.restaurant,
+      item: it.item,
+      calories: it.calories,
+      totalFat: it.totalFat,
+      protein: it.protein,
+      carbohydrates: it.carbohydrates,
+      price: it.price,
+      quantity: it.quantity
+    });
 
     res.status(200).json({
       success: true,
       data: {
         cart: {
-          id: cart._id,
-          items: cart.items,
-          totalItems: cart.totalItems,
-          totalPrice: cart.totalPrice,
-          userId: cart.userId,
-        },
-      },
+          id: String(populatedCart._id),
+          items: populatedCart.items.map(mapItem),
+          totalItems: populatedCart.totalItems,
+          totalPrice: populatedCart.totalPrice,
+          totalCalories: populatedCart.totalCalories,
+          userId: populatedCart.userId ?? undefined
+        }
+      }
     });
   } catch (error) {
-    console.error("Error getting cart:", error);
+    console.error('Error getting cart:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to retrieve cart",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      message: 'Failed to retrieve cart',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -62,20 +106,36 @@ export const getCart = async (req, res) => {
  */
 export const addItemToCart = async (req, res) => {
   try {
-    const { foodItemId, quantity = 1 } = req.body;
+    const { foodItemId, quantity } = req.body;
 
     if (!foodItemId) {
       return res.status(400).json({
         success: false,
-        message: "Food item ID is required",
+        message: 'Food item ID is required'
       });
     }
 
-    // Validate ObjectId format early to avoid Mongoose CastError
-    if (!mongoose.isValidObjectId(foodItemId)) {
+    // Validate ObjectId format first
+    if (!mongoose.Types.ObjectId.isValid(foodItemId)) {
       return res.status(400).json({
         success: false,
-        message: "Invalid food item ID format",
+        message: 'Invalid food item ID'
+      });
+    }
+
+    // Require quantity to be explicitly provided for POST
+    if (quantity === undefined || quantity === null) {
+      return res.status(400).json({
+        success: false,
+        message: 'Quantity is required'
+      });
+    }
+
+    const parsedQty = parseInt(quantity, 10);
+    if (Number.isNaN(parsedQty) || parsedQty < 1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Valid quantity is required'
       });
     }
 
@@ -85,14 +145,21 @@ export const addItemToCart = async (req, res) => {
     if (!foodItem) {
       return res.status(404).json({
         success: false,
-        message: "Food item not found",
+        message: 'Food item not found'
       });
     }
 
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const userId = req.user?.id || null;
 
+    console.log('[CartController] addItemToCart called', { sessionId, userId, foodItemId, quantity });
+
     const cart = await getOrCreateCart(sessionId, userId);
+    // persist session
+    req.cart = cart;
+    await saveSession(req);
+
+    console.log('[CartController] got cart', { cartId: cart._id, itemsBefore: cart.items.length });
 
     // Calculate price based on calories if not provided
     const calculatePrice = (calories) => {
@@ -102,6 +169,7 @@ export const addItemToCart = async (req, res) => {
     };
 
     // Add item with all necessary data
+    // Use calorie-based price calculation when item has no explicit price
     await cart.addItem({
       foodItem: foodItem._id,
       restaurant: foodItem.company,
@@ -110,118 +178,60 @@ export const addItemToCart = async (req, res) => {
       totalFat: foodItem.totalFat || 0,
       protein: foodItem.protein || 0,
       carbohydrates: foodItem.carbs || 0,
-      price: foodItem.price || calculatePrice(foodItem.calories),
-      quantity: parseInt(quantity, 10),
+      price: (typeof foodItem.price === 'number' ? foodItem.price : calculatePrice(foodItem.calories)),
+      quantity: parsedQty
     });
 
+    const refreshed = await Cart.findById(cart._id).populate('items.foodItem');
+    console.log('[CartController] updated cart after addItem', { id: refreshed._id, totalItems: refreshed.totalItems, items: refreshed.items.length });
     // Reload cart with populated items
-    const updatedCart = await Cart.findById(cart._id).populate(
-      "items.foodItem"
-    );
+    const updatedCart = await Cart.findById(cart._id).populate('items.foodItem');
+
+    // Normalize items for response: ensure foodItem is returned as full object when populated
+    const mapItem = (it) => ({
+      foodItem: it.foodItem && typeof it.foodItem === 'object' ? {
+        _id: String(it.foodItem._id),
+        company: it.foodItem.company,
+        item: it.foodItem.item,
+        calories: it.foodItem.calories,
+        price: it.foodItem.price
+      } : (it.foodItem ? String(it.foodItem) : it.foodItem),
+      restaurant: it.restaurant,
+      item: it.item,
+      calories: it.calories,
+      totalFat: it.totalFat,
+      protein: it.protein,
+      carbohydrates: it.carbohydrates,
+      price: it.price,
+      quantity: it.quantity
+    });
+
+    // Also ensure any nested populated objects are converted to id strings inside save hooks or mapping
+    const normalizedItems = updatedCart.items.map(mapItem);
 
     res.status(200).json({
       success: true,
-      message: "Item added to cart",
+      message: 'Item added to cart',
       data: {
         cart: {
-          id: updatedCart._id,
-          items: updatedCart.items,
+          id: String(updatedCart._id),
+          items: normalizedItems,
           totalItems: updatedCart.totalItems,
           totalPrice: updatedCart.totalPrice,
-        },
-      },
-    });
-  } catch (error) {
-    console.error("Error adding item to cart:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to add item to cart",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
-    });
-  }
-};
-
-/**
- * Add multiple items to cart in a single request
- * POST /api/cart/items/bulk
- * Body: { items: [{ foodItemId, quantity }, ...] }
- */
-export const addItemsToCart = async (req, res) => {
-  try {
-    const { items } = req.body;
-
-    if (!Array.isArray(items) || items.length === 0) {
-      return res
-        .status(400)
-        .json({ success: false, message: "items array is required" });
-    }
-
-    const sessionId = req.session.id;
-    const userId = req.user?.id || null;
-
-    const cart = await getOrCreateCart(sessionId, userId);
-
-    // Helper price calc (same as single-add)
-    const calculatePrice = (calories) => {
-      if (!calories || calories <= 0) return 2.0;
-      const basePrice = calories * 0.01;
-      return Math.min(Math.max(basePrice, 2.0), 15.0);
-    };
-
-    for (const itm of items) {
-      const { foodItemId, quantity = 1 } = itm;
-      if (!mongoose.isValidObjectId(foodItemId)) {
-        // skip invalid ids provided in bulk request
-        continue;
+          totalCalories: updatedCart.totalCalories,
+          userId: updatedCart.userId ?? undefined
+        }
       }
-      const foodItem = await FastFoodItem.findById(foodItemId);
-      if (!foodItem) continue; // skip missing items
-
-      await cart.addItem({
-        foodItem: foodItem._id,
-        restaurant: foodItem.company,
-        item: foodItem.item,
-        calories: foodItem.calories || 0,
-        totalFat: foodItem.totalFat || 0,
-        protein: foodItem.protein || 0,
-        carbohydrates: foodItem.carbs || 0,
-        price: foodItem.price || calculatePrice(foodItem.calories),
-        quantity: parseInt(quantity, 10),
-      });
-    }
-
-    const updatedCart = await Cart.findById(cart._id).populate(
-      "items.foodItem"
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Items added to cart",
-      data: {
-        cart: {
-          id: updatedCart._id,
-          items: updatedCart.items,
-          totalItems: updatedCart.totalItems,
-          totalPrice: updatedCart.totalPrice,
-        },
-      },
     });
   } catch (error) {
-    console.error("Error adding items to cart:", error);
+    console.error('Error adding item to cart:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to add items to cart",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      message: 'Failed to add item to cart',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
-
-/**
- * Add multiple items to cart in one request
- * POST /api/cart/items/bulk
- * Body: { items: [{ foodItemId, quantity }, ...] }
- */
-// duplicate bulk-add handler removed (implemented earlier in file)
 
 /**
  * Update item quantity in cart
@@ -232,48 +242,67 @@ export const updateCartItemQuantity = async (req, res) => {
     const { foodItemId } = req.params;
     const { quantity } = req.body;
 
-    if (!quantity || quantity < 0) {
+    // Allow quantity === 0 so that tests can remove items by setting quantity to 0.
+    if (quantity === undefined || quantity === null || isNaN(quantity) || quantity < 0) {
       return res.status(400).json({
         success: false,
-        message: "Valid quantity is required",
+        message: 'Valid quantity is required'
       });
     }
 
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const cart = await Cart.findOne({ sessionId });
 
     if (!cart) {
       return res.status(404).json({
         success: false,
-        message: "Cart not found",
+        message: 'Cart not found'
       });
     }
-
+    // persist session
+    req.cart = cart;
+    await saveSession(req);
     await cart.updateItemQuantity(foodItemId, parseInt(quantity, 10));
 
     // Reload cart with populated items
-    const updatedCart = await Cart.findById(cart._id).populate(
-      "items.foodItem"
-    );
+    const updatedCart = await Cart.findById(cart._id).populate('items.foodItem');
+
+    const mapItem = (it) => ({
+      foodItem: it.foodItem && typeof it.foodItem === 'object' ? {
+        _id: String(it.foodItem._id),
+        company: it.foodItem.company,
+        item: it.foodItem.item,
+        calories: it.foodItem.calories,
+        price: it.foodItem.price
+      } : (it.foodItem ? String(it.foodItem) : it.foodItem),
+      restaurant: it.restaurant,
+      item: it.item,
+      calories: it.calories,
+      totalFat: it.totalFat,
+      protein: it.protein,
+      carbohydrates: it.carbohydrates,
+      price: it.price,
+      quantity: it.quantity
+    });
 
     res.status(200).json({
       success: true,
-      message: quantity === 0 ? "Item removed from cart" : "Cart updated",
+      message: quantity === 0 ? 'Item removed from cart' : 'Cart updated',
       data: {
         cart: {
           id: updatedCart._id,
-          items: updatedCart.items,
+          items: updatedCart.items.map(mapItem),
           totalItems: updatedCart.totalItems,
-          totalPrice: updatedCart.totalPrice,
-        },
-      },
+          totalPrice: updatedCart.totalPrice
+        }
+      }
     });
   } catch (error) {
-    console.error("Error updating cart item:", error);
+    console.error('Error updating cart item:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to update cart item",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      message: 'Failed to update cart item',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -286,41 +315,58 @@ export const removeItemFromCart = async (req, res) => {
   try {
     const { foodItemId } = req.params;
 
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const cart = await Cart.findOne({ sessionId });
 
     if (!cart) {
       return res.status(404).json({
         success: false,
-        message: "Cart not found",
+        message: 'Cart not found'
       });
     }
-
+    req.cart = cart;
+    await saveSession(req);
     await cart.removeItem(foodItemId);
 
     // Reload cart with populated items
-    const updatedCart = await Cart.findById(cart._id).populate(
-      "items.foodItem"
-    );
+    const updatedCart = await Cart.findById(cart._id).populate('items.foodItem');
+
+    const mapItem = (it) => ({
+      foodItem: it.foodItem && typeof it.foodItem === 'object' ? {
+        _id: String(it.foodItem._id),
+        company: it.foodItem.company,
+        item: it.foodItem.item,
+        calories: it.foodItem.calories,
+        price: it.foodItem.price
+      } : (it.foodItem ? String(it.foodItem) : it.foodItem),
+      restaurant: it.restaurant,
+      item: it.item,
+      calories: it.calories,
+      totalFat: it.totalFat,
+      protein: it.protein,
+      carbohydrates: it.carbohydrates,
+      price: it.price,
+      quantity: it.quantity
+    });
 
     res.status(200).json({
       success: true,
-      message: "Item removed from cart",
+      message: 'Item removed from cart',
       data: {
         cart: {
           id: updatedCart._id,
-          items: updatedCart.items,
+          items: updatedCart.items.map(mapItem),
           totalItems: updatedCart.totalItems,
-          totalPrice: updatedCart.totalPrice,
-        },
-      },
+          totalPrice: updatedCart.totalPrice
+        }
+      }
     });
   } catch (error) {
-    console.error("Error removing cart item:", error);
+    console.error('Error removing cart item:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to remove cart item",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      message: 'Failed to remove cart item',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -331,36 +377,37 @@ export const removeItemFromCart = async (req, res) => {
  */
 export const clearCart = async (req, res) => {
   try {
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const cart = await Cart.findOne({ sessionId });
 
     if (!cart) {
       return res.status(404).json({
         success: false,
-        message: "Cart not found",
+        message: 'Cart not found'
       });
     }
-
+    req.cart = cart;
+    await saveSession(req);
     await cart.clearCart();
 
     res.status(200).json({
       success: true,
-      message: "Cart cleared",
+      message: 'Cart cleared',
       data: {
         cart: {
           id: cart._id,
           items: [],
           totalItems: 0,
-          totalPrice: 0,
-        },
-      },
+          totalPrice: 0
+        }
+      }
     });
   } catch (error) {
-    console.error("Error clearing cart:", error);
+    console.error('Error clearing cart:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to clear cart",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      message: 'Failed to clear cart',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -374,21 +421,18 @@ export const mergeCart = async (req, res) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: "Authentication required",
+        message: 'Authentication required'
       });
     }
 
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const userId = req.user.id;
 
     // Get session cart (guest cart)
     const sessionCart = await Cart.findOne({ sessionId });
 
     // Get user's existing cart
-    let userCart = await Cart.findOne({
-      userId,
-      sessionId: { $ne: sessionId },
-    });
+    let userCart = await Cart.findOne({ userId, sessionId: { $ne: sessionId } });
 
     if (sessionCart && sessionCart.items.length > 0) {
       if (userCart) {
@@ -409,33 +453,53 @@ export const mergeCart = async (req, res) => {
       userCart = await Cart.create({
         sessionId,
         userId,
-        items: [],
+        items: []
       });
     }
 
+    // Persist session association
+    req.cart = sessionCart || userCart;
+    await saveSession(req);
+
     // Reload cart with populated items
-    const finalCart = await Cart.findById(userCart._id).populate(
-      "items.foodItem"
-    );
+    const finalCart = await Cart.findById(userCart._id).populate('items.foodItem');
+
+    const mapItem = (it) => ({
+      foodItem: it.foodItem && typeof it.foodItem === 'object' ? {
+        _id: String(it.foodItem._id),
+        company: it.foodItem.company,
+        item: it.foodItem.item,
+        calories: it.foodItem.calories,
+        price: it.foodItem.price
+      } : (it.foodItem ? String(it.foodItem) : it.foodItem),
+      restaurant: it.restaurant,
+      item: it.item,
+      calories: it.calories,
+      totalFat: it.totalFat,
+      protein: it.protein,
+      carbohydrates: it.carbohydrates,
+      price: it.price,
+      quantity: it.quantity
+    });
 
     res.status(200).json({
       success: true,
-      message: "Cart merged successfully",
+      message: 'Cart merged successfully',
       data: {
         cart: {
           id: finalCart._id,
-          items: finalCart.items,
+          items: finalCart.items.map(mapItem),
           totalItems: finalCart.totalItems,
-          totalPrice: finalCart.totalPrice,
-        },
-      },
+          totalPrice: finalCart.totalPrice
+        }
+      }
     });
   } catch (error) {
-    console.error("Error merging cart:", error);
+    console.error('Error merging cart:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to merge cart",
-      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+      message: 'Failed to merge cart',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
