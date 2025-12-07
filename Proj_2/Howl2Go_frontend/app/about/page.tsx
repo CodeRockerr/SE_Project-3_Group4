@@ -12,44 +12,58 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function AboutPage() {
+  const { t } = useLanguage();
   const features = [
     {
       icon: <Search className="h-8 w-8" />,
-      title: "Search-First Discovery",
-      description:
-        "No endless scrolling through menus. Just search for what you're craving and find it instantly across all restaurants.",
+      title: t("about.feature.searchTitle", "Search-First Discovery"),
+      description: t(
+        "about.feature.searchDesc",
+        "No endless scrolling through menus. Just search for what you're craving and find it instantly across all restaurants."
+      ),
     },
     {
       icon: <TrendingUp className="h-8 w-8" />,
-      title: "Instant Nutrition Facts",
-      description:
-        "Get complete nutritional information for every item - calories, protein, carbs, fats, and more at a glance.",
+      title: t("about.feature.nutritionTitle", "Instant Nutrition Facts"),
+      description: t(
+        "about.feature.nutritionDesc",
+        "Get complete nutritional information for every item - calories, protein, carbs, fats, and more at a glance."
+      ),
     },
     {
       icon: <Heart className="h-8 w-8" />,
-      title: "Health Tracking Dashboard",
-      description:
-        "Track your daily nutrition goals, monitor calories, and see your progress with our intuitive dashboard.",
+      title: t("about.feature.healthTitle", "Health Tracking Dashboard"),
+      description: t(
+        "about.feature.healthDesc",
+        "Track your daily nutrition goals, monitor calories, and see your progress with our intuitive dashboard."
+      ),
     },
     {
       icon: <ShoppingCart className="h-8 w-8" />,
-      title: "Smart Cart Management",
-      description:
-        "Add items to your cart from multiple restaurants with real-time price calculations and seamless checkout.",
+      title: t("about.feature.cartTitle", "Smart Cart Management"),
+      description: t(
+        "about.feature.cartDesc",
+        "Add items to your cart from multiple restaurants with real-time price calculations and seamless checkout."
+      ),
     },
     {
       icon: <Shield className="h-8 w-8" />,
-      title: "Secure & Private",
-      description:
-        "Your data is protected with industry-standard security. We use httpOnly cookies and encrypted connections.",
+      title: t("about.feature.securityTitle", "Secure & Private"),
+      description: t(
+        "about.feature.securityDesc",
+        "Your data is protected with industry-standard security. We use httpOnly cookies and encrypted connections."
+      ),
     },
     {
       icon: <Zap className="h-8 w-8" />,
-      title: "Lightning Fast",
-      description:
-        "Built with Next.js and optimized for performance. Get results in milliseconds, not seconds.",
+      title: t("about.feature.speedTitle", "Lightning Fast"),
+      description: t(
+        "about.feature.speedDesc",
+        "Built with Next.js and optimized for performance. Get results in milliseconds, not seconds."
+      ),
     },
   ];
 
@@ -66,9 +80,9 @@ export default function AboutPage() {
             transition={{ duration: 0.6 }}
           >
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-[var(--howl-neutral)] mb-6">
-              About{" "}
+              {t("about.title", "About")}{" "}
               <span className="text-[var(--orange)] relative">
-                Howl2Go
+                {t("about.heroHeading", "Howl2Go")}
                 <svg
                   className="absolute -bottom-2 left-0 w-full"
                   height="8"
@@ -85,8 +99,10 @@ export default function AboutPage() {
               </span>
             </h1>
             <p className="text-xl sm:text-2xl text-[var(--text-subtle)] max-w-3xl mx-auto leading-relaxed">
-              The smart way to discover food nutrition. No menus. No hassle.
-              Just search, find, and track your health goals.
+              {t(
+                "about.sectionDescription",
+                "The smart way to discover food nutrition. No menus. No hassle. Just search, find, and track your health goals."
+              )}
             </p>
           </motion.div>
         </div>
@@ -103,34 +119,12 @@ export default function AboutPage() {
             className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-8 sm:p-12"
           >
             <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text)] mb-6">
-              What is Howl2Go?
+              {t("about.whatIs", "What is Howl2Go?")}
             </h2>
             <div className="space-y-4 text-lg text-[var(--text-subtle)] leading-relaxed">
-              <p>
-                Howl2Go is a revolutionary food delivery platform that puts
-                nutrition information first. We believe you shouldn&apos;t have
-                to scroll through endless menus to find what you&apos;re looking
-                for.
-              </p>
-              <p>
-                Instead, we let you{" "}
-                <strong className="text-[var(--cream)]">
-                  search for exactly what you want
-                </strong>{" "}
-                - whether it&apos;s a burger, a salad, or something specific
-                like &quot;low-carb breakfast&quot; - and instantly show you
-                matching items across all restaurants with complete nutritional
-                information.
-              </p>
-              <p>
-                Built with modern web technologies like{" "}
-                <span className="text-[var(--orange)]">Next.js</span>,{" "}
-                <span className="text-[var(--orange)]">React</span>, and{" "}
-                <span className="text-[var(--orange)]">TypeScript</span>,
-                Howl2Go delivers a premium, lightning-fast experience with a
-                beautiful dark-mode interface designed for food lovers and
-                health-conscious eaters alike.
-              </p>
+              <p>{t("about.whatIsBody1", "Howl2Go is a revolutionary food delivery platform that puts nutrition information first. We believe you shouldn't have to scroll through endless menus to find what you're looking for.")}</p>
+              <p>{t("about.whatIsBody2", "Instead, we let you search for exactly what you want - whether it's a burger, a salad, or something specific like \"low-carb breakfast\" - and instantly show you matching items across all restaurants with complete nutritional information.")}</p>
+              <p>{t("about.whatIsBody3", "Built with modern web technologies like Next.js, React, and TypeScript, Howl2Go delivers a premium, lightning-fast experience with a beautiful dark-mode interface designed for food lovers and health-conscious eaters alike.")}</p>
             </div>
           </motion.div>
         </div>
@@ -147,10 +141,10 @@ export default function AboutPage() {
             className="text-center mb-12"
           >
             <h2 className="text-4xl font-bold text-[var(--text)] mb-4">
-              Key Features
+              {t("about.keyFeatures", "Key Features")}
             </h2>
             <p className="text-lg text-[var(--text-subtle)]">
-              Everything you need for smarter food choices
+              {t("about.keyFeaturesSubtitle", "Everything you need for smarter food choices")}
             </p>
           </motion.div>
 
@@ -189,11 +183,13 @@ export default function AboutPage() {
             className="bg-[var(--bg-card)] border border-[var(--border)] rounded-2xl p-8 sm:p-12 text-center"
           >
             <h2 className="text-3xl sm:text-4xl font-bold text-[var(--text)] mb-6">
-              Built with Modern Technology
+              {t("about.techTitle", "Built with Modern Technology")}
             </h2>
             <p className="text-lg text-[var(--text-subtle)] mb-8">
-              Howl2Go is powered by cutting-edge web technologies to deliver a
-              fast, reliable, and beautiful experience.
+              {t(
+                "about.techSubtitle",
+                "Howl2Go is powered by cutting-edge web technologies to deliver a fast, reliable, and beautiful experience."
+              )}
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               {[
@@ -226,23 +222,23 @@ export default function AboutPage() {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-4xl sm:text-5xl font-bold text-[var(--text)] mb-6">
-              Ready to get started?
+              {t("about.ctaTitle", "Ready to get started?")}
             </h2>
             <p className="text-xl text-[var(--text-subtle)] mb-8">
-              Search for your next meal and track your nutrition goals today.
+              {t("about.ctaSubtitle", "Search for your next meal and track your nutrition goals today.")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/"
                 className="px-8 py-4 rounded-full font-semibold text-lg bg-[var(--orange)] text-[var(--text)] hover:bg-[var(--cream)] hover:text-[var(--bg)] transition-all hover:scale-105 hover:shadow-lg"
               >
-                Start Searching
+                {t("about.ctaPrimary", "Start Searching")}
               </Link>
               <Link
                 href="/dashboard"
                 className="px-8 py-4 rounded-full font-semibold text-lg bg-[var(--bg-card)] border-2 border-[var(--orange)] text-[var(--orange)] hover:bg-[var(--orange)] hover:text-[var(--text)] transition-all hover:scale-105"
               >
-                View Dashboard
+                {t("about.ctaSecondary", "View Dashboard")}
               </Link>
             </div>
           </motion.div>

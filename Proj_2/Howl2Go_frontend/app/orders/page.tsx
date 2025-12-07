@@ -12,12 +12,14 @@ import { useEffect, useState } from 'react';
 import ReviewModal from '@/components/ReviewModal';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { getOrderHistory, getOrderInsights, Order, OrderInsights } from '@/lib/api/order';
 import { getMyReviews } from '@/lib/api/review';
 
 export default function OrderHistoryPage() {
 	const router = useRouter();
 	const { isAuthenticated } = useAuth();
+	const { t } = useLanguage();
 	const [orders, setOrders] = useState<Order[]>([]);
 	const [insights, setInsights] = useState<OrderInsights | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
@@ -195,9 +197,9 @@ export default function OrderHistoryPage() {
 							>
 								<ArrowLeft className="h-5 w-5 text-[var(--text)]" />
 							</Link>
-							<h1 className="text-2xl font-bold text-[var(--text)]">
-								Order History
-							</h1>
+						<h1 className="text-2xl font-bold text-[var(--text)]">
+							{t("orders.title", "Order History")}
+						</h1>
 						</div>
 						<div className="flex items-center gap-2">
 							{["all", "week", "month", "year"].map((range) => (
@@ -247,15 +249,15 @@ export default function OrderHistoryPage() {
 								>
 									<h2 className="text-xl font-bold text-[var(--text)] mb-4 flex items-center gap-2">
 										<BarChart3 className="h-5 w-5 text-[var(--orange)]" />
-										Nutrition Patterns
+										{t("orders.nutritionPatterns", "Nutrition Patterns")}
 									</h2>
 									{insights.patterns.totalOrders > 0 ? (
 										<div className="space-y-4">
 											<div>
-												<div className="flex justify-between text-sm mb-1">
-													<span className="text-[var(--text-subtle)]">
-														Avg Calories
-													</span>
+											<div className="flex justify-between text-sm mb-1">
+												<span className="text-[var(--text-subtle)]">
+													{t("orders.avgCalories", "Avg Calories")}
+												</span>
 													<span className="font-semibold text-[var(--text)]">
 														{
 															insights.patterns
@@ -265,7 +267,7 @@ export default function OrderHistoryPage() {
 												</div>
 												<div className="flex justify-between text-sm mb-1">
 													<span className="text-[var(--text-subtle)]">
-														Avg Protein
+														{t("orders.avgProtein", "Avg Protein")}
 													</span>
 													<span className="font-semibold text-[var(--text)]">
 														{
@@ -277,7 +279,7 @@ export default function OrderHistoryPage() {
 												</div>
 												<div className="flex justify-between text-sm mb-1">
 													<span className="text-[var(--text-subtle)]">
-														Avg Fat
+														{t("orders.avgFat", "Avg Fat")}
 													</span>
 													<span className="font-semibold text-[var(--text)]">
 														{
@@ -289,7 +291,7 @@ export default function OrderHistoryPage() {
 												</div>
 												<div className="flex justify-between text-sm">
 													<span className="text-[var(--text-subtle)]">
-														Avg Carbs
+														{t("orders.avgCarbs", "Avg Carbs")}
 													</span>
 													<span className="font-semibold text-[var(--text)]">
 														{
@@ -308,7 +310,7 @@ export default function OrderHistoryPage() {
 												}}
 											>
 												<p className="text-sm text-[var(--text-subtle)] mb-2">
-													Top Restaurants
+													{t("orders.topRestaurants", "Top Restaurants")}
 												</p>
 												{insights.patterns.mostOrderedRestaurants
 													.slice(0, 3)
@@ -328,9 +330,9 @@ export default function OrderHistoryPage() {
 											</div>
 										</div>
 									) : (
-										<p className="text-sm text-[var(--text-subtle)]">
-											No orders yet
-										</p>
+									<p className="text-sm text-[var(--text-subtle)]">
+										{t("orders.noOrders", "No orders yet")}
+									</p>
 									)}
 								</motion.div>
 
@@ -346,20 +348,20 @@ export default function OrderHistoryPage() {
 											backgroundColor: "var(--bg-card)",
 										}}
 									>
-										<h2 className="text-xl font-bold text-[var(--text)] mb-4 flex items-center gap-2">
-											<Activity className="h-5 w-5 text-[var(--orange)]" />
-											Trends
-										</h2>
+									<h2 className="text-xl font-bold text-[var(--text)] mb-4 flex items-center gap-2">
+										<Activity className="h-5 w-5 text-[var(--orange)]" />
+										{t("orders.trends", "Trends")}
+									</h2>
 										{insights.trends.trends && insights.trends.trends.length > 0 ? (
 											<div className="space-y-4">
 												{/* Trend Data Summary */}
 												<div className="grid grid-cols-2 gap-3 mb-4">
-													<div className="p-3 rounded-lg bg-[var(--bg-hover)]">
-														<p className="text-xs text-[var(--text-subtle)] mb-1">Total Periods</p>
+												<div className="p-3 rounded-lg bg-[var(--bg-hover)]">
+													<p className="text-xs text-[var(--text-subtle)] mb-1">{t("orders.totalPeriods", "Total Periods")}</p>
 														<p className="text-lg font-bold text-[var(--text)]">{insights.trends.trends.length}</p>
 													</div>
-													<div className="p-3 rounded-lg bg-[var(--bg-hover)]">
-														<p className="text-xs text-[var(--text-subtle)] mb-1">Avg Orders/Day</p>
+												<div className="p-3 rounded-lg bg-[var(--bg-hover)]">
+													<p className="text-xs text-[var(--text-subtle)] mb-1">{t("orders.avgOrdersPerDay", "Avg Orders/Day")}</p>
 														<p className="text-lg font-bold text-[var(--text)]">
 															{insights.trends.trends.length > 0 
 																? (insights.trends.trends.reduce((sum, t) => sum + t.orderCount, 0) / insights.trends.trends.length).toFixed(1)
@@ -423,10 +425,10 @@ export default function OrderHistoryPage() {
 											backgroundColor: "var(--bg-card)",
 										}}
 									>
-										<h2 className="text-xl font-bold text-[var(--text)] mb-4 flex items-center gap-2">
-											<Lightbulb className="h-5 w-5 text-[var(--orange)]" />
-											Recommendations
-										</h2>
+									<h2 className="text-xl font-bold text-[var(--text)] mb-4 flex items-center gap-2">
+										<Lightbulb className="h-5 w-5 text-[var(--orange)]" />
+										{t("orders.recommendations", "Recommendations")}
+									</h2>
 										<div className="space-y-3">
 											{insights.recommendations.map(
 												(rec, idx) => (
@@ -487,7 +489,7 @@ export default function OrderHistoryPage() {
 								className="rounded-2xl p-6 border"
 								style={{ borderColor: "var(--border)" }}
 							>
-								<LoadingSpinner message="Fetching your order history..." size="md" />
+								<LoadingSpinner message={t("orders.fetchingHistory", "Fetching your order history...")} size="md" />
 							</div>
 						) : orders.length === 0 ? (
 							<motion.div
@@ -501,17 +503,16 @@ export default function OrderHistoryPage() {
 							>
 								<Utensils className="h-16 w-16 mx-auto mb-4 text-[var(--text-subtle)]" />
 								<h3 className="text-xl font-bold text-[var(--text)] mb-2">
-									No orders yet
+									{t("orders.noOrders", "No orders yet")}
 								</h3>
 								<p className="text-[var(--text-subtle)] mb-6">
-									Start ordering to see your history and
-									insights here!
+									{t("orders.noOrdersDesc", "Start ordering to see your history and insights here!")}
 								</p>
 								<Link
 									href="/"
 									className="inline-block px-6 py-3 rounded-lg font-semibold bg-[var(--orange)] text-[var(--bg)] hover:bg-[var(--cream)] transition-colors"
 								>
-									Start Shopping
+									{t("orders.startShopping", "Start Shopping")}
 								</Link>
 							</motion.div>
 						) : (
@@ -543,12 +544,12 @@ export default function OrderHistoryPage() {
 												<p className="text-xl font-bold text-[var(--orange)]">
 													${order.total.toFixed(2)}
 												</p>
-												<p className="text-xs text-[var(--text-subtle)]">
-													{order.totalItems}{" "}
-													{order.totalItems === 1
-														? "item"
-														: "items"}
-												</p>
+											<p className="text-xs text-[var(--text-subtle)]">
+												{order.totalItems}{" "}
+												{order.totalItems === 1
+													? t("orders.item", "item")
+													: t("orders.items", "items")}
+											</p>
 											</div>
 										</div>
 

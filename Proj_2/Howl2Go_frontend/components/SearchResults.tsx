@@ -2,6 +2,7 @@
 
 import ItemCard from "./ItemCard";
 import type { FoodItem } from "@/types/food";
+import { useLanguage } from "@/context/LanguageContext";
 
 // Realistic demo data matching actual API structure
 const demoDishes: FoodItem[] = [
@@ -78,6 +79,7 @@ export default function SearchResults({
   recommendations,
   onRecommendationClick,
 }: SearchResultsProps) {
+  const { t } = useLanguage();
   return (
     <>
       {/* ========== DEMO MODE: Animated Dish Preview Cards ========== */}
@@ -114,7 +116,7 @@ export default function SearchResults({
         <div key="search-recommendations">
           {/* Header */}
           <h3 className="text-xl font-semibold text-[var(--text)] mb-4 opacity-0 animate-[fadeInDown_0.4s_ease-out_forwards]">
-            Try searching for:
+            {t("search.recommendationHeader", "Try searching for:")}
           </h3>
 
           {/* Recommendations List - Clickable */}

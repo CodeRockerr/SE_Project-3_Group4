@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface AnimatedHeadlineProps {
   isSearchFocused: boolean;
@@ -9,6 +10,8 @@ interface AnimatedHeadlineProps {
 export default function AnimatedHeadline({
   isSearchFocused,
 }: AnimatedHeadlineProps) {
+  const { t } = useLanguage();
+
   const headlineContainerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -40,8 +43,14 @@ export default function AnimatedHeadline({
       },
     },
   };
-
-  const words = ["Crave", "it.", "Find", "it.", "Instantly."];
+  const words = [
+    t("headline.word1", "Crave"),
+    t("headline.word2", "it."),
+    t("headline.word3", "Find"),
+    t("headline.word4", "it."),
+    t("headline.word5", "Instantly."),
+  ];
+  const highlightIndex = words.length - 1;
 
   return (
     <motion.h1
@@ -56,7 +65,7 @@ export default function AnimatedHeadline({
           variants={wordVariants}
           className="inline-block mr-3"
         >
-          {word === "Instantly." ? (
+          {index === highlightIndex ? (
             <span className="relative">
               {word}
               <motion.svg
