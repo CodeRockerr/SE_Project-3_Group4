@@ -32,6 +32,7 @@ Howl2Go eliminates traditional menu browsing by using **AI-powered natural langu
 - Node.js 18+ installed
 - MongoDB (local or Atlas account)
 - Groq API key (free tier available at [groq.com](https://groq.com))
+- Stripe account (free account for payment processing at [stripe.com](https://stripe.com))
 
 ### Installation
 
@@ -50,6 +51,9 @@ cp .env.example .env
 # Edit .env with your credentials:
 # - MONGODB_URI
 # - GROQ_API_KEY
+# - STRIPE_SECRET_KEY (get from https://dashboard.stripe.com/test/apikeys)
+# - STRIPE_PUBLISHABLE_KEY
+# - STRIPE_WEBHOOK_SECRET (configure webhook first)
 # - JWT_SECRET
 # - JWT_REFRESH_SECRET
 # - SESSION_SECRET

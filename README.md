@@ -309,6 +309,7 @@ Complete REST API, TypeScript support, comprehensive docs, pre-commit hooks, and
 - **Node.js** 18+ and **npm** 9+
 - **MongoDB Atlas** account (or local MongoDB)
 - **Groq API key** ([Get free key](https://console.groq.com) 🔑)
+- **Stripe account** ([Get free account](https://stripe.com) 💳) - For payment processing
 
 ### ⚙️ Installation
 
@@ -329,15 +330,29 @@ npm install
 
 # Create .env file
 cat > .env << EOF
-GROQ_API_KEY=your_groq_api_key_here
+# Required - Database
 MONGODB_URI=your_mongodb_connection_string
+
+# Required - API Keys
+GROQ_API_KEY=your_groq_api_key_here
+
+# Required - Stripe Payment Integration
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
+STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+
+# Required - Authentication Secrets (generate secure random strings)
 JWT_SECRET=your_32_char_secret_here
 JWT_REFRESH_SECRET=your_32_char_secret_here
 SESSION_SECRET=your_32_char_secret_here
+
+# Optional - Server Configuration
 FRONTEND_URL=http://localhost:3000
 PORT=4000
 NODE_ENV=development
 EOF
+
+# Get Stripe keys from: https://dashboard.stripe.com/test/apikeys
 
 # Setup database (imports data, seeds meal combos)
 npm run setup:database
@@ -354,8 +369,16 @@ npm run dev
 cd ../Howl2Go_frontend
 npm install
 
-# Create .env.local file (optional, defaults to http://localhost:4000)
-echo "NEXT_PUBLIC_API_URL=http://localhost:4000" > .env.local
+# Create .env.local file
+cat > .env.local << EOF
+# Required - Backend API URL
+NEXT_PUBLIC_API_URL=http://localhost:4000
+
+# Required - Stripe Payment Integration
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
+EOF
+
+# Get Stripe publishable key from: https://dashboard.stripe.com/test/apikeys
 
 # Start development server
 npm run dev
@@ -581,6 +604,57 @@ npm run enrich:ingredients   # Enrich with LLM-generated ingredients (optional)
 
 ---
 
+## 💳 Payment Integration (Stripe)
+
+<div align="center">
+
+[![Stripe](https://img.shields.io/badge/Stripe-Payment_Ready-635BFF?style=for-the-badge&logo=stripe&logoColor=white)](https://stripe.com/)
+
+</div>
+
+Howl2Go includes full Stripe payment integration for secure checkout:
+
+### ✅ Features
+
+- ✅ **Secure Payment Processing** - PCI compliant via Stripe
+- ✅ **Credit/Debit Cards** - Visa, Mastercard, Amex, Discover
+- ✅ **Payment Intents** - Modern Stripe payment flow
+- ✅ **Webhook Support** - Real-time payment status updates
+- ✅ **Error Handling** - Comprehensive error messages
+- ✅ **Test Mode** - Safe testing with test cards
+
+### 🔧 Setup Instructions
+
+**1. Get Stripe API Keys:**
+- Sign up at [stripe.com](https://stripe.com) (free account)
+- Go to [Dashboard → API Keys](https://dashboard.stripe.com/test/apikeys)
+- Copy your **Test** keys (for development):
+  - `pk_test_...` (Publishable key)
+  - `sk_test_...` (Secret key)
+
+**2. Configure Backend:**
+```bash
+# Add to Howl2Go_backend/.env
+STRIPE_SECRET_KEY=sk_test_your_key_here
+STRIPE_PUBLISHABLE_KEY=pk_test_your_key_here
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
+```
+
+**3. Configure Frontend:**
+```bash
+# Add to Howl2Go_frontend/.env.local
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_key_here
+```
+
+**4. Test Payment:**
+- Use test card: `4242 4242 4242 4242`
+- Any future expiry date (e.g., 12/34)
+- Any 3-digit CVC (e.g., 123)
+
+**📚 Full Documentation:** See [Payment Setup Guide](Proj_2/docs/PAYMENT_SETUP.md)
+
+---
+
 ## 🌟 Feature Highlights
 
 ### ✅ Current Features
@@ -612,6 +686,98 @@ npm run enrich:ingredients   # Enrich with LLM-generated ingredients (optional)
 - [ ] Review photo uploads
 - [ ] Real-time order tracking
 - [ ] Mobile app (React Native)
+- [ ] Apple Pay / Google Pay integration
+- [ ] Saved payment methods
+- [ ] Subscription plans
+
+---
+
+## 🚀 Production Deployment
+
+<div align="center">
+
+[![Production](https://img.shields.io/badge/🚀_Production_Ready-success?style=for-the-badge&logo=rocket&logoColor=white)]()
+
+</div>
+
+### ✅ Pre-Deployment Checklist
+
+**Environment Variables:**
+- [ ] All API keys configured (Groq, Stripe, MongoDB)
+- [ ] JWT secrets are secure (32+ characters, random)
+- [ ] `NODE_ENV=production` set
+- [ ] HTTPS enabled for Stripe webhooks
+- [ ] Frontend URL configured correctly
+
+**Security:**
+- [ ] Stripe keys switched to **Live mode** (production)
+- [ ] Webhook endpoint configured in Stripe Dashboard
+- [ ] Webhook secret updated for production
+- [ ] CORS configured for production domain
+- [ ] Session cookies secure (`secure: true`, `sameSite: 'none'`)
+
+**Database:**
+- [ ] MongoDB Atlas cluster configured
+- [ ] Database indexes created
+- [ ] Backup strategy in place
+- [ ] Connection pooling optimized
+
+**Monitoring:**
+- [ ] Error logging configured
+- [ ] Payment webhook monitoring
+- [ ] Server health checks
+- [ ] Performance monitoring
+
+**Documentation:**
+- [ ] API documentation updated
+- [ ] Deployment guides reviewed
+- [ ] Team access documented
+
+### 📋 Production Environment Variables
+
+**Backend:**
+```env
+NODE_ENV=production
+MONGODB_URI=mongodb+srv://...
+GROQ_API_KEY=gsk_...
+STRIPE_SECRET_KEY=sk_live_...  # Live mode key!
+STRIPE_PUBLISHABLE_KEY=pk_live_...  # Live mode key!
+STRIPE_WEBHOOK_SECRET=whsec_...
+JWT_SECRET=<secure-random-32-chars>
+JWT_REFRESH_SECRET=<secure-random-32-chars>
+SESSION_SECRET=<secure-random-32-chars>
+FRONTEND_URL=https://your-domain.com
+PORT=4000
+```
+
+**Frontend:**
+```env
+NEXT_PUBLIC_API_URL=https://api.your-domain.com
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...  # Live mode key!
+```
+
+### 🔐 Stripe Production Setup
+
+1. **Switch to Live Mode:**
+   - In Stripe Dashboard, toggle to **Live mode**
+   - Get your **Live API keys**
+   - Update environment variables
+
+2. **Configure Webhook:**
+   - Create webhook endpoint: `https://api.your-domain.com/api/payments/webhook`
+   - Subscribe to events:
+     - `payment_intent.succeeded`
+     - `payment_intent.payment_failed`
+     - `payment_intent.canceled`
+     - `charge.refunded`
+   - Copy webhook signing secret
+
+3. **Test Payments:**
+   - Use Stripe's test mode initially
+   - Test with real small amounts
+   - Monitor webhook deliveries
+
+**📚 Detailed Guide:** [Production Deployment Guide](Proj_2/docs/PAYMENT_SETUP.md#production-deployment)
 
 ---
 

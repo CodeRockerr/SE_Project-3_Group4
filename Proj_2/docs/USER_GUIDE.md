@@ -207,37 +207,124 @@ The cart shows:
 
 ---
 
-## 📦 Placing Orders
+## 📦 Placing Orders & Payment
 
 ### Before Placing an Order
 
 1. **Review Your Cart**: Make sure all items are correct
 2. **Check Quantities**: Verify quantities for each item
 3. **Review Total**: Confirm the final price
+4. **Login Required**: You must be logged in to place an order and make payments
 
 ### Placing an Order
 
 1. Go to your **Cart** page
 2. Review all items and the order summary
 3. Click **"Place Order"** button
-4. Wait for order processing (2-3 seconds)
-5. You'll see a success message
-6. You'll be redirected to your **Order History** page
+4. **Payment Modal Opens**: A secure payment modal will appear
+
+### 💳 Payment Process
+
+#### Payment Modal
+
+The payment modal provides a secure, PCI-compliant payment experience powered by Stripe:
+
+**Features:**
+- 🔒 **Secure Payment Form**: Stripe handles all sensitive card data
+- 💳 **Credit/Debit Cards**: Visa, Mastercard, American Express, Discover
+- ✅ **Real-time Validation**: Instant feedback on card details
+- 🎨 **Dark Theme**: Matches Howl2Go's beautiful design
+
+#### Entering Payment Information
+
+1. **Card Number**: Enter your 16-digit card number
+   - Example: `4242 4242 4242 4242` (for testing)
+2. **Expiry Date**: Enter MM/YY format
+   - Example: `12/34`
+3. **CVC**: Enter the 3-digit security code
+   - Example: `123`
+4. **ZIP Code**: Enter your billing ZIP code
+   - Example: `12345`
+
+#### Completing Payment
+
+1. Review the **Total Amount** displayed in the modal
+2. Click **"Pay $XX.XX"** button
+3. **Processing**: The button shows "Processing..." while your payment is being verified
+4. **Success**: You'll see a success message and be redirected
+
+### Payment Status
+
+**Successful Payment:**
+- ✅ Green checkmark appears
+- ✅ "Payment successful!" message
+- ✅ Order is immediately confirmed
+- ✅ Redirect to order confirmation page
+
+**Payment Failure:**
+- ❌ Error message displayed
+- ❌ Card may be declined or invalid
+- ❌ You can retry with a different payment method
+- ⚠️ Common reasons:
+  - Insufficient funds
+  - Card declined by bank
+  - Invalid card details
+  - Expired card
 
 ### Order Confirmation
 
-After placing an order, you'll see:
+After successful payment, you'll see:
 - ✅ **Success Animation**: Confirmation that your order was placed
 - **Order Number**: Unique identifier for your order
+- **Payment Confirmation**: Transaction ID
 - **Order Total**: Final amount charged
 - **Item Count**: Number of items in the order
+- **Payment Method**: Last 4 digits of card used
 
 ### What Happens After Ordering
 
 - ✅ Cart is automatically cleared
 - ✅ Order is saved to your account
+- ✅ Payment is processed securely via Stripe
 - ✅ Order appears in your Order History
 - ✅ Nutrition data is tracked for insights
+- ✅ Receipt is available in Order History
+
+### 🔒 Payment Security
+
+**Your payment information is secure:**
+- 🔐 **PCI Compliant**: Stripe handles all card data (we never see your full card number)
+- 🔒 **Encrypted**: All payment data is encrypted in transit
+- ✅ **Verified**: Webhook confirmation ensures payment status is accurate
+- 🛡️ **Secure**: No card data is stored on our servers
+
+### 💡 Payment Tips
+
+✅ **Do:**
+- Use a valid credit or debit card
+- Ensure sufficient funds are available
+- Double-check card details before submitting
+- Keep your payment confirmation email
+
+❌ **Don't:**
+- Share your payment details with others
+- Use expired cards
+- Close the browser during payment processing
+
+### Test Cards (Development Only)
+
+If you're testing the application, you can use these test cards:
+
+**Successful Payment:**
+- Card: `4242 4242 4242 4242`
+- Expiry: Any future date (e.g., `12/34`)
+- CVC: Any 3 digits (e.g., `123`)
+
+**Declined Payment:**
+- Card: `4000 0000 0000 9995`
+
+**3D Secure:**
+- Card: `4000 0025 0000 3155`
 
 ---
 
