@@ -29,16 +29,17 @@
         "jest": "^30.2.0",
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.19.1",
-        "morgan": "^1.10.1"
+        "morgan": "^1.10.1",
+        "stripe": "^20.0.0"
     },
     "devDependencies": {
         "@types/node": "^24.10.0",
-        "tslib": "^2.6.0",
-        "mongodb-memory-server": "^8.11.0",
         "coveralls": "^3.1.1",
         "husky": "^9.1.7",
         "lint-staged": "^16.2.4",
+        "mongodb-memory-server": "^8.11.0",
         "nodemon": "^3.1.10",
-        "supertest": "^7.1.4"
+        "supertest": "^7.1.4",
+        "tslib": "^2.6.0"
     }
 }
