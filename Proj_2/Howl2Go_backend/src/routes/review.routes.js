@@ -24,6 +24,7 @@ router.post('/', authenticate, createReview);
  * @access  Public
  */
 router.get('/item/:foodItemId', optionalAuth, getItemReviews);
+router.get('/food/:foodItemId', optionalAuth, getItemReviews);
 
 /**
  * @route   GET /api/reviews/my-reviews
@@ -40,18 +41,18 @@ router.get('/my-reviews', authenticate, getMyReviews);
 router.patch('/:reviewId', authenticate, updateReview);
 
 /**
+ * @route   PATCH /api/reviews/:reviewId/helpful
+ * @desc    Mark a review as helpful
+ * @access  Private
+ */
+router.patch('/:reviewId/helpful', authenticate, markHelpful);
+
+/**
  * @route   DELETE /api/reviews/:reviewId
  * @desc    Delete a review
  * @access  Private
  */
 router.delete('/:reviewId', authenticate, deleteReview);
-
-/**
- * @route   POST /api/reviews/:reviewId/helpful
- * @desc    Mark a review as helpful
- * @access  Private
- */
-router.post('/:reviewId/helpful', authenticate, markHelpful);
 
 export default router;
 

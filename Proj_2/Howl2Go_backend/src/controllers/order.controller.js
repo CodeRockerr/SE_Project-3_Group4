@@ -21,29 +21,47 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    const sessionId = req.session.id;
     const userId = req.user.id;
+    const sessionId = req.session?.id;
 
-    // Get cart
-    const cart = await Cart.findOne({ sessionId });
+    // Get cart by userId as primary lookup, fall back to sessionId
+    let cart = await Cart.findOne({ userId });
+    if (!cart && sessionId) {
+      cart = await Cart.findOne({ sessionId });
+    }
 
-    if (!cart || cart.items.length === 0) {
+    if (!cart || !cart.items || cart.items.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'Cart is empty'
       });
     }
 
-    // Calculate totals
-    const subtotal = cart.totalPrice;
-    const tax = subtotal * 0.08; // 8% tax
-    const deliveryFee = subtotal > 30 ? 0 : 3.99;
-    const total = subtotal + tax + deliveryFee;
-
     // Populate cart items with full food item data
     const populatedCart = await Cart.findById(cart._id).populate('items.foodItem');
     
+    // Ensure items are populated
+    if (!populatedCart || !populatedCart.items || populatedCart.items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cart is empty'
+      });
+    }
+
+    // Calculate totals from populatedCart to ensure fresh data
+    const subtotal = populatedCart.totalPrice || cart.totalPrice || 0;
+    const tax = subtotal * 0.08; // 8% tax
+    const deliveryFee = subtotal > 30 ? 0 : 3.99;
+    const total = subtotal + tax + deliveryFee;
+    
     // Create order from cart items with full nutrition data
+    if (!Array.isArray(populatedCart.items)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid cart items'
+      });
+    }
+
     const orderItems = await Promise.all(
       populatedCart.items.map(async (item) => {
         // Get full nutrition data from FastFoodItem if available
@@ -66,10 +84,14 @@ export const createOrder = async (req, res) => {
           }
         }
         
+        const foodItemId = item.foodItem && typeof item.foodItem === 'object'
+          ? item.foodItem._id
+          : item.foodItem;
+
         return {
-          foodItem: item.foodItem._id || item.foodItem,
-          restaurant: item.restaurant,
-          item: item.item,
+          foodItem: foodItemId,
+          restaurant: item.restaurant || '',
+          item: item.item || '',
           calories: fullNutrition.calories || item.calories || 0,
           totalFat: fullNutrition.totalFat || item.totalFat || null,
           saturatedFat: fullNutrition.saturatedFat || null,
@@ -234,12 +256,8 @@ export const getOrderById = async (req, res) => {
     const { orderId } = req.params;
     const userId = req.user.id;
 
-    const order = await Order.findOne({
-      _id: orderId,
-      userId
-    })
-      .populate('items.foodItem')
-      .lean();
+    // First check if order exists (regardless of ownership)
+    const order = await Order.findById(orderId).lean();
 
     if (!order) {
       return res.status(404).json({
@@ -248,10 +266,23 @@ export const getOrderById = async (req, res) => {
       });
     }
 
+    // Now check ownership
+    if (String(order.userId) !== String(userId)) {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have permission to access this order'
+      });
+    }
+
+    // Populate and return the order
+    const populatedOrder = await Order.findById(orderId)
+      .populate('items.foodItem')
+      .lean();
+
     res.status(200).json({
       success: true,
       data: {
-        order
+        order: populatedOrder
       }
     });
   } catch (error) {
@@ -294,7 +325,7 @@ export const getOrderInsights = async (req, res) => {
       data: {
         patterns,
         trends,
-        recommendations: recommendations.recommendations
+        recommendations
       }
     });
   } catch (error) {

@@ -38,7 +38,10 @@ export default function BugReportPage() {
 
     setIsSubmitting(true);
     try {
-      await submitBugReport(formData);
+      await submitBugReport({
+        ...formData,
+        severity: formData.severity as "low" | "medium" | "high" | "critical",
+      } as Parameters<typeof submitBugReport>[0]);
       toast.success("Bug report submitted successfully!");
       setFormData({
         title: "",
@@ -53,9 +56,10 @@ export default function BugReportPage() {
       setTimeout(() => {
         router.push("/");
       }, 2000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to submit bug report:", error);
-      toast.error(error.message || "Failed to submit bug report. Please try again.");
+      const err = error instanceof Error ? error : new Error(String(error));
+      toast.error(err.message || "Failed to submit bug report. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

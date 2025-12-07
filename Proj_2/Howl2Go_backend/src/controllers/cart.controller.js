@@ -1,5 +1,24 @@
+import mongoose from 'mongoose';
 import Cart from '../models/Cart.js';
 import FastFoodItem from '../models/FastFoodItem.js';
+
+// Helper to ensure session is marked and saved so cookies are sent to client
+const saveSession = (req) => new Promise((resolve) => {
+  try {
+    if (req && req.session) {
+      if (req.cart && req.cart._id) {
+        req.session.cartId = String(req.cart._id);
+      }
+      if (typeof req.session.save === 'function') {
+        req.session.save(() => resolve());
+        return;
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+  resolve();
+});
 
 /**
  * Get or create cart for current session
@@ -28,20 +47,46 @@ const getOrCreateCart = async (sessionId, userId = null) => {
  */
 export const getCart = async (req, res) => {
   try {
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const userId = req.user?.id || null;
 
     const cart = await getOrCreateCart(sessionId, userId);
+    // Ensure session persists (attach cart to req and save session cookie)
+    req.cart = cart;
+    await saveSession(req);
+
+    // Populate foodItem references
+    const populatedCart = await Cart.findById(cart._id).populate('items.foodItem');
+
+    // Normalize items for response: ensure foodItem is returned as full object when populated
+    const mapItem = (it) => ({
+      foodItem: it.foodItem && typeof it.foodItem === 'object' ? {
+        _id: String(it.foodItem._id),
+        company: it.foodItem.company,
+        item: it.foodItem.item,
+        calories: it.foodItem.calories,
+        price: it.foodItem.price
+      } : (it.foodItem ? String(it.foodItem) : it.foodItem),
+      restaurant: it.restaurant,
+      item: it.item,
+      calories: it.calories,
+      totalFat: it.totalFat,
+      protein: it.protein,
+      carbohydrates: it.carbohydrates,
+      price: it.price,
+      quantity: it.quantity
+    });
 
     res.status(200).json({
       success: true,
       data: {
         cart: {
-          id: cart._id,
-          items: cart.items,
-          totalItems: cart.totalItems,
-          totalPrice: cart.totalPrice,
-          userId: cart.userId
+          id: String(populatedCart._id),
+          items: populatedCart.items.map(mapItem),
+          totalItems: populatedCart.totalItems,
+          totalPrice: populatedCart.totalPrice,
+          totalCalories: populatedCart.totalCalories,
+          userId: populatedCart.userId ?? undefined
         }
       }
     });
@@ -61,12 +106,36 @@ export const getCart = async (req, res) => {
  */
 export const addItemToCart = async (req, res) => {
   try {
-    const { foodItemId, quantity = 1 } = req.body;
+    const { foodItemId, quantity } = req.body;
 
     if (!foodItemId) {
       return res.status(400).json({
         success: false,
         message: 'Food item ID is required'
+      });
+    }
+
+    // Validate ObjectId format first
+    if (!mongoose.Types.ObjectId.isValid(foodItemId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid food item ID'
+      });
+    }
+
+    // Require quantity to be explicitly provided for POST
+    if (quantity === undefined || quantity === null) {
+      return res.status(400).json({
+        success: false,
+        message: 'Quantity is required'
+      });
+    }
+
+    const parsedQty = parseInt(quantity, 10);
+    if (Number.isNaN(parsedQty) || parsedQty < 1) {
+      return res.status(400).json({
+        success: false,
+        message: 'Valid quantity is required'
       });
     }
 
@@ -80,10 +149,17 @@ export const addItemToCart = async (req, res) => {
       });
     }
 
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const userId = req.user?.id || null;
 
+    console.log('[CartController] addItemToCart called', { sessionId, userId, foodItemId, quantity });
+
     const cart = await getOrCreateCart(sessionId, userId);
+    // persist session
+    req.cart = cart;
+    await saveSession(req);
+
+    console.log('[CartController] got cart', { cartId: cart._id, itemsBefore: cart.items.length });
 
     // Calculate price based on calories if not provided
     const calculatePrice = (calories) => {
@@ -93,6 +169,7 @@ export const addItemToCart = async (req, res) => {
     };
 
     // Add item with all necessary data
+    // Use calorie-based price calculation when item has no explicit price
     await cart.addItem({
       foodItem: foodItem._id,
       restaurant: foodItem.company,
@@ -101,22 +178,48 @@ export const addItemToCart = async (req, res) => {
       totalFat: foodItem.totalFat || 0,
       protein: foodItem.protein || 0,
       carbohydrates: foodItem.carbs || 0,
-      price: foodItem.price || calculatePrice(foodItem.calories),
-      quantity: parseInt(quantity, 10)
+      price: (typeof foodItem.price === 'number' ? foodItem.price : calculatePrice(foodItem.calories)),
+      quantity: parsedQty
     });
 
+    const refreshed = await Cart.findById(cart._id).populate('items.foodItem');
+    console.log('[CartController] updated cart after addItem', { id: refreshed._id, totalItems: refreshed.totalItems, items: refreshed.items.length });
     // Reload cart with populated items
     const updatedCart = await Cart.findById(cart._id).populate('items.foodItem');
+
+    // Normalize items for response: ensure foodItem is returned as full object when populated
+    const mapItem = (it) => ({
+      foodItem: it.foodItem && typeof it.foodItem === 'object' ? {
+        _id: String(it.foodItem._id),
+        company: it.foodItem.company,
+        item: it.foodItem.item,
+        calories: it.foodItem.calories,
+        price: it.foodItem.price
+      } : (it.foodItem ? String(it.foodItem) : it.foodItem),
+      restaurant: it.restaurant,
+      item: it.item,
+      calories: it.calories,
+      totalFat: it.totalFat,
+      protein: it.protein,
+      carbohydrates: it.carbohydrates,
+      price: it.price,
+      quantity: it.quantity
+    });
+
+    // Also ensure any nested populated objects are converted to id strings inside save hooks or mapping
+    const normalizedItems = updatedCart.items.map(mapItem);
 
     res.status(200).json({
       success: true,
       message: 'Item added to cart',
       data: {
         cart: {
-          id: updatedCart._id,
-          items: updatedCart.items,
+          id: String(updatedCart._id),
+          items: normalizedItems,
           totalItems: updatedCart.totalItems,
-          totalPrice: updatedCart.totalPrice
+          totalPrice: updatedCart.totalPrice,
+          totalCalories: updatedCart.totalCalories,
+          userId: updatedCart.userId ?? undefined
         }
       }
     });
@@ -139,14 +242,15 @@ export const updateCartItemQuantity = async (req, res) => {
     const { foodItemId } = req.params;
     const { quantity } = req.body;
 
-    if (!quantity || quantity < 0) {
+    // Allow quantity === 0 so that tests can remove items by setting quantity to 0.
+    if (quantity === undefined || quantity === null || isNaN(quantity) || quantity < 0) {
       return res.status(400).json({
         success: false,
         message: 'Valid quantity is required'
       });
     }
 
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const cart = await Cart.findOne({ sessionId });
 
     if (!cart) {
@@ -155,11 +259,31 @@ export const updateCartItemQuantity = async (req, res) => {
         message: 'Cart not found'
       });
     }
-
+    // persist session
+    req.cart = cart;
+    await saveSession(req);
     await cart.updateItemQuantity(foodItemId, parseInt(quantity, 10));
 
     // Reload cart with populated items
     const updatedCart = await Cart.findById(cart._id).populate('items.foodItem');
+
+    const mapItem = (it) => ({
+      foodItem: it.foodItem && typeof it.foodItem === 'object' ? {
+        _id: String(it.foodItem._id),
+        company: it.foodItem.company,
+        item: it.foodItem.item,
+        calories: it.foodItem.calories,
+        price: it.foodItem.price
+      } : (it.foodItem ? String(it.foodItem) : it.foodItem),
+      restaurant: it.restaurant,
+      item: it.item,
+      calories: it.calories,
+      totalFat: it.totalFat,
+      protein: it.protein,
+      carbohydrates: it.carbohydrates,
+      price: it.price,
+      quantity: it.quantity
+    });
 
     res.status(200).json({
       success: true,
@@ -167,7 +291,7 @@ export const updateCartItemQuantity = async (req, res) => {
       data: {
         cart: {
           id: updatedCart._id,
-          items: updatedCart.items,
+          items: updatedCart.items.map(mapItem),
           totalItems: updatedCart.totalItems,
           totalPrice: updatedCart.totalPrice
         }
@@ -191,7 +315,7 @@ export const removeItemFromCart = async (req, res) => {
   try {
     const { foodItemId } = req.params;
 
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const cart = await Cart.findOne({ sessionId });
 
     if (!cart) {
@@ -200,11 +324,30 @@ export const removeItemFromCart = async (req, res) => {
         message: 'Cart not found'
       });
     }
-
+    req.cart = cart;
+    await saveSession(req);
     await cart.removeItem(foodItemId);
 
     // Reload cart with populated items
     const updatedCart = await Cart.findById(cart._id).populate('items.foodItem');
+
+    const mapItem = (it) => ({
+      foodItem: it.foodItem && typeof it.foodItem === 'object' ? {
+        _id: String(it.foodItem._id),
+        company: it.foodItem.company,
+        item: it.foodItem.item,
+        calories: it.foodItem.calories,
+        price: it.foodItem.price
+      } : (it.foodItem ? String(it.foodItem) : it.foodItem),
+      restaurant: it.restaurant,
+      item: it.item,
+      calories: it.calories,
+      totalFat: it.totalFat,
+      protein: it.protein,
+      carbohydrates: it.carbohydrates,
+      price: it.price,
+      quantity: it.quantity
+    });
 
     res.status(200).json({
       success: true,
@@ -212,7 +355,7 @@ export const removeItemFromCart = async (req, res) => {
       data: {
         cart: {
           id: updatedCart._id,
-          items: updatedCart.items,
+          items: updatedCart.items.map(mapItem),
           totalItems: updatedCart.totalItems,
           totalPrice: updatedCart.totalPrice
         }
@@ -234,7 +377,7 @@ export const removeItemFromCart = async (req, res) => {
  */
 export const clearCart = async (req, res) => {
   try {
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const cart = await Cart.findOne({ sessionId });
 
     if (!cart) {
@@ -243,7 +386,8 @@ export const clearCart = async (req, res) => {
         message: 'Cart not found'
       });
     }
-
+    req.cart = cart;
+    await saveSession(req);
     await cart.clearCart();
 
     res.status(200).json({
@@ -281,7 +425,7 @@ export const mergeCart = async (req, res) => {
       });
     }
 
-    const sessionId = req.session.id;
+    const sessionId = req.sessionID;
     const userId = req.user.id;
 
     // Get session cart (guest cart)
@@ -313,8 +457,30 @@ export const mergeCart = async (req, res) => {
       });
     }
 
+    // Persist session association
+    req.cart = sessionCart || userCart;
+    await saveSession(req);
+
     // Reload cart with populated items
     const finalCart = await Cart.findById(userCart._id).populate('items.foodItem');
+
+    const mapItem = (it) => ({
+      foodItem: it.foodItem && typeof it.foodItem === 'object' ? {
+        _id: String(it.foodItem._id),
+        company: it.foodItem.company,
+        item: it.foodItem.item,
+        calories: it.foodItem.calories,
+        price: it.foodItem.price
+      } : (it.foodItem ? String(it.foodItem) : it.foodItem),
+      restaurant: it.restaurant,
+      item: it.item,
+      calories: it.calories,
+      totalFat: it.totalFat,
+      protein: it.protein,
+      carbohydrates: it.carbohydrates,
+      price: it.price,
+      quantity: it.quantity
+    });
 
     res.status(200).json({
       success: true,
@@ -322,7 +488,7 @@ export const mergeCart = async (req, res) => {
       data: {
         cart: {
           id: finalCart._id,
-          items: finalCart.items,
+          items: finalCart.items.map(mapItem),
           totalItems: finalCart.totalItems,
           totalPrice: finalCart.totalPrice
         }

@@ -36,9 +36,11 @@ export default function LoadingSpinner({
             repeat: Infinity,
             ease: "linear",
           }}
+          className="animate-pulse"
         >
           <Loader2
             className={`${sizeClasses[size]} text-[var(--orange)]`}
+            data-testid="loading-icon"
           />
         </motion.div>
         {message && (

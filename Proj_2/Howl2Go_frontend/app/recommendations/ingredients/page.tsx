@@ -52,8 +52,9 @@ export default function IngredientRecommendationsPage() {
       const items = res.items || res.results || [];
       setData(items);
       if (typeof res.total === "number") setTotal(res.total);
-    } catch (e: any) {
-      setError(e?.message || "Failed to load recommendations");
+    } catch (e) {
+      const error = e as Error;
+      setError(error?.message || "Failed to load recommendations");
     } finally {
       setLoading(false);
     }
@@ -149,7 +150,7 @@ export default function IngredientRecommendationsPage() {
             </motion.div>
             <select
               value={sortMode}
-              onChange={e => setSortMode(e.target.value as any)}
+              onChange={e => setSortMode(e.target.value as 'matches' | 'calories' | 'price-asc' | 'price-desc')}
               className="bg-[var(--bg-card)] border border-[var(--border)] rounded px-2 py-1 text-xs text-[var(--text)] focus:border-[var(--orange)] focus:outline-none"
             >
               <option value="matches">Sort: Matches</option>
@@ -172,25 +173,22 @@ export default function IngredientRecommendationsPage() {
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {data
           .slice() // shallow copy for client sorting
-          .sort((a,b) => {
+          .sort((a: FoodItem, b: FoodItem) => {
             if (sortMode === 'calories') {
               return (a.calories || 0) - (b.calories || 0);
             } else if (sortMode === 'price-asc') {
-              return ((a as any).price || 0) - ((b as any).price || 0);
+              return ((a as unknown as {price: number}).price || 0) - ((b as unknown as {price: number}).price || 0);
             } else if (sortMode === 'price-desc') {
-              return ((b as any).price || 0) - ((a as any).price || 0);
+              return ((b as unknown as {price: number}).price || 0) - ((a as unknown as {price: number}).price || 0);
             }
-            return ((b as any).matchScore || 0) - ((a as any).matchScore || 0);
+            return ((b as unknown as {matchScore: number}).matchScore || 0) - ((a as unknown as {matchScore: number}).matchScore || 0);
           })
-          .map(food => {
-          const key = (food as any)._id || `${food.restaurant || (food as any).company}-${food.item}`;
+          .map((food: FoodItem) => {
+          const key = food._id || `${food.restaurant || (food as unknown as {company: string}).company}-${food.item}`;
           return (
             <div key={key} className="space-y-2">
               <ItemCard
-                restaurant={food.restaurant || (food as any).company || "Unknown"}
-                item={food.item}
-                calories={food.calories || 0}
-                price={(food as any).price}
+                price={(food as unknown as {price: number}).price}
                 {...food}
               />
               {/* Matched ingredients chips */}
