@@ -35,13 +35,13 @@ const getRestaurantLogo = (restaurant?: string): string => {
   const normalized = restaurant.trim().toLowerCase();
 
   // Direct mappings with multiple variants
-  // if (normalized.includes("mcdonald")) return "/mcdonalds-5.svg";
-  // if (normalized.includes("burger king")) return "/burger-king-4.svg";
-  // if (normalized.includes("wendy")) return "/wendys-logo-1.svg";
-  // if (normalized.includes("kfc") || normalized.includes("kentucky"))
-  //   return "/kfc-4.svg";
-  // if (normalized.includes("taco bell") || normalized.includes("tacobell"))
-  //   return "/taco-bell-1.svg";
+  if (normalized.includes("mcdonald")) return "/mcdonalds-5.svg";
+  if (normalized.includes("burger king")) return "/burger-king-4.svg";
+  if (normalized.includes("wendy")) return "/wendys-logo-1.svg";
+  if (normalized.includes("kfc") || normalized.includes("kentucky"))
+    return "/kfc-4.svg";
+  if (normalized.includes("taco bell") || normalized.includes("tacobell"))
+    return "/taco-bell-1.svg";
 
   // Fallback to generic fast food icon
   return "/fast-food-svgrepo-com.svg";

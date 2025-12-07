@@ -488,7 +488,7 @@ describe('Dashboard Page', () => {
 
       const { container } = render(<Dashboard />)
       const loadingText = screen.getByText('Loading...')
-      expect(loadingText).toHaveClass('text-\\[var\\(--text\\)\\]')
+      expect(loadingText).toHaveClass('text-[var(--text)]')
     })
 
     it('has proper text color for login prompt', () => {
@@ -499,7 +499,7 @@ describe('Dashboard Page', () => {
 
       const { container } = render(<Dashboard />)
       const promptText = screen.getByText('Please log in to view dashboard')
-      expect(promptText).toHaveClass('text-\\[var\\(--text\\)\\]')
+      expect(promptText).toHaveClass('text-[var(--text)]')
     })
 
     it('maintains readable text size', () => {

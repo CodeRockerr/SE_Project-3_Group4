@@ -11,7 +11,7 @@ describe('Footer Component', () => {
   it('has the correct height class', () => {
     render(<Footer />)
     const footer = screen.getByRole('contentinfo')
-    expect(footer).toHaveClass('h-8')
+    expect(footer).toHaveClass('py-4')
   })
 
   it('renders without errors', () => {

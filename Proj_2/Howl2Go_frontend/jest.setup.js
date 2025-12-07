@@ -68,9 +68,21 @@ jest.mock('lucide-react', () => ({
   ChevronLeft: () => <span data-testid="chevron-left-icon">ChevronLeft Icon</span>,
   ChevronRight: () => <span data-testid="chevron-right-icon">ChevronRight Icon</span>,
   ArrowLeft: () => <span data-testid="arrow-left-icon">ArrowLeft Icon</span>,
+  ArrowRight: () => <span data-testid="arrow-right-icon">ArrowRight Icon</span>,
   Loader2: () => <span data-testid="loader-icon">Loader Icon</span>,
   Star: () => <span data-testid="star-icon">Star Icon</span>,
   Heart: () => <span data-testid="heart-icon">Heart Icon</span>,
+  ShoppingCart: () => <span data-testid="shopping-cart-icon">ShoppingCart Icon</span>,
+  User: () => <span data-testid="user-icon">User Icon</span>,
+  LogOut: () => <span data-testid="logout-icon">LogOut Icon</span>,
+  Bug: () => <span data-testid="bug-icon">Bug Icon</span>,
+  UtensilsCrossed: () => <span data-testid="utensils-crossed-icon">UtensilsCrossed Icon</span>,
+  Calendar: () => <span data-testid="calendar-icon">Calendar Icon</span>,
+  Clock: () => <span data-testid="clock-icon">Clock Icon</span>,
+  MapPin: () => <span data-testid="map-pin-icon">MapPin Icon</span>,
+  Phone: () => <span data-testid="phone-icon">Phone Icon</span>,
+  Mail: () => <span data-testid="mail-icon">Mail Icon</span>,
+  X: () => <span data-testid="x-icon">X Icon</span>,
 }))
 
 // Mock useRouter
@@ -190,3 +202,29 @@ try {
 } catch (e) {
   // ignore if jsdom doesn't allow reconfiguring location
 }
+
+// Mock useAuth globally for all tests that need it
+jest.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({
+    user: null,
+    isAuthenticated: false,
+    logout: jest.fn(),
+  }),
+  AuthContext: require('react').createContext(null),
+  AuthProvider: ({ children }) => children,
+}))
+
+// Mock useCart globally for all tests that need it
+jest.mock('@/context/CartContext', () => ({
+  useCart: () => ({
+    items: [],
+    addToCart: jest.fn(),
+    removeFromCart: jest.fn(),
+    updateQuantity: jest.fn(),
+    clearCart: jest.fn(),
+    summary: { count: 0, total: 0, totalItems: 0, subtotal: 0, tax: 0, deliveryFee: 0 },
+    isLoading: false,
+  }),
+  CartContext: require('react').createContext(null),
+  CartProvider: ({ children }) => children,
+}))

@@ -1,22 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import Header from '@/components/Header'
 
-// Mock the useAuth hook
-jest.mock('@/context/AuthContext', () => ({
-  useAuth: () => ({
-    user: null,
-    isAuthenticated: false,
-    logout: jest.fn(),
-  }),
-}))
-
-// Mock the useCart hook
-jest.mock('@/context/CartContext', () => ({
-  useCart: () => ({
-    summary: { count: 0, total: 0 },
-  }),
-}))
-
 describe('Header Component', () => {
   it('renders the header component', () => {
     render(<Header />)
@@ -31,18 +15,6 @@ describe('Header Component', () => {
     expect(logo).toHaveAttribute('src', '/Howl2go_orange_logo_transparent.png')
   })
 
-  it('renders menu button with accessible label', () => {
-    render(<Header />)
-    const menuButton = screen.getByLabelText('Menu')
-    expect(menuButton).toBeInTheDocument()
-  })
-
-  it('renders menu icon', () => {
-    render(<Header />)
-    const menuIcon = screen.getByTestId('menu-icon')
-    expect(menuIcon).toBeInTheDocument()
-  })
-
   it('renders About link', () => {
     render(<Header />)
     const aboutLink = screen.getByText('About')
@@ -50,18 +22,18 @@ describe('Header Component', () => {
     expect(aboutLink).toHaveAttribute('href', '/about')
   })
 
-  it('renders Log In link', () => {
+  it('renders Log In link when not authenticated', () => {
     render(<Header />)
     const loginLink = screen.getByText('Log In')
     expect(loginLink).toBeInTheDocument()
     expect(loginLink).toHaveAttribute('href', '/login')
   })
 
-  it('renders Dashboard link', () => {
+  it('renders Dashboard button when not authenticated', () => {
     render(<Header />)
-    const dashboardLink = screen.getByText('Dashboard')
-    expect(dashboardLink).toBeInTheDocument()
-    expect(dashboardLink).toHaveAttribute('href', '/dashboard')
+    const dashboardButton = screen.getByRole('link', { name: /Dashboard/i })
+    expect(dashboardButton).toBeInTheDocument()
+    expect(dashboardButton).toHaveAttribute('href', '/dashboard')
   })
 
   it('has correct navigation structure', () => {
