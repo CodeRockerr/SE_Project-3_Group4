@@ -2,7 +2,12 @@ import Stripe from "stripe";
 import env from "../config/env.js";
 import * as paymentService from "../services/paymentService.js";
 
-const stripe = new Stripe(env.stripe.secretKey || 'sk_test_dummy_key_for_testing');
+// Initialize Stripe - will be null if key is not set
+const stripe = env.stripe.secretKey 
+  ? new Stripe(env.stripe.secretKey, {
+      apiVersion: '2024-12-18.acacia',
+    })
+  : null;
 
 /**
  * Create payment intent for an order
@@ -210,6 +215,11 @@ export const getOrderPayments = async (req, res) => {
  */
 export const handleWebhook = async (req, res) => {
   try {
+    if (!stripe) {
+      console.error("Stripe is not configured. Webhook cannot be processed.");
+      return res.status(500).send("Payment processing is not configured");
+    }
+
     const sig = req.headers["stripe-signature"];
     const webhookSecret = env.stripe.webhookSecret;
 

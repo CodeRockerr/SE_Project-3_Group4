@@ -4,8 +4,18 @@ import Order from "../models/Order.js";
 import User from "../models/User.js";
 import env from "../config/env.js";
 
-// Initialize Stripe with API key (use test key if not provided)
-const stripe = new Stripe(env.stripe.secretKey || 'sk_test_dummy_key_for_testing');
+// Initialize Stripe with API key - validate it's set
+if (!env.stripe.secretKey) {
+  console.warn("⚠️  WARNING: STRIPE_SECRET_KEY is not set. Payment functionality will not work.");
+  console.warn("   Please set STRIPE_SECRET_KEY in your .env file");
+  console.warn("   Get your keys from: https://dashboard.stripe.com/apikeys");
+}
+
+const stripe = env.stripe.secretKey 
+  ? new Stripe(env.stripe.secretKey, {
+      apiVersion: '2024-12-18.acacia',
+    })
+  : null;
 
 /**
  * Create or retrieve a Stripe customer for a user and persist on user record
@@ -14,6 +24,10 @@ const stripe = new Stripe(env.stripe.secretKey || 'sk_test_dummy_key_for_testing
  * @returns {Promise<string>} stripeCustomerId
  */
 export const ensureStripeCustomerForUser = async (userId, metadata = {}) => {
+  if (!stripe) {
+    throw new Error("Stripe is not configured. Please set STRIPE_SECRET_KEY in environment variables.");
+  }
+
   const user = await User.findById(userId);
   if (!user) throw new Error("User not found");
 
@@ -48,6 +62,11 @@ export const ensureStripeCustomerForUser = async (userId, metadata = {}) => {
  * @returns {Promise<Array>} array of payment methods
  */
 export const getSavedPaymentMethodsForUser = async (userId) => {
+  if (!stripe) {
+    console.warn("Stripe is not configured. Returning empty payment methods.");
+    return [];
+  }
+
   const user = await User.findById(userId);
   if (!user || !user.stripeCustomerId) return [];
 
@@ -67,6 +86,10 @@ export const getSavedPaymentMethodsForUser = async (userId) => {
  */
 export const createPaymentIntent = async (orderId, userId) => {
   try {
+    if (!stripe) {
+      throw new Error("Payment processing is not available. Stripe is not configured. Please set STRIPE_SECRET_KEY in environment variables.");
+    }
+
     // Fetch order details
     const order = await Order.findById(orderId);
 
@@ -151,6 +174,10 @@ export const createPaymentIntent = async (orderId, userId) => {
  */
 export const confirmPayment = async (paymentIntentId) => {
   try {
+    if (!stripe) {
+      throw new Error("Payment processing is not available. Stripe is not configured.");
+    }
+
     // Retrieve payment intent from Stripe
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
@@ -281,6 +308,10 @@ export const getPaymentsByUserId = async (userId, options = {}) => {
  */
 export const refundPayment = async (paymentId, reason = "") => {
   try {
+    if (!stripe) {
+      throw new Error("Payment processing is not available. Stripe is not configured.");
+    }
+
     const payment = await Payment.findById(paymentId);
 
     if (!payment) {
