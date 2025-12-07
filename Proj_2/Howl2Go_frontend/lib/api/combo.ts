@@ -8,7 +8,7 @@ export interface ComboSuggestion {
     price?: number;
     calories?: number;
     protein?: number;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   reason?: string;
   frequency?: number;
@@ -19,7 +19,7 @@ export interface ComboSuggestion {
 export async function getComboSuggestions(
   mainItemId: string,
   limit: number = 5,
-  options?: { nutritional_focus?: string; preferences?: Record<string, any> }
+  options?: { nutritional_focus?: string; preferences?: Record<string, unknown> }
 ) {
   const qs = new URLSearchParams();
   qs.set("mainItemId", mainItemId);

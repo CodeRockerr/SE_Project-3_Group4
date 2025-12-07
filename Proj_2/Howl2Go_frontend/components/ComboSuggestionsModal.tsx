@@ -35,7 +35,7 @@ type Props = {
   ) => Promise<void>;
   onApply?: (opts: {
     nutritional_focus?: string;
-    preferences?: Record<string, any>;
+    preferences?: Record<string, unknown>;
   }) => Promise<ComboSuggestion[]>;
   onClose: () => void;
 };
@@ -47,7 +47,14 @@ export default function ComboSuggestionsModal({
   onApply,
   onClose,
 }: Props) {
-  if (!suggestions || suggestions.length === 0) return null;
+  const [nutritionalFocus, setNutritionalFocus] =
+    React.useState<string>("balanced");
+  const [preferences, setPreferences] = React.useState({
+    vegetarian: false,
+    low_sugar: false,
+    low_sodium: false,
+  });
+  const [isApplying, setIsApplying] = React.useState(false);
 
   // DEBUG: Log suggestions to see what the backend returned
   React.useEffect(() => {
@@ -61,14 +68,7 @@ export default function ComboSuggestionsModal({
     });
   }, [suggestions]);
 
-  const [nutritionalFocus, setNutritionalFocus] =
-    React.useState<string>("balanced");
-  const [preferences, setPreferences] = React.useState({
-    vegetarian: false,
-    low_sugar: false,
-    low_sodium: false,
-  });
-  const [isApplying, setIsApplying] = React.useState(false);
+  if (!suggestions || suggestions.length === 0) return null;
 
   const handleApply = async () => {
     if (!onApply) return;
