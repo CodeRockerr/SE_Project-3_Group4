@@ -8,10 +8,17 @@ import CheckoutForm from "./CheckoutForm";
 import { createPaymentIntent, confirmPayment } from "@/lib/api/payment";
 import toast from "react-hot-toast";
 
-// Initialize Stripe
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || ""
-);
+// Initialize Stripe - validate key is set
+const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+
+if (!stripePublishableKey) {
+  console.warn("⚠️  WARNING: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not set.");
+  console.warn("   Payment functionality will not work.");
+  console.warn("   Please set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in your .env.local file");
+  console.warn("   Get your keys from: https://dashboard.stripe.com/apikeys");
+}
+
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 interface PaymentModalProps {
   orderId: string;
@@ -35,6 +42,18 @@ export default function PaymentModal({
   const [isInitializing, setIsInitializing] = useState(false);
 
   useEffect(() => {
+    // Check if Stripe is configured
+    if (!stripePublishableKey) {
+      const errorMsg = "Payment processing is not configured. Please contact support.";
+      setError(errorMsg);
+      setIsLoading(false);
+      toast.error(errorMsg);
+      if (onError) {
+        onError(errorMsg);
+      }
+      return;
+    }
+
     // Prevent duplicate calls (React Strict Mode in dev)
     if (isInitializing) return;
 
@@ -172,7 +191,7 @@ export default function PaymentModal({
               Close
             </button>
           </div>
-        ) : clientSecret && paymentIntentId ? (
+        ) : clientSecret && paymentIntentId && stripePromise ? (
           <Elements
             key={`elements-${clientSecret}`}
             stripe={stripePromise}

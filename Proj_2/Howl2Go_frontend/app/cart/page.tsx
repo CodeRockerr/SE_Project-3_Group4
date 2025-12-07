@@ -8,6 +8,7 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { createOrder } from "@/lib/api/order";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import PaymentModal from "@/components/PaymentModal";
 import toast from "react-hot-toast";
 
 export default function CartPage() {
@@ -19,6 +20,10 @@ export default function CartPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderSummary, setOrderSummary] = useState({ total: 0, totalItems: 0 });
+  
+  // Payment modal state
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
 
   // Increase quantity
   const increaseQuantity = async (id: string) => {
@@ -49,7 +54,7 @@ export default function CartPage() {
   // Destructure summary
   const { totalItems, subtotal, tax, deliveryFee, total } = summary;
 
-  // Place Order handler
+  // Place Order handler - Creates order and shows payment modal
   const handlePlaceOrder = async () => {
     // Check if user is authenticated
     if (!isAuthenticated) {
@@ -67,35 +72,31 @@ export default function CartPage() {
     setIsProcessing(true);
 
     try {
-      // Create order in MongoDB
+      // Create order in MongoDB (order will be pending until payment)
       const order = await createOrder();
 
-      // Save order summary before clearing cart
+      // Save order summary for payment
       setOrderSummary({
         total: total,
         totalItems: totalItems,
       });
 
-      // Clear the cart after successful order
-      await clearCart();
+      // Store order ID for payment
+      setCurrentOrderId(order._id);
 
-      console.log("Order placed successfully!", order);
-      toast.success("Order placed successfully!");
-
+      console.log("Order created successfully! Opening payment modal...", order);
+      
       setIsProcessing(false);
-      setOrderPlaced(true);
 
-      // Redirect to order history after 3 seconds
-      setTimeout(() => {
-        router.push("/orders");
-      }, 3000);
+      // Show payment modal instead of redirecting
+      setShowPaymentModal(true);
     } catch (error: unknown) {
-      console.error("Failed to place order:", error);
+      console.error("Failed to create order:", error);
       setIsProcessing(false);
       
       // Show user-friendly error message
       const err = error instanceof Error ? error : new Error(String(error));
-      const errorMessage = err.message || "Failed to place order. Please try again.";
+      const errorMessage = err.message || "Failed to create order. Please try again.";
       toast.error(errorMessage);
       
       // If authentication error, redirect to login
@@ -105,6 +106,39 @@ export default function CartPage() {
         }, 2000);
       }
     }
+  };
+
+  // Handle successful payment
+  const handlePaymentSuccess = async () => {
+    // Clear the cart after successful payment
+    await clearCart();
+    
+    // Close payment modal
+    setShowPaymentModal(false);
+    
+    // Show success message
+    toast.success("Payment successful! Order confirmed.");
+    
+    // Set order placed state
+    setOrderPlaced(true);
+    
+    // Redirect to order history after 2 seconds
+    setTimeout(() => {
+      router.push("/orders");
+    }, 2000);
+  };
+
+  // Handle payment error
+  const handlePaymentError = (error: string) => {
+    toast.error(error || "Payment failed. Please try again.");
+    // Payment modal will stay open so user can retry
+  };
+
+  // Handle payment modal close
+  const handlePaymentModalClose = () => {
+    setShowPaymentModal(false);
+    setCurrentOrderId(null);
+    // Optionally: Cancel the pending order or keep it for retry
   };
 
   // Success Animation State
@@ -546,7 +580,7 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                {/* Place Order Button */}
+                {/* Proceed to Payment Button */}
                 <button
                   onClick={handlePlaceOrder}
                   disabled={isProcessing || isAuthLoading || !isAuthenticated || cartItems.length === 0}
@@ -559,12 +593,12 @@ export default function CartPage() {
                   {isProcessing ? (
                     <span className="flex items-center justify-center gap-2">
                       <Loader2 className="w-5 h-5 animate-spin text-[var(--text)]" />
-                      Processing your order...
+                      Processing...
                     </span>
                   ) : !isAuthenticated ? (
-                    "Log In to Place Order"
+                    "Log In to Checkout"
                   ) : (
-                    "Place Order"
+                    `Proceed to Payment - $${total.toFixed(2)}`
                   )}
                 </button>
 
@@ -597,6 +631,17 @@ export default function CartPage() {
           </div>
         )}
       </div>
+
+      {/* Payment Modal */}
+      {showPaymentModal && currentOrderId && (
+        <PaymentModal
+          orderId={currentOrderId}
+          amount={Math.round(total * 100)} // Convert to cents for Stripe
+          onClose={handlePaymentModalClose}
+          onSuccess={handlePaymentSuccess}
+          onError={handlePaymentError}
+        />
+      )}
     </div>
   );
 }
