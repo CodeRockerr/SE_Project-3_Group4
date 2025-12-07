@@ -2,7 +2,7 @@ import Stripe from "stripe";
 import env from "../config/env.js";
 import * as paymentService from "../services/paymentService.js";
 
-const stripe = new Stripe(env.stripe.secretKey);
+const stripe = new Stripe(env.stripe.secretKey || 'sk_test_dummy_key_for_testing');
 
 /**
  * Create payment intent for an order

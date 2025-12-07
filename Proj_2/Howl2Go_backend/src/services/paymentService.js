@@ -4,8 +4,8 @@ import Order from "../models/Order.js";
 import User from "../models/User.js";
 import env from "../config/env.js";
 
-// Initialize Stripe with API key
-const stripe = new Stripe(env.stripe.secretKey);
+// Initialize Stripe with API key (use test key if not provided)
+const stripe = new Stripe(env.stripe.secretKey || 'sk_test_dummy_key_for_testing');
 
 /**
  * Create or retrieve a Stripe customer for a user and persist on user record
