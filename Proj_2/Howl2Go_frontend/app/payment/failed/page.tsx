@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { XCircle, AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
+import { XCircle, AlertCircle, ArrowLeft, RefreshCw, Loader2 } from "lucide-react";
 import Link from "next/link";
 
-export default function PaymentFailedPage() {
+function PaymentFailedContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
@@ -163,5 +163,25 @@ export default function PaymentFailedPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentFailedPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          className="min-h-screen flex items-center justify-center"
+          style={{ backgroundColor: "var(--bg)" }}
+        >
+          <Loader2
+            className="w-12 h-12 animate-spin"
+            style={{ color: "var(--orange)" }}
+          />
+        </div>
+      }
+    >
+      <PaymentFailedContent />
+    </Suspense>
   );
 }
