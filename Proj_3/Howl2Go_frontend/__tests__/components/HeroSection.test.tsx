@@ -1,5 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import HeroSection from '@/components/HeroSection'
+import { LanguageProvider } from '@/context/LanguageContext'
+
+const renderWithLanguage = (ui: React.ReactElement) => render(ui, { wrapper: LanguageProvider })
 
 // Mock child components
 jest.mock('@/components/AnimatedHeadline', () => {
@@ -54,23 +57,23 @@ describe('HeroSection Component', () => {
 
   describe('Initial State', () => {
     it('renders the hero section', () => {
-      render(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
+      renderWithLanguage(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
       expect(screen.getByTestId('animated-headline')).toBeInTheDocument()
       expect(screen.getByTestId('search-bar')).toBeInTheDocument()
     })
 
     it('starts in demo mode', () => {
-      render(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
+      renderWithLanguage(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
       expect(screen.getByTestId('mode')).toHaveTextContent('Demo')
     })
 
     it('starts with search not focused', () => {
-      render(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
+      renderWithLanguage(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
       expect(screen.getByTestId('focus-state')).toHaveTextContent('Blurred')
     })
 
     it('starts with empty input value', () => {
-      render(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
+      renderWithLanguage(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
       const input = screen.getByTestId('search-input') as HTMLInputElement
       expect(input.value).toBe('')
     })
@@ -78,7 +81,7 @@ describe('HeroSection Component', () => {
 
   describe('Mode Switching', () => {
     it('switches to live mode when search is focused', () => {
-      render(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
+      renderWithLanguage(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
       const input = screen.getByTestId('search-input')
 
       fireEvent.focus(input)
@@ -88,7 +91,7 @@ describe('HeroSection Component', () => {
     })
 
     it('returns to demo mode when input is blurred and empty', () => {
-      render(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
+      renderWithLanguage(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
       const input = screen.getByTestId('search-input')
 
       fireEvent.focus(input)
@@ -98,7 +101,7 @@ describe('HeroSection Component', () => {
     })
 
     it('calls onSearchFocusChange when focus state changes', () => {
-      render(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
+      renderWithLanguage(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
       const input = screen.getByTestId('search-input')
 
       fireEvent.focus(input)
@@ -111,13 +114,13 @@ describe('HeroSection Component', () => {
 
   describe('Component Structure', () => {
     it('renders within a section element', () => {
-      const { container } = render(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
+      const { container } = renderWithLanguage(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
       const section = container.querySelector('section')
       expect(section).toBeInTheDocument()
     })
 
     it('renders all main child components', () => {
-      render(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
+      renderWithLanguage(<HeroSection onSearchFocusChange={mockOnSearchFocusChange} />)
       expect(screen.getByTestId('animated-headline')).toBeInTheDocument()
       expect(screen.getByTestId('search-bar')).toBeInTheDocument()
     })

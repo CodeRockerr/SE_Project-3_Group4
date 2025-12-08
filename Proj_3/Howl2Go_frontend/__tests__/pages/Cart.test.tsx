@@ -26,6 +26,10 @@ jest.mock('lucide-react', () => ({
 
 import { render, screen } from '@testing-library/react'
 import CartPage from '../../app/cart/page'
+import { LanguageProvider } from '@/context/LanguageContext'
+
+const renderWithLanguage = (ui: React.ReactElement) =>
+  render(<LanguageProvider>{ui}</LanguageProvider>)
 
 describe('CartPage Component', () => {
   beforeEach(() => {
@@ -40,56 +44,56 @@ describe('CartPage Component', () => {
 
   describe('Basic Rendering', () => {
     it('renders the cart page without errors', () => {
-      render(<CartPage />)
+      renderWithLanguage(<CartPage />)
       expect(screen.getByText('Shopping Cart')).toBeInTheDocument()
     })
 
     it('displays empty cart message when cart is empty', () => {
-      render(<CartPage />)
+      renderWithLanguage(<CartPage />)
       expect(screen.getByText('Your cart is empty')).toBeInTheDocument()
     })
 
     it('shows Browse Menu link when cart is empty', () => {
-      render(<CartPage />)
+      renderWithLanguage(<CartPage />)
       expect(screen.getByText('Browse Menu')).toBeInTheDocument()
     })
 
     it('renders back arrow link to home page', () => {
-      render(<CartPage />)
+      renderWithLanguage(<CartPage />)
       const backLinks = screen.getAllByRole('link')
       expect(backLinks.length).toBeGreaterThan(0)
     })
 
     it('displays shopping bag icon in header', () => {
-      const { container } = render(<CartPage />)
+      const { container } = renderWithLanguage(<CartPage />)
       const icons = container.querySelectorAll('svg')
       expect(icons.length).toBeGreaterThan(0)
     })
 
     it('renders the main container with correct structure', () => {
-      const { container } = render(<CartPage />)
+      const { container } = renderWithLanguage(<CartPage />)
       expect(container).toBeInTheDocument()
     })
 
     it('displays the page title', () => {
-      render(<CartPage />)
+      renderWithLanguage(<CartPage />)
       const heading = screen.getByText('Shopping Cart')
       expect(heading).toBeInTheDocument()
     })
 
     it('renders browse menu link as navigation', () => {
-      render(<CartPage />)
+      renderWithLanguage(<CartPage />)
       const browseLink = screen.getByText('Browse Menu')
       expect(browseLink).toBeInTheDocument()
     })
 
     it('shows empty state message correctly', () => {
-      render(<CartPage />)
+      renderWithLanguage(<CartPage />)
       expect(screen.getByText('Add some delicious items to get started!')).toBeInTheDocument()
     })
 
     it('renders without crashing when cart is empty', () => {
-      const { container } = render(<CartPage />)
+      const { container } = renderWithLanguage(<CartPage />)
       expect(container.firstChild).toBeInTheDocument()
     })
   })

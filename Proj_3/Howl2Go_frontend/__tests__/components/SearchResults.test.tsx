@@ -2,6 +2,10 @@ import { render, screen } from '@testing-library/react'
 import SearchResults from '@/components/SearchResults'
 import type { FoodItem } from '@/types/food'
 
+import { LanguageProvider } from "@/context/LanguageContext"
+
+const renderWithLanguage = (ui: React.ReactElement) => render(<LanguageProvider>{ui}</LanguageProvider>)
+
 // Mock ItemCard component
 jest.mock('@/components/ItemCard', () => {
   return function MockItemCard({ restaurant, item, calories, index }: any) {
@@ -51,7 +55,7 @@ describe('SearchResults Component', () => {
 
   describe('Demo Mode', () => {
     it('shows demo cards when in demo mode and showDemoCards is true', () => {
-      render(
+      renderWithLanguage(
         <SearchResults
           isDemoMode={true}
           isSearchFocused={false}
@@ -68,7 +72,7 @@ describe('SearchResults Component', () => {
     })
 
     it('does not show demo cards when showDemoCards is false', () => {
-      render(
+      renderWithLanguage(
         <SearchResults
           isDemoMode={true}
           isSearchFocused={false}
@@ -82,7 +86,7 @@ describe('SearchResults Component', () => {
     })
 
     it('renders exactly 3 demo cards', () => {
-      render(
+      renderWithLanguage(
         <SearchResults
           isDemoMode={true}
           isSearchFocused={false}
@@ -97,7 +101,7 @@ describe('SearchResults Component', () => {
     })
 
     it('demo cards are in a grid layout', () => {
-      const { container } = render(
+      const { container } = renderWithLanguage(
         <SearchResults
           isDemoMode={true}
           isSearchFocused={false}
@@ -120,7 +124,7 @@ describe('SearchResults Component', () => {
     ]
 
     it('shows recommendations when not in demo mode and showLiveResults is true', () => {
-      render(
+      renderWithLanguage(
         <SearchResults
           isDemoMode={false}
           isSearchFocused={true}
@@ -137,7 +141,7 @@ describe('SearchResults Component', () => {
     })
 
     it('renders all recommendation suggestions', () => {
-      render(
+      renderWithLanguage(
         <SearchResults
           isDemoMode={false}
           isSearchFocused={true}
@@ -152,7 +156,7 @@ describe('SearchResults Component', () => {
     })
 
     it('recommendations are in a list layout', () => {
-      const { container } = render(
+      const { container } = renderWithLanguage(
         <SearchResults
           isDemoMode={false}
           isSearchFocused={true}
@@ -167,7 +171,7 @@ describe('SearchResults Component', () => {
     })
 
     it('handles empty recommendations array', () => {
-      render(
+      renderWithLanguage(
         <SearchResults
           isDemoMode={false}
           isSearchFocused={true}
@@ -185,7 +189,7 @@ describe('SearchResults Component', () => {
 
   describe('No Results State', () => {
     it('shows nothing when neither demo nor live results should show', () => {
-      const { container } = render(
+      const { container } = renderWithLanguage(
         <SearchResults
           isDemoMode={false}
           isSearchFocused={false}
@@ -202,7 +206,7 @@ describe('SearchResults Component', () => {
 
   describe('Focus State Interaction', () => {
     it('applies blur effect to demo cards when search is focused', () => {
-      render(
+      renderWithLanguage(
         <SearchResults
           isDemoMode={true}
           isSearchFocused={true}
@@ -217,7 +221,7 @@ describe('SearchResults Component', () => {
     })
 
     it('renders demo cards without blur when not focused', () => {
-      render(
+      renderWithLanguage(
         <SearchResults
           isDemoMode={true}
           isSearchFocused={false}

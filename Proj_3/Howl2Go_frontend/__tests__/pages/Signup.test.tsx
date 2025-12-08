@@ -1,6 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Signup from '@/app/signup/page'
+import { LanguageProvider } from '@/context/LanguageContext'
+
+const renderWithLanguage = (ui: React.ReactElement) => render(ui, { wrapper: LanguageProvider })
 
 // Mock next/link
 jest.mock('next/link', () => {
@@ -20,80 +23,80 @@ describe('Signup Page', () => {
 
   describe('Rendering', () => {
     it('renders the signup page', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       expect(screen.getByRole('heading', { name: 'Sign Up' })).toBeInTheDocument()
     })
 
     it('renders all form fields', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       expect(screen.getByPlaceholderText('Full Name')).toBeInTheDocument()
       expect(screen.getByPlaceholderText('Email')).toBeInTheDocument()
       expect(screen.getByPlaceholderText(/Password/)).toBeInTheDocument()
     })
 
     it('renders the signup button', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       expect(screen.getByRole('button', { name: /Sign Up/i })).toBeInTheDocument()
     })
 
     it('renders link to login page', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const loginLink = screen.getByText('Log In')
       expect(loginLink).toBeInTheDocument()
       expect(loginLink.closest('a')).toHaveAttribute('href', '/login')
     })
 
     it('displays "Already have an account?" text', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       expect(screen.getByText(/Already have an account?/)).toBeInTheDocument()
     })
   })
 
   describe('Form Input Validation', () => {
     it('requires name field to be filled', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const nameInput = screen.getByPlaceholderText('Full Name')
       expect(nameInput).toHaveAttribute('required')
     })
 
     it('requires email field to be filled', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const emailInput = screen.getByPlaceholderText('Email')
       expect(emailInput).toHaveAttribute('required')
     })
 
     it('requires password field to be filled', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const passwordInput = screen.getByPlaceholderText(/Password/)
       expect(passwordInput).toHaveAttribute('required')
     })
 
     it('enforces minimum name length of 2 characters', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const nameInput = screen.getByPlaceholderText('Full Name')
       expect(nameInput).toHaveAttribute('minLength', '2')
     })
 
     it('enforces maximum name length of 100 characters', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const nameInput = screen.getByPlaceholderText('Full Name')
       expect(nameInput).toHaveAttribute('maxLength', '100')
     })
 
     it('enforces minimum password length of 8 characters', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const passwordInput = screen.getByPlaceholderText(/Password/)
       expect(passwordInput).toHaveAttribute('minLength', '8')
     })
 
     it('has email input type for email field', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const emailInput = screen.getByPlaceholderText('Email')
       expect(emailInput).toHaveAttribute('type', 'email')
     })
 
     it('has password input type for password field', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const passwordInput = screen.getByPlaceholderText(/Password/)
       expect(passwordInput).toHaveAttribute('type', 'password')
     })
@@ -101,7 +104,7 @@ describe('Signup Page', () => {
 
   describe('Form Submission', () => {
     it('prevents submission with password less than 8 characters', async () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name')
       const emailInput = screen.getByPlaceholderText('Email')
@@ -125,7 +128,7 @@ describe('Signup Page', () => {
         json: async () => ({ success: true, user: { name: 'John Doe', email: 'john@example.com' } }),
       })
 
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name')
       const emailInput = screen.getByPlaceholderText('Email')
@@ -157,7 +160,7 @@ describe('Signup Page', () => {
         json: async () => ({ success: true, user: { name: 'John Doe' } }),
       })
 
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name')
       const emailInput = screen.getByPlaceholderText('Email')
@@ -185,7 +188,7 @@ describe('Signup Page', () => {
         json: async () => ({ message: 'Email already exists' }),
       })
 
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name')
       const emailInput = screen.getByPlaceholderText('Email')
@@ -206,7 +209,7 @@ describe('Signup Page', () => {
     it('displays generic error on network failure', async () => {
       ;(global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'))
 
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name')
       const emailInput = screen.getByPlaceholderText('Email')
@@ -231,7 +234,7 @@ describe('Signup Page', () => {
         json: async () => ({}),
       })
 
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name')
       const emailInput = screen.getByPlaceholderText('Email')
@@ -255,7 +258,7 @@ describe('Signup Page', () => {
         json: async () => ({ message: 'Email already exists' }),
       })
 
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name')
       const emailInput = screen.getByPlaceholderText('Email')
@@ -291,7 +294,7 @@ describe('Signup Page', () => {
 
   describe('User Input Handling', () => {
     it('updates name field when user types', async () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const nameInput = screen.getByPlaceholderText('Full Name') as HTMLInputElement
 
       await userEvent.type(nameInput, 'Jane Smith')
@@ -300,7 +303,7 @@ describe('Signup Page', () => {
     })
 
     it('updates email field when user types', async () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const emailInput = screen.getByPlaceholderText('Email') as HTMLInputElement
 
       await userEvent.type(emailInput, 'jane@example.com')
@@ -309,7 +312,7 @@ describe('Signup Page', () => {
     })
 
     it('updates password field when user types', async () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const passwordInput = screen.getByPlaceholderText(/Password/) as HTMLInputElement
 
       await userEvent.type(passwordInput, 'mypassword123')
@@ -323,7 +326,7 @@ describe('Signup Page', () => {
         json: async () => ({ success: true }),
       })
 
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name')
       const emailInput = screen.getByPlaceholderText('Email')
@@ -341,31 +344,31 @@ describe('Signup Page', () => {
 
   describe('Layout and Styling', () => {
     it('has centered layout', () => {
-      const { container } = render(<Signup />)
+      const { container } = renderWithLanguage(<Signup />)
       const mainDiv = container.querySelector('.min-h-screen')
       expect(mainDiv).toHaveClass('flex', 'justify-center', 'items-center')
     })
 
     it('applies background color', () => {
-      const { container } = render(<Signup />)
+      const { container } = renderWithLanguage(<Signup />)
       const mainDiv = container.querySelector('.bg-\\[var\\(--login-bg\\)\\]')
       expect(mainDiv).toBeInTheDocument()
     })
 
     it('card has proper styling classes', () => {
-      const { container } = render(<Signup />)
+      const { container } = renderWithLanguage(<Signup />)
       const card = container.querySelector('.rounded-lg')
       expect(card).toHaveClass('p-8', 'w-full', 'max-w-md')
     })
 
     it('heading has proper styling', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const heading = screen.getByRole('heading', { name: 'Sign Up' })
       expect(heading).toHaveClass('text-3xl', 'font-bold', 'mb-6', 'text-center')
     })
 
     it('form has proper gap between fields', () => {
-      const { container } = render(<Signup />)
+      const { container } = renderWithLanguage(<Signup />)
       const form = container.querySelector('form')
       expect(form).toHaveClass('flex', 'flex-col', 'gap-4')
     })
@@ -373,20 +376,20 @@ describe('Signup Page', () => {
 
   describe('Accessibility', () => {
     it('input fields have proper placeholder text', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       expect(screen.getByPlaceholderText('Full Name')).toBeInTheDocument()
       expect(screen.getByPlaceholderText('Email')).toBeInTheDocument()
       expect(screen.getByPlaceholderText(/Password \(min 8 characters\)/)).toBeInTheDocument()
     })
 
     it('submit button is a proper button element', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const button = screen.getByRole('button', { name: /Sign Up/i })
       expect(button).toHaveAttribute('type', 'submit')
     })
 
     it('error messages are visible to screen readers', async () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const passwordInput = screen.getByPlaceholderText(/Password/)
       const submitButton = screen.getByRole('button', { name: /Sign Up/i })
@@ -404,26 +407,26 @@ describe('Signup Page', () => {
     })
 
     it('has semantic form structure', () => {
-      const { container } = render(<Signup />)
+      const { container } = renderWithLanguage(<Signup />)
       expect(container.querySelector('form')).toBeInTheDocument()
     })
   })
 
   describe('Navigation', () => {
     it('has link to login page', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const loginLink = screen.getByText('Log In').closest('a')
       expect(loginLink).toHaveAttribute('href', '/login')
     })
 
     it('login link has proper styling', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       const loginLink = screen.getByText('Log In')
       expect(loginLink).toHaveClass('hover:underline', 'font-semibold')
     })
 
     it('displays contextual text for login link', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       expect(screen.getByText(/Already have an account?/)).toBeInTheDocument()
     })
   })
@@ -432,7 +435,7 @@ describe('Signup Page', () => {
     it('prevents default form submission behavior', async () => {
       const mockPreventDefault = jest.fn()
 
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const form = screen.getByRole('button', { name: /Sign Up/i }).closest('form')!
 
@@ -449,7 +452,7 @@ describe('Signup Page', () => {
     })
 
     it('starts with empty form fields', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name') as HTMLInputElement
       const emailInput = screen.getByPlaceholderText('Email') as HTMLInputElement
@@ -461,7 +464,7 @@ describe('Signup Page', () => {
     })
 
     it('does not display error message initially', () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
       expect(screen.queryByText(/error/i)).not.toBeInTheDocument()
     })
   })
@@ -473,7 +476,7 @@ describe('Signup Page', () => {
         json: async () => ({ success: true }),
       })
 
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name')
       const emailInput = screen.getByPlaceholderText('Email')
@@ -496,7 +499,7 @@ describe('Signup Page', () => {
     })
 
     it('handles special characters in input fields', async () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name') as HTMLInputElement
       const emailInput = screen.getByPlaceholderText('Email') as HTMLInputElement
@@ -514,12 +517,12 @@ describe('Signup Page', () => {
 
   describe('Client Component Functionality', () => {
     it('renders as a client component', () => {
-      const { container } = render(<Signup />)
+      const { container } = renderWithLanguage(<Signup />)
       expect(container).toBeInTheDocument()
     })
 
     it('handles state updates correctly', async () => {
-      render(<Signup />)
+      renderWithLanguage(<Signup />)
 
       const nameInput = screen.getByPlaceholderText('Full Name')
 

@@ -7,6 +7,9 @@
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { LanguageProvider } from '@/context/LanguageContext'
+
+const renderWithLanguage = (ui: React.ReactElement) => render(<LanguageProvider>{ui}</LanguageProvider>)
 
 // Mock router and navigation
 const mockPush = jest.fn()

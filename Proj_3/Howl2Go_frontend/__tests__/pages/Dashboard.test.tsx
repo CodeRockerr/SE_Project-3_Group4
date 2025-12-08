@@ -1,5 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import Dashboard from '@/app/dashboard/page'
+import { LanguageProvider } from '@/context/LanguageContext'
+
+const renderWithLanguage = (ui: React.ReactElement) => render(ui, { wrapper: LanguageProvider })
 
 // Mock useAuth hook
 const mockUseAuth = jest.fn()
@@ -81,7 +84,7 @@ describe('Dashboard Page', () => {
         isLoading: true,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
       expect(screen.getByText('Loading...')).toBeInTheDocument()
     })
 
@@ -91,7 +94,7 @@ describe('Dashboard Page', () => {
         isLoading: true,
       })
 
-      const { container } = render(<Dashboard />)
+      const { container } = renderWithLanguage(<Dashboard />)
       const loadingDiv = container.querySelector('.min-h-screen')
       expect(loadingDiv).toBeInTheDocument()
       expect(loadingDiv).toHaveClass('flex', 'items-center', 'justify-center')
@@ -103,7 +106,7 @@ describe('Dashboard Page', () => {
         isLoading: true,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
       expect(screen.queryByTestId('header')).not.toBeInTheDocument()
       expect(screen.queryByTestId('footer')).not.toBeInTheDocument()
     })
@@ -116,7 +119,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
       expect(screen.getByText('Please log in to view dashboard')).toBeInTheDocument()
     })
 
@@ -126,7 +129,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
       expect(screen.queryByTestId('dashboard-hero')).not.toBeInTheDocument()
     })
 
@@ -136,7 +139,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      const { container } = render(<Dashboard />)
+      const { container } = renderWithLanguage(<Dashboard />)
       const mainDiv = container.querySelector('.bg-\\[var\\(--howl-bg\\)\\]')
       expect(mainDiv).toBeInTheDocument()
     })
@@ -158,28 +161,28 @@ describe('Dashboard Page', () => {
     })
 
     it('renders Header when user is logged in', () => {
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
       expect(screen.getByTestId('header')).toBeInTheDocument()
     })
 
     it('renders Footer when user is logged in', () => {
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
       expect(screen.getByTestId('footer')).toBeInTheDocument()
     })
 
     it('renders DashboardHero component', () => {
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
       expect(screen.getByTestId('dashboard-hero')).toBeInTheDocument()
     })
 
     it('has proper layout structure', () => {
-      const { container } = render(<Dashboard />)
+      const { container } = renderWithLanguage(<Dashboard />)
       const mainDiv = container.querySelector('.min-h-screen')
       expect(mainDiv).toBeInTheDocument()
     })
 
     it('applies proper padding for header spacing', () => {
-      const { container } = render(<Dashboard />)
+      const { container } = renderWithLanguage(<Dashboard />)
       const contentDiv = container.querySelector('.pt-15')
       expect(contentDiv).toBeInTheDocument()
     })
@@ -197,7 +200,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
       expect(screen.getByTestId('user-name')).toHaveTextContent('Jane Smith')
     })
 
@@ -212,7 +215,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
       expect(screen.getByTestId('user-name')).toHaveTextContent('Alex Johnson')
     })
   })
@@ -229,7 +232,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
 
       await waitFor(() => {
         expect(screen.getByTestId('daily-progress-goal')).toHaveTextContent('2000')
@@ -247,7 +250,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
 
       await waitFor(() => {
         expect(screen.getByTestId('daily-progress-goal')).toHaveTextContent('2500')
@@ -265,7 +268,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
 
       // Mock meals: 300 + 150 = 450 calories
       await waitFor(() => {
@@ -286,7 +289,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
 
       await waitFor(() => {
         expect(screen.getByTestId('meals-count')).toHaveTextContent('2')
@@ -304,7 +307,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
 
       await waitFor(() => {
         const dashboardHero = screen.getByTestId('dashboard-hero')
@@ -327,18 +330,18 @@ describe('Dashboard Page', () => {
     })
 
     it('has minimum height screen class', () => {
-      const { container } = render(<Dashboard />)
+      const { container } = renderWithLanguage(<Dashboard />)
       expect(container.querySelector('.min-h-screen')).toBeInTheDocument()
     })
 
     it('applies correct background color', () => {
-      const { container } = render(<Dashboard />)
+      const { container } = renderWithLanguage(<Dashboard />)
       const mainDiv = container.querySelector('.bg-\\[var\\(--howl-bg\\)\\]')
       expect(mainDiv).toBeInTheDocument()
     })
 
     it('has proper padding top for header', () => {
-      const { container } = render(<Dashboard />)
+      const { container } = renderWithLanguage(<Dashboard />)
       expect(container.querySelector('.pt-15')).toBeInTheDocument()
     })
   })
@@ -350,7 +353,7 @@ describe('Dashboard Page', () => {
         isLoading: true,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
       // Should not crash on initial render
       expect(screen.getByText('Loading...')).toBeInTheDocument()
     })
@@ -366,7 +369,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
 
       await waitFor(() => {
         expect(screen.getByTestId('meals-count')).toBeInTheDocument()
@@ -384,7 +387,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
 
       await waitFor(() => {
         expect(screen.getByTestId('daily-progress-goal')).toHaveTextContent('1500')
@@ -404,7 +407,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
 
       await waitFor(() => {
         // Should default to 2000
@@ -418,11 +421,11 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      expect(() => render(<Dashboard />)).not.toThrow()
+      expect(() => renderWithLanguage(<Dashboard />)).not.toThrow()
     })
 
     it('handles transition from loading to authenticated', async () => {
-      const { rerender } = render(<Dashboard />)
+      const { rerender } = renderWithLanguage(<Dashboard />)
 
       // Initially loading
       mockUseAuth.mockReturnValue({
@@ -464,7 +467,7 @@ describe('Dashboard Page', () => {
     })
 
     it('renders all components in correct order', () => {
-      const { container } = render(<Dashboard />)
+      const { container } = renderWithLanguage(<Dashboard />)
       const elements = container.querySelectorAll('[data-testid]')
       const testIds = Array.from(elements).map(el => el.getAttribute('data-testid'))
 
@@ -474,7 +477,7 @@ describe('Dashboard Page', () => {
     })
 
     it('passes correct props to DashboardHero', async () => {
-      render(<Dashboard />)
+      renderWithLanguage(<Dashboard />)
 
       await waitFor(() => {
         expect(screen.getByTestId('user-name')).toHaveTextContent('John Doe')
@@ -492,7 +495,7 @@ describe('Dashboard Page', () => {
         isLoading: true,
       })
 
-      const { container } = render(<Dashboard />)
+      const { container } = renderWithLanguage(<Dashboard />)
       const loadingText = screen.getByText('Loading...')
       expect(loadingText).toHaveClass('text-[var(--text)]')
     })
@@ -503,7 +506,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      const { container } = render(<Dashboard />)
+      const { container } = renderWithLanguage(<Dashboard />)
       const promptText = screen.getByText('Please log in to view dashboard')
       expect(promptText).toHaveClass('text-[var(--text)]')
     })
@@ -514,7 +517,7 @@ describe('Dashboard Page', () => {
         isLoading: true,
       })
 
-      const { container } = render(<Dashboard />)
+      const { container } = renderWithLanguage(<Dashboard />)
       const loadingText = screen.getByText('Loading...')
       expect(loadingText).toHaveClass('text-xl')
     })
@@ -532,7 +535,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      const { container } = render(<Dashboard />)
+      const { container } = renderWithLanguage(<Dashboard />)
       expect(container).toBeInTheDocument()
     })
 
@@ -547,7 +550,7 @@ describe('Dashboard Page', () => {
         isLoading: false,
       })
 
-      expect(() => render(<Dashboard />)).not.toThrow()
+      expect(() => renderWithLanguage(<Dashboard />)).not.toThrow()
 
       await waitFor(() => {
         expect(screen.getByTestId('dashboard-hero')).toBeInTheDocument()

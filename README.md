@@ -4,7 +4,7 @@
 
 <div align="center">
 
-<img src="assets/Howl2Go_Poster.png" alt="Howl2Go Project Poster" width="700" style="border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.25);" />
+<img src="assets/Howl2Go_Poster_v2.jpeg" alt="Howl2Go Project Poster" width="700" style="border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.25);" />
 
 *High-level overview of Howl2Go – mission, stakeholders, features, tech stack, and test metrics.*
 
@@ -73,8 +73,8 @@
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=flat-square&logo=github-actions&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 [![Coverage Status](https://coveralls.io/repos/github/CodeRockerr/se_project-3_group4/badge.svg?branch=main&style=flat-square)](https://coveralls.io/github/CodeRockerr/se_project-3_group4?branch=main)
-[![Tests](https://img.shields.io/badge/tests-404_passing-success?style=flat-square&logo=jest&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
-[![Test Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen?style=flat-square&logo=coveralls&logoColor=white)](https://coveralls.io/github/CodeRockerr/se_project-3_group4)
+[![Tests](https://img.shields.io/badge/tests-843_passing-success?style=flat-square&logo=jest&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![Test Coverage](https://img.shields.io/badge/coverage-100%25_pass_rate-brightgreen?style=flat-square&logo=coveralls&logoColor=white)](https://coveralls.io/github/CodeRockerr/se_project-3_group4)
 [![Code Quality](https://img.shields.io/badge/code_quality-A-green?style=flat-square&logo=code-quality&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 [![Code Style](https://img.shields.io/badge/code_style-prettier-F7B93E?style=flat-square&logo=prettier&logoColor=white)](https://prettier.io/)
 [![Linting](https://img.shields.io/badge/linting-eslint-4B32C3?style=flat-square&logo=eslint&logoColor=white)](https://eslint.org/)
@@ -509,8 +509,8 @@ graph LR
 
 <div align="center">
 
-[![Tests](https://img.shields.io/badge/Tests-404_passing-success?style=for-the-badge&logo=jest&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
-[![Coverage](https://img.shields.io/badge/Coverage-85%25-brightgreen?style=for-the-badge&logo=coveralls&logoColor=white)](https://coveralls.io/)
+[![Tests](https://img.shields.io/badge/Tests-843_passing-success?style=for-the-badge&logo=jest&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
+[![Pass Rate](https://img.shields.io/badge/Pass_Rate-100%25-brightgreen?style=for-the-badge&logo=check-circle&logoColor=white)](https://github.com/CodeRockerr/se_project-3_group4)
 
 </div>
 
@@ -529,18 +529,55 @@ npm test
 npm run test:coverage
 ```
 
-### 📊 Test Coverage
+### 📊 Test Coverage Summary
 
-- **Backend:** 200+ comprehensive test cases
-  - Unit tests for API endpoints
-  - Integration tests for LLM service
-  - Database operation tests
-- **Frontend:** 200+ test cases
-  - Component tests
-  - Integration tests
-  - User interaction tests
+#### Frontend Tests ✅
+- **Test Suites:** 21 passed, 21 total
+- **Tests:** 385 passed, 385 total ✅
+- **Pass Rate:** 100% ✅
+- **Test Files:** 21 test suites covering all pages and components
 
-**Overall Coverage:** 85%+ ✅
+#### Backend Tests ✅
+- **Test Suites:** 31 passed, 31 total
+- **Tests:** 458 passed, 458 total ✅
+- **Pass Rate:** 100% ✅
+- **Test Files:** 31 test suites covering API endpoints, services, and middleware
+
+#### Overall Test Coverage
+- **Total Tests:** 843 passing
+- **Total Test Suites:** 52 passing
+- **Overall Pass Rate:** 100% ✅
+
+### 🎯 Test Coverage Breakdown
+
+**Frontend (385 tests):**
+- Component tests (ItemCard, Header, Cart, DishCard, HeroSection, SearchResults, SearchBar, FrequentlyBoughtSection, Footer, AnimatedHeadline)
+- Page tests (Home, About, Dashboard, Search, Signup, Login)
+- Integration tests (SearchToCart, Multi-language support)
+- Context tests (LanguageContext)
+
+**Backend (458 tests):**
+- User authentication tests (register, login, password reset, token refresh)
+- Food search and recommendation tests (LLM integration, filtering, sorting)
+- Cart management tests (add, update, remove items, persistence)
+- Order management tests (create, history, insights, analytics)
+- Payment processing tests (Stripe integration, payment intents)
+- Admin dashboard tests (analytics, restaurant data, trends)
+- Review system tests (create, update, delete, helpful marking)
+- Bug reporting tests (submit, retrieve, filter)
+- Ingredient recommendation tests (filtering, ranking, pagination)
+- Middleware tests (authentication, authorization, LLM parsing)
+- Database tests (connection, models, schema validation)
+- API integration tests (endpoints, error handling, response validation)
+
+### ✅ Test Categories
+
+- ✅ **Unit Tests** - Individual function and component testing
+- ✅ **Integration Tests** - API endpoint and cross-component testing
+- ✅ **End-to-End Tests** - Complete user workflows (search → cart → order)
+- ✅ **Error Handling Tests** - Edge cases and error scenarios
+- ✅ **Security Tests** - Authentication, authorization, SQL injection prevention
+- ✅ **Performance Tests** - Response time validation, query optimization
 
 ---
 

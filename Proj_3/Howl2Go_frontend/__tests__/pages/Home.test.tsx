@@ -1,5 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import Home from '@/app/page'
+import { LanguageProvider } from '@/context/LanguageContext'
+
+const renderWithLanguage = (ui: React.ReactElement) => render(ui, { wrapper: LanguageProvider })
 
 // Mock all child components
 jest.mock('@/components/Header', () => {
@@ -38,14 +41,14 @@ jest.mock('@/components/FrequentlyBoughtSection', () => {
 describe('Home Page', () => {
   describe('Rendering', () => {
     it('renders the home page', () => {
-      render(<Home />)
+      renderWithLanguage(<Home />)
       expect(screen.getByTestId('header')).toBeInTheDocument()
       expect(screen.getByTestId('hero-section')).toBeInTheDocument()
       expect(screen.getByTestId('footer')).toBeInTheDocument()
     })
 
     it('renders header and footer', () => {
-      const { container } = render(<Home />)
+      const { container } = renderWithLanguage(<Home />)
       expect(screen.getByTestId('header')).toBeInTheDocument()
       expect(screen.getByTestId('footer')).toBeInTheDocument()
     })
@@ -53,20 +56,20 @@ describe('Home Page', () => {
 
   describe('State Management', () => {
     it('renders hero section', () => {
-      render(<Home />)
+      renderWithLanguage(<Home />)
       expect(screen.getByTestId('hero-section')).toBeInTheDocument()
     })
   })
 
   describe('Layout', () => {
     it('has minimum height screen class', () => {
-      const { container } = render(<Home />)
+      const { container } = renderWithLanguage(<Home />)
       const mainDiv = container.querySelector('.min-h-screen')
       expect(mainDiv).toBeInTheDocument()
     })
 
     it('applies background color class', () => {
-      const { container } = render(<Home />)
+      const { container } = renderWithLanguage(<Home />)
       const mainDiv = container.querySelector('[class*="bg-"]')
       expect(mainDiv).toBeInTheDocument()
     })
@@ -74,7 +77,7 @@ describe('Home Page', () => {
 
   describe('Component Integration', () => {
     it('passes callback to HeroSection', () => {
-      render(<Home />)
+      renderWithLanguage(<Home />)
       const heroSection = screen.getByTestId('hero-section')
       expect(heroSection).toBeInTheDocument()
     })
@@ -82,7 +85,7 @@ describe('Home Page', () => {
 
   describe('Client Component', () => {
     it('renders as a client component', () => {
-      const { container } = render(<Home />)
+      const { container } = renderWithLanguage(<Home />)
       expect(container).toBeInTheDocument()
     })
   })

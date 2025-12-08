@@ -1,6 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import SmartMenuSearch from '@/app/search/page'
+import { LanguageProvider } from '@/context/LanguageContext'
+
+const renderWithLanguage = (ui: React.ReactElement) => render(ui, { wrapper: LanguageProvider })
 
 // Mock Next.js modules
 const mockGet = jest.fn()
@@ -44,35 +47,35 @@ describe('Search Page', () => {
 
   describe('Initial Rendering', () => {
     it('renders the search page', async () => {
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
       })
     })
 
     it('renders navigation header with logo', async () => {
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
       await waitFor(() => {
         expect(screen.getByAltText('Howl2Go Logo')).toBeInTheDocument()
       })
     })
 
     it('renders Back button', async () => {
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
       await waitFor(() => {
         expect(screen.getByText('Back')).toBeInTheDocument()
       })
     })
 
     it('renders Dashboard link', async () => {
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
       await waitFor(() => {
         expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument()
       })
     })
 
     it('Back button links to home page', async () => {
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
       await waitFor(() => {
         const backLink = screen.getByText('Back').closest('a')
         expect(backLink).toHaveAttribute('href', '/')
@@ -80,7 +83,7 @@ describe('Search Page', () => {
     })
 
     it('renders search input field', async () => {
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
       await waitFor(() => {
         const searchInput = screen.getByLabelText('Search for food')
         expect(searchInput).toBeInTheDocument()
@@ -105,7 +108,7 @@ describe('Search Page', () => {
         }),
       })
 
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         const searchInput = screen.getByLabelText('Search for food') as HTMLInputElement
@@ -128,7 +131,7 @@ describe('Search Page', () => {
         }),
       })
 
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(mockFetch).toHaveBeenCalledWith(
@@ -145,7 +148,7 @@ describe('Search Page', () => {
   describe('Search Functionality', () => {
     it('allows user to type in search field', async () => {
       const user = userEvent.setup()
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
@@ -164,7 +167,7 @@ describe('Search Page', () => {
       })
 
       const user = userEvent.setup()
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
@@ -192,7 +195,7 @@ describe('Search Page', () => {
       })
 
       const user = userEvent.setup()
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
@@ -212,7 +215,7 @@ describe('Search Page', () => {
 
     it('does not update URL while typing', async () => {
       const user = userEvent.setup()
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
@@ -247,7 +250,7 @@ describe('Search Page', () => {
       })
 
       const user = userEvent.setup()
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
@@ -277,7 +280,7 @@ describe('Search Page', () => {
       )
 
       const user = userEvent.setup()
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
@@ -301,7 +304,7 @@ describe('Search Page', () => {
       })
 
       const user = userEvent.setup()
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
@@ -320,7 +323,7 @@ describe('Search Page', () => {
       mockFetch.mockRejectedValue(new Error('Network error'))
 
       const user = userEvent.setup()
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
@@ -342,7 +345,7 @@ describe('Search Page', () => {
       })
 
       const user = userEvent.setup()
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
@@ -360,7 +363,7 @@ describe('Search Page', () => {
 
   describe('Empty States', () => {
     it('shows empty state when no query', async () => {
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByText('Start Your Search')).toBeInTheDocument()
@@ -368,7 +371,7 @@ describe('Search Page', () => {
     })
 
     it('shows search suggestions in empty state', async () => {
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(
@@ -380,7 +383,7 @@ describe('Search Page', () => {
 
   describe('Keyboard Navigation', () => {
     it('returns to home page on Escape key', async () => {
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
@@ -395,7 +398,7 @@ describe('Search Page', () => {
 
   describe('Search Icon and CTA', () => {
     it('displays search icon', async () => {
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByTestId('search-icon')).toBeInTheDocument()
@@ -404,7 +407,7 @@ describe('Search Page', () => {
 
     it('shows Enter key CTA when typing', async () => {
       const user = userEvent.setup()
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
@@ -435,7 +438,7 @@ describe('Search Page', () => {
       })
 
       const user = userEvent.setup()
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
@@ -463,7 +466,7 @@ describe('Search Page', () => {
       })
 
       const user = userEvent.setup()
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
@@ -481,7 +484,7 @@ describe('Search Page', () => {
 
   describe('Layout', () => {
     it('has sticky header', async () => {
-      const { container } = render(<SmartMenuSearch />)
+      const { container } = renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         const header = container.querySelector('.sticky')
@@ -500,7 +503,7 @@ describe('Search Page', () => {
       })
 
       const user = userEvent.setup()
-      render(<SmartMenuSearch />)
+      renderWithLanguage(<SmartMenuSearch />)
 
       await waitFor(() => {
         expect(screen.getByLabelText('Search for food')).toBeInTheDocument()
