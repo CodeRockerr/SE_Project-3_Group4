@@ -25,7 +25,7 @@ Before starting, ensure you have:
 git clone https://github.com/CodeRockerr/SE-Project-3_Group4.git
 
 # Navigate to the project
-cd SE-Project-3_Group4/Proj_2
+cd SE-Project-3_Group4/Proj_3
 ```
 
 ---
@@ -152,7 +152,7 @@ Importing 12 items...
 ```
 
 **Note:** 
-- If you have a CSV file with fast food data, place it at `Proj_2/data/fast-food/FastFoodNutritionMenuV3.csv`
+- If you have a CSV file with fast food data, place it at `Proj_3/data/fast-food/FastFoodNutritionMenuV3.csv`
 - If no CSV is found, the script will import 12 sample items from major restaurants
 - The sample data is sufficient for testing the application
 
@@ -183,7 +183,7 @@ Food Delivery API listening on port 4000 in development mode
 
 ```bash
 # Navigate to frontend directory
-cd SE-Project-3_Group4/Proj_2/Howl2Go_frontend
+cd SE-Project-3_Group4/Proj_3/Howl2Go_frontend
 
 # Install dependencies
 npm install

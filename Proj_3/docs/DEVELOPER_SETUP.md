@@ -89,8 +89,8 @@ git clone https://github.com/harsha711/SE_Project_Grp_27.git
 # Navigate to the project directory
 cd SE_Project_Grp_27
 
-# Navigate to Proj_2 (main project folder)
-cd "Proj_2"
+# Navigate to Proj_3 (main project folder)
+cd "Proj_3"
 ```
 
 ### Understand the Branch Structure
@@ -108,7 +108,7 @@ git branch -a
 ### Current Project Structure
 
 ```
-Proj_2/
+Proj_3/
 ├── Howl2Go_backend/          # Express.js API Server
 │   ├── src/
 │   │   ├── app.js            # Express app configuration
@@ -512,7 +512,7 @@ import('groq-sdk').then(Groq => {
 ### Step 1: Navigate to Backend Directory
 
 ```bash
-# From Proj_2 directory
+# From Proj_3 directory
 cd Howl2Go_backend
 ```
 
@@ -625,7 +625,7 @@ curl -X POST http://localhost:4000/api/food/parse \
 ### Step 1: Navigate to Frontend Directory
 
 ```bash
-# From Proj_2 directory
+# From Proj_3 directory
 cd Howl2Go_frontend
 ```
 
@@ -704,12 +704,12 @@ npm run dev
 
 ```bash
 # Terminal 1 - Backend
-cd "Proj_2/Howl2Go_backend"
+cd "Proj_3/Howl2Go_backend"
 npm run dev
 # Running on http://localhost:4000
 
 # Terminal 2 - Frontend
-cd "Proj_2/Howl2Go_frontend"
+cd "Proj_3/Howl2Go_frontend"
 npm run dev
 # Running on http://localhost:3000
 ```
@@ -741,7 +741,7 @@ The project includes a fast food nutrition database with 1,148+ items from major
 ### Step 1: Verify CSV File Exists
 
 ```bash
-# From Proj_2 directory
+# From Proj_3 directory
 ls -lh data/fast-food/FastFoodNutritionMenuV3.csv
 
 # If file doesn't exist, contact project maintainer
@@ -1088,7 +1088,7 @@ Create `.vscode/launch.json`:
       "request": "launch",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "cwd": "${workspaceFolder}/Proj_2/Howl2Go_backend",
+      "cwd": "${workspaceFolder}/Proj_3/Howl2Go_backend",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "skipFiles": ["<node_internals>/**"]
@@ -1099,7 +1099,7 @@ Create `.vscode/launch.json`:
       "request": "launch",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "cwd": "${workspaceFolder}/Proj_2/Howl2Go_frontend",
+      "cwd": "${workspaceFolder}/Proj_3/Howl2Go_frontend",
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen"
     },
@@ -1109,7 +1109,7 @@ Create `.vscode/launch.json`:
       "request": "launch",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["test"],
-      "cwd": "${workspaceFolder}/Proj_2/Howl2Go_backend",
+      "cwd": "${workspaceFolder}/Proj_3/Howl2Go_backend",
       "console": "integratedTerminal"
     }
   ]

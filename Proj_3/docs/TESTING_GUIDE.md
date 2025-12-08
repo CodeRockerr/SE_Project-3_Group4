@@ -33,7 +33,7 @@ Total Tests: 404+
 ### Frontend Tests
 
 ```bash
-cd "Proj_2/Howl2Go_frontend"
+cd "Proj_3/Howl2Go_frontend"
 
 # Run all tests
 npm test
@@ -51,7 +51,7 @@ npm test Cart.test.tsx
 ### Backend Tests
 
 ```bash
-cd "Proj_2/Howl2Go_backend"
+cd "Proj_3/Howl2Go_backend"
 
 # Run all tests
 npm test
@@ -305,8 +305,8 @@ Tests run automatically on push/PR via `.github/workflows/test.yml`:
 Husky runs tests before each commit:
 
 ```bash
-cd "Proj_2/Howl2Go_frontend" && npm test
-cd "Proj_2/Howl2Go_backend" && npm test
+cd "Proj_3/Howl2Go_frontend" && npm test
+cd "Proj_3/Howl2Go_backend" && npm test
 ```
 
 ### Coverage Reports

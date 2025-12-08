@@ -23,7 +23,7 @@
 
 1. **Navigate to frontend directory:**
    ```bash
-   cd Proj_2/Howl2Go_frontend
+   cd Proj_3/Howl2Go_frontend
    ```
 
 2. **Create `.env.local` file** (if it doesn't exist):
@@ -50,7 +50,7 @@
 
 1. **Navigate to backend directory:**
    ```bash
-   cd Proj_2/Howl2Go_backend
+   cd Proj_3/Howl2Go_backend
    ```
 
 2. **Create `.env` file** (if it doesn't exist):
@@ -122,14 +122,14 @@
 
 **Frontend:**
 ```powershell
-cd Proj_2/Howl2Go_frontend
+cd Proj_3/Howl2Go_frontend
 echo "NEXT_PUBLIC_API_URL=http://localhost:4000" > .env.local
 echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_YOUR_KEY" >> .env.local
 ```
 
 **Backend:**
 ```powershell
-cd Proj_2/Howl2Go_backend
+cd Proj_3/Howl2Go_backend
 echo "STRIPE_SECRET_KEY=sk_test_YOUR_KEY" > .env
 echo "STRIPE_PUBLISHABLE_KEY=pk_test_YOUR_KEY" >> .env
 ```

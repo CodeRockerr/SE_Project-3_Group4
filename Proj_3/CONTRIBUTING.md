@@ -74,7 +74,7 @@ Submit improvements for backend (API, performance, security), frontend (UI, acce
 
 ```bash
 git clone https://github.com/YOUR_USERNAME/SE-Project-3_Group4.git
-cd SE-Project-3_Group4/Proj_2
+cd SE-Project-3_Group4/Proj_3
 
 # Add upstream remote
 git remote add upstream https://github.com/CodeRockerr/SE-Project-3_Group4.git

@@ -17,7 +17,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_51SboAA5zTufkzilEzIRzBlDRiIWYdVtrhnmU
 
 2. **Restart the frontend server:**
    ```bash
-   cd Proj_2/Howl2Go_frontend
+   cd Proj_3/Howl2Go_frontend
    npm run dev
    ```
 
@@ -58,7 +58,7 @@ If you still see the error after restarting:
 
 1. **Check `.env.local` exists:**
    ```bash
-   cd Proj_2/Howl2Go_frontend
+   cd Proj_3/Howl2Go_frontend
    cat .env.local  # or type .env.local on Windows
    ```
 

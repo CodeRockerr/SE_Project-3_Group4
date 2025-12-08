@@ -38,7 +38,7 @@ Howl2Go eliminates traditional menu browsing by using **AI-powered natural langu
 
 **1. Clone the Repository**
 ```bash
-cd "SE_Project_Grp_27/Proj_2"
+cd "SE_Project_Grp_27/Proj_3"
 ```
 
 **2. Setup Backend**

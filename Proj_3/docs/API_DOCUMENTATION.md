@@ -682,7 +682,7 @@ Mark a review as helpful (one vote per user per review).
 ### "GROQ_API_KEY is not set"
 ```bash
 # Check .env file
-cat "Proj_2/Howl2Go_backend/.env"
+cat "Proj_3/Howl2Go_backend/.env"
 
 # Should contain:
 GROQ_API_KEY=your_actual_key_here

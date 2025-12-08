@@ -42,7 +42,7 @@ Before installing HOWL2GO, ensure you have the following installed on your syste
 
 ```bash
 git clone https://github.com/harsha711/SE_Project_Grp_27.git
-cd SE_Project_Grp_27/Proj_2
+cd SE_Project_Grp_27/Proj_3
 ```
 
 ---
@@ -257,7 +257,7 @@ curl -X POST http://localhost:4000/api/food/recommend \
 ## Project Structure
 
 ```
-Proj_2/
+Proj_3/
 ├── Howl2Go_backend/          # Backend API (Node.js + Express)
 │   ├── src/
 │   │   ├── controllers/      # Request handlers

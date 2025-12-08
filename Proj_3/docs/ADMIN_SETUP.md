@@ -7,7 +7,7 @@ This guide explains how to create an admin user to access the admin dashboard fo
 ### Step 1: Navigate to Backend Directory
 
 ```bash
-cd Proj_2/Howl2Go_backend
+cd Proj_3/Howl2Go_backend
 ```
 
 ### Step 2: Run the Admin Creation Script
@@ -133,7 +133,7 @@ Once you have an admin account:
 
 ```bash
 # Create/update admin user
-cd Proj_2/Howl2Go_backend
+cd Proj_3/Howl2Go_backend
 npm run create:admin <email> [password]
 
 # Example

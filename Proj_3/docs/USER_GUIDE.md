@@ -817,7 +817,7 @@ Each item's review section shows:
 
 - **Email**: supp0rt.howl2go@gmail.com
 - **GitHub Issues**: [Report a bug](https://github.com/harsha711/SE_Project_Grp_27/issues)
-- **Documentation**: Check our [docs folder](Proj_2/docs/)
+- **Documentation**: Check our [docs folder](Proj_3/docs/)
 
 ### Common Questions
 
