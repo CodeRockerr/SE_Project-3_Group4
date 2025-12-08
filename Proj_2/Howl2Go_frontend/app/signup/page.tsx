@@ -3,9 +3,11 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export default function SignupPage() {
   const router = useRouter();
+  const { login } = useAuth();
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -33,6 +35,13 @@ export default function SignupPage() {
       if (!response.ok) {
         setError(data.message || "Registration failed");
         return;
+      }
+
+      // Set client auth state then redirect after successful registration
+      try {
+        if (data?.user) login(data.user);
+      } catch (e) {
+        // ignore login errors and proceed to redirect
       }
 
       // Redirect after successful registration using Next router when available

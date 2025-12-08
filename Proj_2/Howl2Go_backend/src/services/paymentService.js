@@ -229,7 +229,7 @@ export const confirmPayment = async (paymentIntentId) => {
       await Order.findByIdAndUpdate(payment.orderId, {
         paymentStatus: "paid",
         paymentId: payment._id,
-        status: "confirmed",
+        status: "completed",
       });
     }
 
@@ -357,6 +357,9 @@ export const refundPayment = async (paymentId, reason = "") => {
 export const handleWebhookEvent = async (event) => {
   try {
     switch (event.type) {
+      case "payment_intent.created":
+        await handlePaymentCreated(event.data.object);
+        break;
       case "payment_intent.succeeded":
         await handlePaymentSucceeded(event.data.object);
         break;
@@ -365,6 +368,9 @@ export const handleWebhookEvent = async (event) => {
         break;
       case "payment_intent.canceled":
         await handlePaymentCanceled(event.data.object);
+        break;
+      case "charge.succeeded":
+        await handleChargeSucceeded(event.data.object);
         break;
       case "charge.refunded":
         await handleChargeRefunded(event.data.object);
@@ -391,8 +397,123 @@ async function handlePaymentSucceeded(paymentIntent) {
     await Order.findByIdAndUpdate(payment.orderId, {
       paymentStatus: "paid",
       paymentId: payment._id,
-      status: "confirmed",
+      status: "completed",
     });
+  }
+}
+
+/**
+ * Ensure a Payment record exists for a PaymentIntent (upsert).
+ * This prevents race conditions where Stripe webhooks arrive before
+ * the application-created Payment record is persisted.
+ */
+async function ensurePaymentRecord(paymentIntent) {
+  try {
+    const metadata = paymentIntent.metadata || {};
+    const orderId = metadata.orderId || null;
+    const userId = metadata.userId || null;
+
+    // Map Stripe PI status to our internal payment status
+    const statusMap = {
+      succeeded: "succeeded",
+      processing: "processing",
+      requires_payment_method: "failed",
+      requires_confirmation: "pending",
+      requires_action: "pending",
+      canceled: "canceled",
+    };
+
+    const paymentStatus = statusMap[paymentIntent.status] || "pending";
+
+    const amount = paymentIntent.amount || 0;
+    const currency = paymentIntent.currency || "usd";
+
+    const update = {
+      orderId: orderId || undefined,
+      userId: userId || undefined,
+      amount,
+      currency,
+      status: paymentStatus,
+      paymentIntentId: paymentIntent.id,
+    };
+
+    // Use upsert to create or update the payment record atomically
+    const payment = await Payment.findOneAndUpdate(
+      { paymentIntentId: paymentIntent.id },
+      { $set: update },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    return payment;
+  } catch (err) {
+    console.error("Error ensuring payment record:", err);
+    throw err;
+  }
+}
+
+async function handlePaymentCreated(paymentIntent) {
+  try {
+    // Upsert a pending payment record so subsequent webhook/confirm flows have a DB record
+    await ensurePaymentRecord(paymentIntent);
+  } catch (err) {
+    console.error("Error handling payment_intent.created:", err);
+    throw err;
+  }
+}
+
+async function handleChargeSucceeded(charge) {
+  try {
+    const paymentIntentId = charge.payment_intent;
+    if (!paymentIntentId) return;
+
+    const payment = await Payment.findOne({ paymentIntentId });
+
+    // If payment record doesn't exist, attempt to create it from the PaymentIntent
+    if (!payment) {
+      // Try to retrieve the PaymentIntent from Stripe (if stripe client available)
+      if (stripe) {
+        try {
+          const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
+          await ensurePaymentRecord(pi);
+        } catch (e) {
+          console.warn("Unable to retrieve PaymentIntent while handling charge.succeeded:", e.message);
+        }
+      }
+
+      // Re-fetch payment after attempting to create
+      const p = await Payment.findOne({ paymentIntentId });
+      if (!p) return;
+    }
+
+    const existing = await Payment.findOne({ paymentIntentId });
+    if (existing && existing.status !== "succeeded") {
+      existing.status = "succeeded";
+      existing.transactionId = charge.id;
+
+      // Capture card details if available on charge
+      if (charge.payment_method_details && charge.payment_method_details.card) {
+        const card = charge.payment_method_details.card;
+        existing.paymentMethod = "card";
+        existing.paymentMethodDetails = {
+          brand: card.brand,
+          last4: card.last4,
+          expiryMonth: card.exp_month,
+          expiryYear: card.exp_year,
+        };
+      }
+
+      await existing.save();
+
+      // Update order to paid/completed
+      await Order.findByIdAndUpdate(existing.orderId, {
+        paymentStatus: "paid",
+        paymentId: existing._id,
+        status: "completed",
+      });
+    }
+  } catch (err) {
+    console.error("Error handling charge.succeeded:", err);
+    throw err;
   }
 }
 

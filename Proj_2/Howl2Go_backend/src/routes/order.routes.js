@@ -31,6 +31,13 @@ router.get('/', authenticate, getOrderHistory);
 router.get('/insights', authenticate, getOrderInsights);
 
 /**
+ * @route   GET /api/orders/me
+ * @desc    Alias to get current user's order history
+ * @access  Private
+ */
+router.get('/me', authenticate, getOrderHistory);
+
+/**
  * @route   GET /api/orders/:orderId
  * @desc    Get single order by ID
  * @access  Private
