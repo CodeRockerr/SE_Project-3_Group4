@@ -124,7 +124,7 @@ export const createOrder = async (req, res) => {
       }
     }
 
-    // Create order
+    // Create order with pending payment state
     const order = await Order.create({
       userId,
       orderNumber,
@@ -133,7 +133,8 @@ export const createOrder = async (req, res) => {
       tax,
       deliveryFee,
       total,
-      status: 'completed'
+      status: 'pending',
+      paymentStatus: 'pending',
     });
 
     // Clear cart after order is created
@@ -185,10 +186,10 @@ export const getOrderHistory = async (req, res) => {
       });
     }
 
-    // Build query
+    // Build query - include common completed/processed statuses so paid orders show in history
     const query = {
       userId: new mongoose.Types.ObjectId(userId),
-      status: 'completed'
+      status: { $in: ['confirmed', 'completed', 'preparing', 'ready', 'delivered'] },
     };
 
     // Build date filter if needed
@@ -255,6 +256,14 @@ export const getOrderById = async (req, res) => {
 
     const { orderId } = req.params;
     const userId = req.user.id;
+
+    // Validate orderId is a valid ObjectId to avoid CastError
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid order ID'
+      });
+    }
 
     // First check if order exists (regardless of ownership)
     const order = await Order.findById(orderId).lean();

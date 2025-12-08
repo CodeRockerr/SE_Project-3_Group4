@@ -5,6 +5,7 @@ import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import env from './config/env.js';
 import routes from './routes/index.js';
+import { handleWebhook } from './controllers/payment.controller.js';
 
 const app = express();
 
@@ -13,6 +14,9 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true, // Allow cookies to be sent
 }));
+// Webhook endpoint must receive raw body for signature verification
+app.post('/api/payments/webhook', express.raw({ type: 'application/json' }), handleWebhook);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));

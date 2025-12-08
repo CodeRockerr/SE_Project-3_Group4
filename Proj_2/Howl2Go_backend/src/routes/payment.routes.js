@@ -1,5 +1,4 @@
 import { Router } from "express";
-import express from "express";
 import {
   createPaymentIntent,
   confirmPayment,
@@ -14,15 +13,7 @@ import { authenticate, authorize } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-/**
- * Webhook endpoint - must use raw body for signature verification
- * POST /api/payments/webhook
- */
-router.post(
-  "/webhook",
-  express.raw({ type: "application/json" }),
-  handleWebhook
-);
+// Webhook route is registered in app.js to ensure raw body is available before JSON parsing
 
 /**
  * Create payment intent for an order
