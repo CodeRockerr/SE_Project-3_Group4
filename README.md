@@ -19,7 +19,7 @@
 
 [![Watch the Demo Video](https://img.shields.io/badge/▶️_Watch_Demo_Video-red?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/ZVE26hXL6yo)
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-success?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
-[![Documentation](https://img.shields.io/badge/📚_Documentation-blue?style=for-the-badge&logo=read-the-docs&logoColor=white)](Proj_2/docs/)
+[![Documentation](https://img.shields.io/badge/📚_Documentation-blue?style=for-the-badge&logo=read-the-docs&logoColor=white)](Proj_3/docs/)
 
 ---
 
@@ -44,12 +44,12 @@
 <div align="center">
 
 ### 🏠 Home Page
-<img src="Proj_2/docs/screenshots/home.png" alt="Home Page" width="600" style="border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+<img src="Proj_3/docs/screenshots/home.png" alt="Home Page" width="600" style="border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
 
 *Beautiful landing page with natural language search interface*
 
 ### 🔍 Search Results
-<img src="Proj_2/docs/screenshots/results.png" alt="Search Results" width="600" style="border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+<img src="Proj_3/docs/screenshots/results.png" alt="Search Results" width="600" style="border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
 
 *AI-powered search results with nutritional information and filtering options*
 
@@ -326,12 +326,12 @@ Complete REST API, TypeScript support, comprehensive docs, pre-commit hooks, and
 
 ```bash
 git clone https://github.com/CodeRockerr/se_project-3_group4.git
-cd se_project-3_group4/Proj_2
+cd se_project-3_group4/Proj_3
 ```
 
 #### 2️⃣ Setup Backend
 
-[![Backend](https://img.shields.io/badge/Backend-Setup-blue?style=flat-square&logo=backend&logoColor=white)](Proj_2/Howl2Go_backend)
+[![Backend](https://img.shields.io/badge/Backend-Setup-blue?style=flat-square&logo=backend&logoColor=white)](Proj_3/Howl2Go_backend)
 
 ```bash
 cd Howl2Go_backend
@@ -372,7 +372,7 @@ npm run dev
 
 #### 3️⃣ Setup Frontend
 
-[![Frontend](https://img.shields.io/badge/Frontend-Setup-blue?style=flat-square&logo=frontend&logoColor=white)](Proj_2/Howl2Go_frontend)
+[![Frontend](https://img.shields.io/badge/Frontend-Setup-blue?style=flat-square&logo=frontend&logoColor=white)](Proj_3/Howl2Go_frontend)
 
 ```bash
 cd ../Howl2Go_frontend
@@ -491,18 +491,18 @@ graph LR
 
 <div align="center">
 
-[![Documentation](https://img.shields.io/badge/📚_Documentation-blue?style=for-the-badge&logo=read-the-docs&logoColor=white)](Proj_2/docs/)
+[![Documentation](https://img.shields.io/badge/📚_Documentation-blue?style=for-the-badge&logo=read-the-docs&logoColor=white)](Proj_3/docs/)
 
 </div>
 
 | 📄 Document                                                                                                                                                 | 📝 Description                            |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| [![Getting Started](https://img.shields.io/badge/Getting_Started-Guide-blue?style=flat-square&logo=book&logoColor=white)](Proj_2/docs/GETTING_STARTED.md)  | Complete user guide with search examples |
-| [![Developer Setup](https://img.shields.io/badge/Developer_Setup-Guide-green?style=flat-square&logo=code&logoColor=white)](Proj_2/docs/DEVELOPER_SETUP.md) | Development environment setup            |
-| [![API Docs](https://img.shields.io/badge/API-Documentation-purple?style=flat-square&logo=api&logoColor=white)](Proj_2/docs/API_DOCUMENTATION.md)          | REST API reference                       |
-| [![Database Schema](https://img.shields.io/badge/Database-Schema-orange?style=flat-square&logo=database&logoColor=white)](Proj_2/docs/DATABASE_SCHEMA.md)  | Database structure and models            |
-| [![Features](https://img.shields.io/badge/Features-Catalog-yellow?style=flat-square&logo=features&logoColor=white)](Proj_2/docs/FEATURES.md)               | Complete feature catalog                 |
-| [![Testing Guide](https://img.shields.io/badge/Testing-Guide-red?style=flat-square&logo=test&logoColor=white)](Proj_2/docs/TESTING_GUIDE.md)               | Testing strategies and examples          |
+| [![Getting Started](https://img.shields.io/badge/Getting_Started-Guide-blue?style=flat-square&logo=book&logoColor=white)](Proj_3/docs/GETTING_STARTED.md)  | Complete user guide with search examples |
+| [![Developer Setup](https://img.shields.io/badge/Developer_Setup-Guide-green?style=flat-square&logo=code&logoColor=white)](Proj_3/docs/DEVELOPER_SETUP.md) | Development environment setup            |
+| [![API Docs](https://img.shields.io/badge/API-Documentation-purple?style=flat-square&logo=api&logoColor=white)](Proj_3/docs/API_DOCUMENTATION.md)          | REST API reference                       |
+| [![Database Schema](https://img.shields.io/badge/Database-Schema-orange?style=flat-square&logo=database&logoColor=white)](Proj_3/docs/DATABASE_SCHEMA.md)  | Database structure and models            |
+| [![Features](https://img.shields.io/badge/Features-Catalog-yellow?style=flat-square&logo=features&logoColor=white)](Proj_3/docs/FEATURES.md)               | Complete feature catalog                 |
+| [![Testing Guide](https://img.shields.io/badge/Testing-Guide-red?style=flat-square&logo=test&logoColor=white)](Proj_3/docs/TESTING_GUIDE.md)               | Testing strategies and examples          |
 
 ---
 
@@ -549,7 +549,7 @@ npm run test:coverage
 
 ```
 SE_Project-3_Group4/
-├── Proj_2/
+├── Proj_3/
 │   ├── Howl2Go_backend/          # Express.js API server
 │   │   ├── src/
 │   │   │   ├── controllers/      # Request handlers
@@ -576,7 +576,7 @@ SE_Project-3_Group4/
 
 <div align="center">
 
-[![Database](https://img.shields.io/badge/💾_Database_Setup-blue?style=for-the-badge&logo=database&logoColor=white)](Proj_2/Howl2Go_backend/src/scripts/)
+[![Database](https://img.shields.io/badge/💾_Database_Setup-blue?style=for-the-badge&logo=database&logoColor=white)](Proj_3/Howl2Go_backend/src/scripts/)
 
 </div>
 
@@ -660,7 +660,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_key_here
 - Any future expiry date (e.g., 12/34)
 - Any 3-digit CVC (e.g., 123)
 
-**📚 Full Documentation:** See [Payment Setup Guide](Proj_2/docs/PAYMENT_SETUP.md)
+**📚 Full Documentation:** See [Payment Setup Guide](Proj_3/docs/PAYMENT_SETUP.md)
 
 ---
 
@@ -670,7 +670,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_key_here
 
 <div align="center">
 
-[![Features](https://img.shields.io/badge/✅_Current_Features-success?style=for-the-badge&logo=check-circle&logoColor=white)](Proj_2/docs/FEATURES.md)
+[![Features](https://img.shields.io/badge/✅_Current_Features-success?style=for-the-badge&logo=check-circle&logoColor=white)](Proj_3/docs/FEATURES.md)
 
 </div>
 
@@ -786,7 +786,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...  # Live mode key!
    - Test with real small amounts
    - Monitor webhook deliveries
 
-**📚 Detailed Guide:** [Production Deployment Guide](Proj_2/docs/PAYMENT_SETUP.md#production-deployment)
+**📚 Detailed Guide:** [Production Deployment Guide](Proj_3/docs/PAYMENT_SETUP.md#production-deployment)
 
 ---
 
@@ -794,11 +794,11 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...  # Live mode key!
 
 <div align="center">
 
-[![Contributing](https://img.shields.io/badge/🤝_Contributing-welcome-success?style=for-the-badge&logo=github&logoColor=white)](Proj_2/CONTRIBUTING.md)
+[![Contributing](https://img.shields.io/badge/🤝_Contributing-welcome-success?style=for-the-badge&logo=github&logoColor=white)](Proj_3/CONTRIBUTING.md)
 
 </div>
 
-We welcome contributions! Please see our [Contributing Guide](Proj_2/CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Contributing Guide](Proj_3/CONTRIBUTING.md) for details.
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
