@@ -11,10 +11,7 @@ const app = express();
 
 // Global middleware
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:3000',
-    'https://railway.com/project/2d096e2d-1d3f-41be-8309-b82eb0fc48a8/service/7088d7d2-d492-43ab-b657-166fe57d0bf3/settings?environmentId=e2273d01-ad78-4986-b21c-225f0c0e7243' 
-  ],
+  origin: 'https://railway.com/project/2d096e2d-1d3f-41be-8309-b82eb0fc48a8/service/7088d7d2-d492-43ab-b657-166fe57d0bf3/settings?environmentId=e2273d01-ad78-4986-b21c-225f0c0e7243',
   credentials: true, // Allow cookies to be sent
 }));
 // Webhook endpoint must receive raw body for signature verification
