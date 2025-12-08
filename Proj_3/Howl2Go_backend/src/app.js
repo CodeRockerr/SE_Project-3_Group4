@@ -11,7 +11,10 @@ const app = express();
 
 // Global middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: [
+    process.env.FRONTEND_URL || 'http://localhost:3000',
+    'https://se-project3-group4.vercel.app' 
+  ],
   credentials: true, // Allow cookies to be sent
 }));
 // Webhook endpoint must receive raw body for signature verification
