@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, KeyboardEvent } from 'react';
+import { useState, KeyboardEvent } from 'react';
 import { X, Plus } from 'lucide-react';
 
 interface IngredientTagInputProps {

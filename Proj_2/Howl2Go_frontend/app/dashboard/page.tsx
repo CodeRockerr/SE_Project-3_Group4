@@ -31,12 +31,11 @@ export default function Dashboard() {
     // In tests, prefer mock dashboard data when available
     if (process.env.NODE_ENV === 'test') {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const md = await import('@/lib/mockDashboardData');
         if (md && md.mockDashboardData && Array.isArray(md.mockDashboardData.todaysMeals)) {
           return md.mockDashboardData.todaysMeals as unknown as MealLog[];
         }
-      } catch (e) {
+      } catch {
         // ignore and fall back to real API fetch
       }
     }

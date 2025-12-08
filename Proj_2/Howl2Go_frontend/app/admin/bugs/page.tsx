@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, Bug as BugIcon, Filter, Search, AlertCircle, CheckCircle, Clock, XCircle, BarChart3 } from "lucide-react";
@@ -50,23 +50,7 @@ export default function AdminBugsPage() {
   });
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    if (!isAuthLoading) {
-      if (!isAuthenticated) {
-        router.push("/login?returnUrl=/admin/bugs");
-        return;
-      }
-      // Check if user is admin
-      if (user?.role !== 'admin') {
-        toast.error("Admin access required");
-        router.push("/");
-        return;
-      }
-      loadBugs();
-    }
-  }, [isAuthenticated, isAuthLoading, user, page, filters]);
-
-  const loadBugs = async () => {
+  const loadBugs = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -85,7 +69,23 @@ export default function AdminBugsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [filters.assignedTo, filters.severity, filters.status, page]);
+
+  useEffect(() => {
+    if (!isAuthLoading) {
+      if (!isAuthenticated) {
+        router.push("/login?returnUrl=/admin/bugs");
+        return;
+      }
+      // Check if user is admin
+      if (user?.role !== 'admin') {
+        toast.error("Admin access required");
+        router.push("/");
+        return;
+      }
+      loadBugs();
+    }
+  }, [isAuthenticated, isAuthLoading, user, router, loadBugs]);
 
   const filteredBugs = bugs.filter((bug) => {
     if (!searchQuery) return true;

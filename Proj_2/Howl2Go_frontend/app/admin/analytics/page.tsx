@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -12,14 +12,13 @@ import {
   Calendar,
   BarChart3,
   Store,
-  Target,
   Zap,
   Filter,
   Bug,
 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { getAdminDashboard, type AdminDashboardData, type RestaurantAnalytics } from "@/lib/api/admin";
+import { getAdminDashboard, type AdminDashboardData } from "@/lib/api/admin";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import toast from "react-hot-toast";
 
@@ -40,22 +39,7 @@ export default function AdminAnalyticsPage() {
   const [timeRange, setTimeRange] = useState<string>("all");
   const [selectedRestaurant, setSelectedRestaurant] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!isAuthLoading) {
-      if (!isAuthenticated) {
-        router.push("/login?returnUrl=/admin/analytics");
-        return;
-      }
-      if (user?.role !== "admin") {
-        toast.error("Admin access required");
-        router.push("/");
-        return;
-      }
-      loadDashboard();
-    }
-  }, [isAuthenticated, isAuthLoading, user, timeRange, router]);
-
-  const loadDashboard = async () => {
+  const loadDashboard = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -69,7 +53,22 @@ export default function AdminAnalyticsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [timeRange]);
+
+  useEffect(() => {
+    if (!isAuthLoading) {
+      if (!isAuthenticated) {
+        router.push("/login?returnUrl=/admin/analytics");
+        return;
+      }
+      if (user?.role !== "admin") {
+        toast.error("Admin access required");
+        router.push("/");
+        return;
+      }
+      loadDashboard();
+    }
+  }, [isAuthenticated, isAuthLoading, user, router, loadDashboard]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {

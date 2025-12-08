@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star } from "lucide-react";
-import StarRating from "./StarRating";
 import { createReview, updateReview, getItemReviews } from "@/lib/api/review";
 import toast from "react-hot-toast";
 
@@ -72,7 +71,7 @@ export default function ReviewModal({
               setComment("");
             }
           }
-        } catch (error) {
+        } catch {
           // Silently fail - user might not be authenticated or review might not exist
           setCurrentReviewId(undefined);
           if (!existingReview) {
@@ -157,7 +156,7 @@ export default function ReviewModal({
               } else {
                 throw createError; // Re-throw if we can't find the review
               }
-            } catch (updateError: unknown) {
+            } catch {
               // If update also fails, show the original error
               throw createError;
             }

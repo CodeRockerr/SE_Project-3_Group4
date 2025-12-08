@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { MessageSquare, Star, TrendingUp, Filter } from "lucide-react";
+import { MessageSquare, Filter } from "lucide-react";
 import ReviewCard from "./ReviewCard";
 import StarRating from "./StarRating";
 import { getItemReviews, type ReviewStats } from "@/lib/api/review";
@@ -12,13 +12,11 @@ import LoadingSpinner from "./LoadingSpinner";
 interface ReviewsSectionProps {
   foodItemId: string;
   itemName: string;
-  onReviewUpdated?: () => void;
 }
 
 export default function ReviewsSection({
   foodItemId,
   itemName,
-  onReviewUpdated,
 }: ReviewsSectionProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [stats, setStats] = useState<ReviewStats | null>(null);
@@ -31,11 +29,7 @@ export default function ReviewsSection({
     limit: 10,
   });
 
-  useEffect(() => {
-    loadReviews();
-  }, [foodItemId, page, sort]);
-
-  const loadReviews = async () => {
+  const loadReviews = useCallback(async () => {
     try {
       setIsLoading(true);
       const data = await getItemReviews(foodItemId, page, 10, sort);
@@ -48,7 +42,11 @@ export default function ReviewsSection({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [foodItemId, page, sort]);
+
+  useEffect(() => {
+    loadReviews();
+  }, [loadReviews]);
 
   const getRatingPercentage = (rating: number) => {
     if (!stats || stats.totalReviews === 0) return 0;
@@ -171,7 +169,7 @@ export default function ReviewsSection({
 
       {/* Reviews List */}
       <div className="space-y-4">
-        {reviews.map((review, idx) => (
+        {reviews.map((review) => (
           <ReviewCard
             key={review._id}
             review={review}

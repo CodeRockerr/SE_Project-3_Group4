@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ThumbsUp, CheckCircle, MoreVertical } from "lucide-react";
+import { ThumbsUp, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import StarRating from "./StarRating";
 import type { Review } from "@/lib/api/review";

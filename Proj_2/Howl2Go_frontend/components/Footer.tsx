@@ -1,7 +1,5 @@
 "use client";
 
-import { useLanguage } from "@/context/LanguageContext";
-
 export default function Footer() {
 	return (
 		<footer className="bg-[var(--bg-card)] border-t border-[var(--border)] py-4 mt-auto">

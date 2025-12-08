@@ -77,14 +77,14 @@ export async function createReview(
       try {
         const errorData = await response.json();
         errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch (e) {
+      } catch {
         // If response is not JSON, try to get text
         try {
           const errorText = await response.text();
           if (errorText) {
             errorMessage = errorText;
           }
-        } catch (textError) {
+        } catch {
           // If all else fails, use the status-based message
         }
       }
@@ -211,14 +211,14 @@ export async function updateReview(
       try {
         const errorData = await response.json();
         errorMessage = errorData.message || errorData.error || errorMessage;
-      } catch (e) {
+      } catch {
         // If response is not JSON, try to get text
         try {
           const errorText = await response.text();
           if (errorText) {
             errorMessage = errorText;
           }
-        } catch (textError) {
+        } catch {
           // If all else fails, use the status-based message
         }
       }

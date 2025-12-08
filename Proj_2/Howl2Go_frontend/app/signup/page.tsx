@@ -40,7 +40,7 @@ export default function SignupPage() {
       // Set client auth state then redirect after successful registration
       try {
         if (data?.user) login(data.user);
-      } catch (e) {
+      } catch {
         // ignore login errors and proceed to redirect
       }
 
@@ -52,17 +52,17 @@ export default function SignupPage() {
           // Fallback for environments without Next router
           try {
             window.location.assign('/dashboard');
-          } catch (e) {
+          } catch {
             // ignore navigation errors in test environment
           }
         } else {
           try {
             window.location.href = '/dashboard';
-          } catch (e) {
+          } catch {
             // ignore navigation errors in test environment
           }
         }
-      } catch (e) {
+      } catch {
         // swallow any navigation errors in tests
       }
     } catch (err) {

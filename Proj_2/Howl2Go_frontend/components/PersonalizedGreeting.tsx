@@ -41,26 +41,6 @@ export default function PersonalizedGreeting({
     return taglines[dayIndex];
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.12,
-        delayChildren: 0.2,
-      },
-    },
-    focused: {
-      opacity: 1,
-      scale: 1,
-      filter: "blur(0px)",
-      transition: {
-        duration: 0.5,
-        ease: [0.4, 0, 0.2, 1] as [number, number, number, number],
-      },
-    },
-  };
-
   const wordVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {

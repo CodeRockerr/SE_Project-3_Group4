@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { MessageSquare, CheckCircle, Utensils } from "lucide-react";
+import { MessageSquare, CheckCircle } from "lucide-react";
 import type { FoodItem } from "@/types/food";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";

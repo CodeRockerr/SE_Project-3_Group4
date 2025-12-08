@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 import ReviewModal from '@/components/ReviewModal';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -24,8 +24,6 @@ export default function OrderHistoryPage() {
 	const [insights, setInsights] = useState<OrderInsights | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isLoadingInsights, setIsLoadingInsights] = useState(true);
-	const [isLoadingReviews, setIsLoadingReviews] = useState(true);
-
 	const [timeRange, setTimeRange] = useState<
 		"all" | "week" | "month" | "year"
 	>("all");
@@ -55,20 +53,8 @@ export default function OrderHistoryPage() {
 		createdAt: string;
 	}>>(new Map());
 
-	useEffect(() => {
-		if (!isAuthenticated) {
-			router.push("/login?returnUrl=/orders");
-			return;
-		}
-
-		loadOrders();
-		loadInsights();
-		// Reviews are now loaded within loadOrders() to ensure they're available when orders render
-	}, [isAuthenticated, timeRange, page, router]);
-
-	const loadUserReviews = async () => {
+	const loadUserReviews = useCallback(async () => {
 		try {
-			setIsLoadingReviews(true);
 			const data = await getMyReviews(1, 100);
 			
 			const reviewSet = new Set<string>();
@@ -113,11 +99,11 @@ export default function OrderHistoryPage() {
 		} catch (error) {
 			console.error("Failed to load user reviews:", error);
 		} finally {
-			setIsLoadingReviews(false);
+			// no-op
 		}
-	};
+	}, []);
 
-	const loadOrders = async () => {
+	const loadOrders = useCallback(async () => {
 		try {
 			setIsLoading(true);
 			// Load orders and reviews in parallel
@@ -132,9 +118,9 @@ export default function OrderHistoryPage() {
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}, [page, timeRange, loadUserReviews]);
 
-	const loadInsights = async () => {
+	const loadInsights = useCallback(async () => {
 		try {
 			setIsLoadingInsights(true);
 			const data = await getOrderInsights(timeRange, "month");
@@ -144,7 +130,18 @@ export default function OrderHistoryPage() {
 		} finally {
 			setIsLoadingInsights(false);
 		}
-	};
+	}, [timeRange]);
+
+	useEffect(() => {
+		if (!isAuthenticated) {
+			router.push("/login?returnUrl=/orders");
+			return;
+		}
+
+		loadOrders();
+		loadInsights();
+		// Reviews are now loaded within loadOrders() to ensure they're available when orders render
+	}, [isAuthenticated, loadOrders, loadInsights, router]);
 
 	const formatDate = (dateString: string) => {
 		const date = new Date(dateString);
