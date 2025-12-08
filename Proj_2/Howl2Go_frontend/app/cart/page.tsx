@@ -564,9 +564,9 @@ export default function CartPage() {
                       {t("cart.processing", "Processing your order...")}
                     </span>
                   ) : !isAuthenticated ? (
-                    {t("cart.loginToOrder", "Log In to Place Order")}
+                    <span>{t("cart.loginToOrder", "Log In to Place Order")}</span>
                   ) : (
-                    {t("cart.placeOrder", "Place Order")}
+                    <span>{t("cart.placeOrder", "Place Order")}</span>
                   )}
                 </button>
 
