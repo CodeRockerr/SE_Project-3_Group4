@@ -2,13 +2,21 @@
 
 # 🍔 Howl2Go
 
+<div align="center">
+
+<img src="assets/Howl2Go_Poster.png" alt="Howl2Go Project Poster" width="700" style="border-radius: 12px; box-shadow: 0 6px 12px rgba(0,0,0,0.25);" />
+
+*High-level overview of Howl2Go – mission, stakeholders, features, tech stack, and test metrics.*
+
+</div>
+
 ![Howl2Go Logo](https://img.shields.io/badge/🍔_Howl2Go-Food_Discovery-orange?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDJMMTMuMDkgOC4yNkwyMSA5TDEzLjA5IDE1Ljc0TDEyIDIyTDEwLjkxIDE1Ljc0TDMgOUwxMC45MSA4LjI2TDEyIDJaIiBmaWxsPSIjRkY4ODAwIi8+Cjwvc3ZnPgo=)
 
 **🤖 AI-Powered Food Discovery Platform**
 
 *Crave it. Find it. Instantly.* 🚀
 
-[![Watch the Demo Video](https://img.shields.io/badge/▶️_Watch_Demo_Video-red?style=for-the-badge&logo=youtube&logoColor=white)](https://drive.google.com/file/d/1GpH5jJUv2xHC_xYNScsTxllGcykTA2Hj/view?usp=drive_link)
+[![Watch the Demo Video](https://img.shields.io/badge/▶️_Watch_Demo_Video-red?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/ZVE26hXL6yo)
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-success?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com)
 [![Documentation](https://img.shields.io/badge/📚_Documentation-blue?style=for-the-badge&logo=read-the-docs&logoColor=white)](Proj_3/docs/)
 
@@ -20,11 +28,11 @@
 
 <div align="center">
 
-**📹 [Watch Full Demo Video](https://drive.google.com/file/d/1GpH5jJUv2xHC_xYNScsTxllGcykTA2Hj/view?usp=drive_link)**
+**📹 [Watch Full Demo Video](https://youtu.be/ZVE26hXL6yo)**
 
 *Experience Howl2Go in action - Natural language search, smart recommendations, and seamless ordering*
 
-[![Video Thumbnail](https://img.youtube.com/vi/VIDEO_ID_HERE/0.jpg)](https://drive.google.com/file/d/1GpH5jJUv2xHC_xYNScsTxllGcykTA2Hj/view?usp=drive_link)
+[![Video Thumbnail](assets/thumbnail.png)](https://youtu.be/ZVE26hXL6yo)
 
 </div>
 
