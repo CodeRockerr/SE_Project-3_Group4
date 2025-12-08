@@ -7,13 +7,13 @@ on:
     push:
         branches: ["main"]
         paths:
-            - "Proj_2/Howl2Go_frontend/**" # ⬅️ IMPORTANT: Only run if files in frontend folder changed
+            - "Proj_3/Howl2Go_frontend/**" # ⬅️ IMPORTANT: Only run if files in frontend folder changed
 
     # Also run on pull requests that target the 'main' branch
     pull_request:
         branches: ["main"]
         paths:
-            - "Proj_2/Howl2Go_frontend/**" # ⬅️ IMPORTANT: Only run if files in frontend folder changed
+            - "Proj_3/Howl2Go_frontend/**" # ⬅️ IMPORTANT: Only run if files in frontend folder changed
 
 # A workflow is made of one or more jobs
 jobs:
@@ -25,7 +25,7 @@ jobs:
         # ⬅️ IMPORTANT: Tell all commands to run inside the frontend folder
         defaults:
             run:
-                working-directory: "./Proj_2/Howl2Go_frontend"
+                working-directory: "./Proj_3/Howl2Go_frontend"
 
         # The sequence of steps to run
         steps:
