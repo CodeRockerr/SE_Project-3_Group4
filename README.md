@@ -32,7 +32,7 @@
 
 *Experience Howl2Go in action - Natural language search, smart recommendations, and seamless ordering*
 
-[![Video Thumbnail](assets/thumbnail.png)](https://youtu.be/ZVE26hXL6yo)
+[![Video Thumbnail](https://img.youtube.com/vi/ZVE26hXL6yo/0.jpg)](https://youtu.be/ZVE26hXL6yo)
 
 </div>
 
