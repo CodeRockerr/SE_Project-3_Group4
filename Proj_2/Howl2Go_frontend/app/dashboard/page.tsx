@@ -44,7 +44,7 @@ export default function Dashboard() {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      const res = await apiFetch('/api/orders/me');
+      const res = await apiFetch('/api/orders');
       if (!res.ok) {
         console.error('Failed to fetch orders');
         return [];
@@ -74,7 +74,9 @@ export default function Dashboard() {
         createdAt: string;
         items: OrderItem[];
       }
-      const orders: Order[] = await res.json();
+      
+      const responseData = await res.json();
+      const orders: Order[] = responseData.data?.orders || [];
       
       // Filter today's orders and convert to meal logs
       const todayOrders = orders.filter((order: Order) => {

@@ -6,6 +6,7 @@ import { Trash2, Plus, Minus, ShoppingBag, ArrowLeft, CheckCircle, Loader2 } fro
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { createOrder } from "@/lib/api/order";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import PaymentModal from "@/components/PaymentModal";
@@ -15,6 +16,7 @@ export default function CartPage() {
   const router = useRouter();
   const { items: cartItems, removeFromCart, updateQuantity, clearCart, summary, isLoading: isCartLoading } = useCart();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { t } = useLanguage();
 
   // Order state
   const [isProcessing, setIsProcessing] = useState(false);
@@ -172,11 +174,11 @@ export default function CartPage() {
             className="text-4xl font-bold mb-3"
             style={{ color: "var(--text)" }}
           >
-            Order Placed!
+            {t("cart.orderPlaced", "Order Placed!")}
           </h1>
 
           <p className="text-lg mb-6" style={{ color: "var(--text-subtle)" }}>
-            Your delicious food is on the way!
+            {t("cart.foodOnTheWay", "Your delicious food is on the way!")}
           </p>
 
           <div
@@ -187,7 +189,7 @@ export default function CartPage() {
             }}
           >
             <p className="text-sm mb-2" style={{ color: "var(--text-muted)" }}>
-              Order Total
+              {t("cart.orderTotal", "Order Total")}
             </p>
             <p
               className="text-3xl font-bold"
@@ -196,7 +198,7 @@ export default function CartPage() {
               ${orderSummary.total.toFixed(2)}
             </p>
             <p className="text-sm mt-2" style={{ color: "var(--text-subtle)" }}>
-              {orderSummary.totalItems} {orderSummary.totalItems === 1 ? "item" : "items"}
+              {orderSummary.totalItems} {orderSummary.totalItems === 1 ? t("orders.item", "item") : t("orders.items", "items")}
             </p>
           </div>
 
@@ -218,7 +220,7 @@ export default function CartPage() {
                 style={{ backgroundColor: "var(--orange)", animationDelay: "0.4s" }}
               />
             </div>
-            <span>Redirecting to home...</span>
+            <span>{t("cart.redirecting", "Redirecting to home...")}</span>
           </div>
         </div>
 
@@ -281,7 +283,7 @@ export default function CartPage() {
                 className="text-3xl font-bold"
                 style={{ color: "var(--text)" }}
               >
-                Shopping Cart
+                {t("cart.title", "Shopping Cart")}
               </h1>
             </div>
           </div>
@@ -291,7 +293,7 @@ export default function CartPage() {
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {isCartLoading ? (
-          <LoadingSpinner message="Loading your cart..." size="lg" fullScreen={false} />
+          <LoadingSpinner message={t("cart.loadingCart", "Loading your cart...")} size="lg" fullScreen={false} />
         ) : cartItems.length === 0 ? (
           // Empty Cart State
           <div className="text-center py-20">
@@ -303,10 +305,10 @@ export default function CartPage() {
               className="text-2xl font-semibold mb-2"
               style={{ color: "var(--text)" }}
             >
-              Your cart is empty
+              {t("cart.emptyCart", "Your cart is empty")}
             </h2>
             <p className="mb-6" style={{ color: "var(--text-subtle)" }}>
-              Add some delicious items to get started!
+              {t("cart.emptyCartDesc", "Add some delicious items to get started!")}
             </p>
             <Link
               href="/"
@@ -316,7 +318,7 @@ export default function CartPage() {
                 color: "var(--text)",
               }}
             >
-              Browse Menu
+              {t("cart.browseMenu", "Browse Menu")}
             </Link>
           </div>
         ) : (
@@ -329,7 +331,7 @@ export default function CartPage() {
                   className="text-xl font-semibold"
                   style={{ color: "var(--text)" }}
                 >
-                  {totalItems} {totalItems === 1 ? "Item" : "Items"}
+                  {totalItems} {totalItems === 1 ? t("cart.item", "Item") : t("cart.items", "Items")}
                 </h2>
                 <button
                   onClick={() => clearCart()}
@@ -342,7 +344,7 @@ export default function CartPage() {
                     e.currentTarget.style.color = "var(--text-subtle)";
                   }}
                 >
-                  Clear Cart
+                  {t("cart.clearCart", "Clear Cart")}
                 </button>
               </div>
 
@@ -492,7 +494,7 @@ export default function CartPage() {
                             className="text-sm"
                             style={{ color: "var(--text-muted)" }}
                           >
-                            ${cartItem.price.toFixed(2)} each
+                            ${cartItem.price.toFixed(2)} {t("cart.each", "each")}
                           </div>
                         </div>
                       </div>
@@ -515,14 +517,14 @@ export default function CartPage() {
                   className="text-xl font-bold mb-6"
                   style={{ color: "var(--text)" }}
                 >
-                  Order Summary
+                  {t("cart.orderSummary", "Order Summary")}
                 </h2>
 
                 <div className="space-y-4 mb-6">
                   {/* Subtotal */}
                   <div className="flex justify-between">
                     <span style={{ color: "var(--text-subtle)" }}>
-                      Subtotal
+                      {t("cart.subtotal", "Subtotal")}
                     </span>
                     <span
                       className="font-semibold"
@@ -535,7 +537,7 @@ export default function CartPage() {
                   {/* Tax */}
                   <div className="flex justify-between">
                     <span style={{ color: "var(--text-subtle)" }}>
-                      Tax (8%)
+                      {t("cart.tax", "Tax (8%)")}
                     </span>
                     <span
                       className="font-semibold"
@@ -548,7 +550,7 @@ export default function CartPage() {
                   {/* Delivery Fee */}
                   <div className="flex justify-between">
                     <span style={{ color: "var(--text-subtle)" }}>
-                      Delivery Fee
+                      {t("cart.deliveryFee", "Delivery Fee")}
                     </span>
                     <span
                       className="font-semibold"
@@ -568,7 +570,7 @@ export default function CartPage() {
                         className="text-lg font-semibold"
                         style={{ color: "var(--text)" }}
                       >
-                        Total
+                        {t("cart.total", "Total")}
                       </span>
                       <span
                         className="text-2xl font-bold"
@@ -608,7 +610,7 @@ export default function CartPage() {
                     className="text-sm"
                     style={{ color: "var(--text-muted)" }}
                   >
-                    Free delivery on orders over $30
+                    {t("cart.freeDelivery", "Free delivery on orders over $30")}
                   </p>
                   {!isAuthenticated && !isAuthLoading && (
                     <p
@@ -620,9 +622,9 @@ export default function CartPage() {
                         className="underline hover:no-underline"
                         style={{ color: "var(--orange)" }}
                       >
-                        Log in
+                        {t("cart.login", "Log in")}
                       </Link>{" "}
-                      to place an order
+                      {t("cart.toPlaceOrder", "to place an order")}
                     </p>
                   )}
                 </div>

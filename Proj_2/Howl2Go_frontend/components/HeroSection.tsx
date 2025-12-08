@@ -1,18 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import AnimatedHeadline from "./AnimatedHeadline";
 import SearchBar from "./SearchBar";
 import SearchResults from "./SearchResults";
 import { motion, AnimatePresence } from "framer-motion";
-
-// Search recommendations shown in Live Mode
-const searchRecommendations: string[] = [
-  "high protein burger with low saturated fat",
-  "meal with less than 600 calories and over 30g of protein",
-  "high protein salad",
-];
+import { useLanguage } from "@/context/LanguageContext";
 
 interface HeroSectionProps {
   onSearchFocusChange?: (focused: boolean) => void;
@@ -20,6 +14,7 @@ interface HeroSectionProps {
 
 export default function HeroSection({ onSearchFocusChange }: HeroSectionProps) {
   const router = useRouter();
+  const { t } = useLanguage();
 
   // Demo Mode vs Live Search Mode
   const [isDemoMode, setIsDemoMode] = useState(true);
@@ -34,8 +29,24 @@ export default function HeroSection({ onSearchFocusChange }: HeroSectionProps) {
   const [showLiveResults, setShowLiveResults] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  const cravings = ["spicy ramen", "cheesy pizza", "healthy salad"];
+  const cravings = useMemo(
+    () => [
+      t("search.craving1", "spicy ramen"),
+      t("search.craving2", "cheesy pizza"),
+      t("search.craving3", "healthy salad"),
+    ],
+    [t]
+  );
   const currentCraving = cravings[demoStep % cravings.length];
+
+  const searchRecommendations = useMemo(
+    () => [
+      t("search.recommendation1", "high protein burger with low saturated fat"),
+      t("search.recommendation2", "meal with less than 600 calories and over 30g of protein"),
+      t("search.recommendation3", "high protein salad"),
+    ],
+    [t]
+  );
 
   useEffect(() => {
     onSearchFocusChange?.(isSearchFocused);
@@ -48,15 +59,17 @@ export default function HeroSection({ onSearchFocusChange }: HeroSectionProps) {
       announcement.setAttribute("role", "status");
       announcement.setAttribute("aria-live", "polite");
       announcement.className = "sr-only";
-      announcement.textContent =
-        "Search activated. Type your query and press Enter to search.";
+      announcement.textContent = t(
+        "search.demoAnnouncement",
+        "Search activated. Type your query and press Enter to search."
+      );
       document.body.appendChild(announcement);
 
       return () => {
         document.body.removeChild(announcement);
       };
     }
-  }, [isSearchFocused, isDemoMode]);
+  }, [isSearchFocused, isDemoMode, t]);
 
   // Typewriter loop for demo mode
   useEffect(() => {

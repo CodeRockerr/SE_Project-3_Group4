@@ -9,6 +9,7 @@ import { MessageSquare, CheckCircle, Utensils } from "lucide-react";
 import type { FoodItem } from "@/types/food";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { getItemReviews } from "@/lib/api/review";
 import StarRating from "./StarRating";
 import ReviewsSection from "./ReviewsSection";
@@ -23,6 +24,7 @@ interface ItemCardProps extends Partial<FoodItem> {
   onAdd?: (item: FoodItem) => void;
   onShowDescription?: (item: FoodItem) => void;
   price?: number;
+  hidePrice?: boolean;
   showReviews?: boolean;
 }
 
@@ -50,6 +52,7 @@ const getRestaurantLogo = (restaurant?: string): string => {
 export default function ItemCard({
   restaurant,
   price,
+  hidePrice = false,
   item,
   calories,
   index = 0,
@@ -68,6 +71,7 @@ export default function ItemCard({
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
+  const { t } = useLanguage();
 
   // Fetch rating and user's review if foodItem has _id
   useEffect(() => {
@@ -216,9 +220,15 @@ export default function ItemCard({
             className="object-contain"
           />
         </div>
-        <span className="text-xl font-bold text-[var(--cream)]">
-          ${typeof price === "number" ? price.toFixed(2) : "—"}
-        </span>
+            {/* Price (hidden when `hidePrice` is true). Show placeholder "$ —" when price is missing. */}
+            {!hidePrice && (
+              <div className="ml-4 text-sm font-semibold text-[var(--text)]">
+                <span className="text-[var(--text-subtle)] mr-1">$</span>
+                <span className="text-[var(--text)]">
+                  {typeof price === 'number' ? price.toFixed(2) : '—'}
+                </span>
+              </div>
+            )}
       </div>
 
       {/* Item Name */}
@@ -244,7 +254,7 @@ export default function ItemCard({
                 className="ml-auto text-xs text-[var(--orange)] hover:text-[var(--cream)] transition-colors flex items-center gap-1"
               >
                 <MessageSquare size={12} />
-                Reviews
+                {t("item.reviews", "Reviews")}
               </button>
             </div>
           )}
@@ -305,7 +315,7 @@ export default function ItemCard({
           className="mb-4 p-3 bg-[var(--bg-hover)] rounded-lg text-sm text-[var(--text-subtle)]"
         >
           <h4 className="font-semibold text-[var(--text)] mb-2">
-            Nutrition Details:
+            {t("item.nutritionDetails", "Nutrition Details")}:
           </h4>
           <div className="grid grid-cols-2 gap-2">
             {restProps.totalFat !== undefined &&
@@ -332,7 +342,7 @@ export default function ItemCard({
           {/* Full Ingredients List */}
           {restProps.ingredients && restProps.ingredients.length > 0 && (
             <div className="mt-3 pt-3 border-t border-[var(--border)]">
-              <h5 className="font-semibold text-[var(--text)] mb-2 text-xs">Ingredients:</h5>
+              <h5 className="font-semibold text-[var(--text)] mb-2 text-xs">{t("item.ingredients", "Ingredients")}:</h5>
               <div className="flex flex-wrap gap-1">
                 {restProps.ingredients.map((ingredient, idx) => (
                   <span
@@ -369,7 +379,7 @@ export default function ItemCard({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          {showDescription ? "Hide" : "Details"}
+          {showDescription ? t("item.hide", "Hide") : t("item.details", "Details")}
         </motion.button>
         <motion.button
           onClick={handleAdd}
@@ -377,7 +387,7 @@ export default function ItemCard({
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          {variant === "dashboard" ? "Add to Today" : "Add"}
+          {variant === "dashboard" ? t("item.addToToday", "Add to Today") : t("item.add", "Add")}
         </motion.button>
       </div>
     </motion.div>

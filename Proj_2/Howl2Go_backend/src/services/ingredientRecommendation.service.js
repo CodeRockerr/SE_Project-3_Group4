@@ -1,6 +1,29 @@
 import FastFoodItem from '../models/FastFoodItem.js';
 
 /**
+ * Calculate estimated price based on calorie content
+ * Uses heuristic: ~$0.01 per calorie, with min/max bounds
+ * @param {number} calories - Calorie count for the food item
+ * @returns {number} - Estimated price in dollars (2.00 - 15.00 range)
+ */
+const toNumber = (value) => {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    // Extract the first numeric portion (handles "240 cal", "440.5", etc.)
+    const parsed = parseFloat(value.replace(/[^0-9.-]+/g, ''));
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  return null;
+};
+
+const calculatePrice = (calories) => {
+  const caloriesNum = toNumber(calories);
+  if (!caloriesNum || caloriesNum <= 0) return 2.0;
+  const basePrice = caloriesNum * 0.01;
+  return Math.min(Math.max(basePrice, 2.0), 15.0);
+};
+
+/**
  * Build a MongoDB query for ingredient include/exclude logic.
  * @param {string[]} include - Ingredients that must all be present.
  * @param {string[]} exclude - Ingredients that must not be present.
@@ -41,10 +64,15 @@ export function rankItems(items, include = []) {
     const ing = (doc.ingredients || []).map(i => i.toLowerCase());
     const includeLower = include.map(i => i.toLowerCase());
     const score = includeLower.filter(i => ing.includes(i)).length;
+    // Since we use .lean(), doc is already a plain object
     const itemObj = doc.toObject ? doc.toObject() : doc;
+    const normalizedPrice = toNumber(itemObj.price);
+    const calculatedPrice = calculatePrice(itemObj.calories);
     return { 
       ...itemObj, 
       restaurant: itemObj.company || itemObj.restaurant, // Map company to restaurant
+      // Prefer stored price; fall back to calorie-based estimate to avoid $2.00 defaults
+      price: normalizedPrice ?? calculatedPrice,
       matchScore: score 
     };
   }).sort((a, b) => {
@@ -67,7 +95,7 @@ export async function getIngredientRecommendations({ include = [], exclude = [],
   const skip = Math.max(0, (page - 1) * limit);
   // To ensure consistent ranking across pages, fetch all matching items,
   // rank them globally, then slice for pagination.
-  const allItems = await FastFoodItem.find(query);
+  const allItems = await FastFoodItem.find(query).lean();
   const rankedAll = rankItems(allItems, include);
   const total = rankedAll.length;
   const items = rankedAll.slice(skip, skip + limit);
