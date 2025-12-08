@@ -828,9 +828,9 @@ We welcome contributions! Please see our [Contributing Guide](Proj_3/CONTRIBUTIN
 | 👤 Member     | 🔗 GitHub                                                                                                                                      | 🏷️ Role    |
 | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
 | Anandteertha | [![GitHub](https://img.shields.io/badge/@anandteertha-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/anandteertha) | Developer |
-| Adit         | [![GitHub](https://img.shields.io/badge/@pratham2879-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/CodeRockerr)   | Developer |
-| Advait       | [![GitHub](https://img.shields.io/badge/@Samarth061-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/Advait2207)     | Developer |
-| Kavya        | [![GitHub](https://img.shields.io/badge/@JaiRumz-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/KavyaGujjala)      | Developer |
+| Adit         | [![GitHub](https://img.shields.io/badge/@adit-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/CodeRockerr)   | Developer |
+| Advait       | [![GitHub](https://img.shields.io/badge/@advait-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/Advait2207)     | Developer |
+| Kavya        | [![GitHub](https://img.shields.io/badge/@kavya-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/KavyaGujjala)      | Developer |
 
 **📚 Course:** Software Engineering  
 **🏫 Institution:** NC State University (Fall 2025)
