@@ -56,6 +56,7 @@ Howl2Go_frontend/
 -   🔍 **Smart Search** - AI-powered natural language search
 -   🛒 **Shopping Cart** - Complete cart management with place order
 -   🧪 **Well Tested** - 56+ test cases with Jest & React Testing Library
+-   🌐 **Multi-language** - Header toggle for English/Spanish with persisted choice
 
 ## Tech Stack
 

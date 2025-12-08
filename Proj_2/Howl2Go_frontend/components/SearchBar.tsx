@@ -1,8 +1,9 @@
 "use client";
 
-import { Search, UtensilsCrossed, ArrowRight } from "lucide-react";
+import { Search, UtensilsCrossed } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface SearchBarProps {
   isDemoMode: boolean;
@@ -26,6 +27,7 @@ export default function SearchBar({
   onSearchBlur,
 }: SearchBarProps) {
   const router = useRouter();
+  const { t } = useLanguage();
 
   return (
     <div className="w-full">
@@ -46,14 +48,14 @@ export default function SearchBar({
           {/* Always-present search input - focusable in both demo and live modes */}
           <input
             type="text"
-            placeholder={isDemoMode ? "" : "Search for any craving..."}
+            placeholder={isDemoMode ? "" : t("search.placeholder", "Search for any craving...")}
             value={inputValue}
             onChange={(e) => onInputChange(e.target.value)}
             onKeyDown={onKeyDown}
             onFocus={onSearchFocus}
             onBlur={onSearchBlur}
             autoFocus={!isDemoMode}
-            aria-label="Search for food"
+            aria-label={t("search.ariaLabel", "Search for food")}
             className="flex-1 bg-transparent border-none focus:border-none outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 text-[var(--search-bar-text)] placeholder:text-[var(--search-bar-placeholder)] relative z-10"
           />
 
@@ -77,7 +79,7 @@ export default function SearchBar({
               </div>
               {isSearchFocused && inputValue.trim().length > 0 && (
                 <span className="text-sm font-medium text-[var(--cream)] flex items-center gap-1 animate-[fadeIn_0.3s_ease-out]">
-                  <span className="hidden sm:inline">Press</span>
+                  <span className="hidden sm:inline">{t("search.press", "Press")}</span>
                   <kbd className="px-2 py-0.5 text-xs bg-[var(--bg-hover)] border border-[var(--border)] rounded">
                     ↵
                   </kbd>
@@ -91,14 +93,14 @@ export default function SearchBar({
         <div className="mt-6 flex flex-col items-center gap-3">
           {isSearchFocused && inputValue.trim().length > 1 && (
             <p className="text-xs text-[var(--text-subtle)] opacity-70 animate-[fadeIn_0.3s_ease-out]">
-              Press Enter to search
+              {t("search.pressEnter", "Press Enter to search")}
             </p>
           )}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <span className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--text)] flex items-center gap-2 text-center leading-tight">
-              <span>Order based on</span>
+              <span>{t("search.orderBasedOn", "Order based on")}</span>
               <span className="relative inline-block">
-                Ingredients
+                {t("search.ingredients", "Ingredients")}
                 <motion.svg
                   className="absolute -bottom-1 left-0 w-full"
                   height="6"
@@ -122,10 +124,10 @@ export default function SearchBar({
               type="button"
               onClick={() => router.push('/recommendations/ingredients')}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--orange)] text-[var(--text)] text-sm font-semibold hover:bg-[var(--cream)] hover:text-[var(--bg)] transition-colors border border-[var(--orange)] shadow-[0_4px_14px_rgba(0,0,0,0.35)] focus:outline-none focus:ring-2 focus:ring-[var(--orange)] focus:ring-offset-2 focus:ring-offset-[var(--bg)]"
-              aria-label="Ingredient based recommendations"
+              aria-label={t("search.ingredientMatches", "Ingredient based recommendations")}
             >
               <UtensilsCrossed className="h-4 w-4" />
-              Ingredient Matches
+              {t("search.ingredientMatches", "Ingredient Matches")}
             </button>
           </div>
         </div>

@@ -6,29 +6,46 @@ import { User, ShoppingCart, LogOut, Bug } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useState, useEffect, useRef } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuth();
   const { summary } = useCart();
+  const { language, setLanguage, t } = useLanguage();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const languageMenuRef = useRef<HTMLDivElement>(null);
 
-  // Close menu when clicking outside
+  // Close menus when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const clickedUserMenu = menuRef.current?.contains(target);
+      const clickedLanguageMenu = languageMenuRef.current?.contains(target);
+
+      if (!clickedUserMenu) {
         setShowUserMenu(false);
+      }
+
+      if (!clickedLanguageMenu) {
+        setShowLanguageMenu(false);
       }
     };
 
-    if (showUserMenu) {
+    if (showUserMenu || showLanguageMenu) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showUserMenu]);
+  }, [showUserMenu, showLanguageMenu]);
+
+  const handleLanguageSelect = (lang: "en" | "es") => {
+    setLanguage(lang);
+    setShowLanguageMenu(false);
+  };
   return (
     <header
       className="absolute top-0 left-0 right-0 z-50 border-b backdrop-blur-sm"
@@ -56,12 +73,48 @@ export default function Header() {
 
         {/* Right Side */}
         <div className="flex items-center gap-4">
+          {/* Language Switcher */}
+          <div className="relative" ref={languageMenuRef}>
+            <button
+              onClick={() => setShowLanguageMenu((prev) => !prev)}
+              className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full border border-[var(--border)] bg-[var(--bg-card)] text-sm font-medium text-[var(--text)] hover:border-[var(--orange)] transition-colors"
+              aria-label={t("language.label", "Language")}
+            >
+              <span className="text-[var(--text-subtle)]">
+                {t("language.label", "Language")}:
+              </span>
+              <span className="font-semibold text-[var(--text)]">
+                {language === "es" ? t("language.spanish", "Spanish") : t("language.english", "English")}
+              </span>
+            </button>
+            {showLanguageMenu && (
+              <div className="absolute left-0 mt-2 w-40 bg-[var(--bg-card)] border border-[var(--border)] rounded-lg shadow-lg py-2 z-50">
+                <button
+                  onClick={() => handleLanguageSelect("en")}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-[var(--bg-hover)] transition-colors ${
+                    language === "en" ? "text-[var(--orange)] font-semibold" : "text-[var(--text)]"
+                  }`}
+                >
+                  {t("language.english", "English")}
+                </button>
+                <button
+                  onClick={() => handleLanguageSelect("es")}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-[var(--bg-hover)] transition-colors ${
+                    language === "es" ? "text-[var(--orange)] font-semibold" : "text-[var(--text)]"
+                  }`}
+                >
+                  {t("language.spanish", "Spanish")}
+                </button>
+              </div>
+            )}
+          </div>
+
           {/* About Link */}
           <Link
             href="/about"
             className="hidden sm:inline-block font-medium transition-colors hover:opacity-70 text-[var(--howl-neutral)]"
           >
-            About
+            {t("nav.about", "About")}
           </Link>
 
 
@@ -72,7 +125,7 @@ export default function Header() {
                 href="/dashboard"
                 className="hidden sm:inline-block font-medium transition-colors hover:opacity-70 text-[var(--howl-neutral)]"
               >
-                Dashboard
+                {t("nav.dashboard", "Dashboard")}
               </Link>
 
               {/* Orders Link - when logged in */}
@@ -80,7 +133,7 @@ export default function Header() {
                 href="/orders"
                 className="hidden sm:inline-block font-medium transition-colors hover:opacity-70 text-[var(--howl-neutral)]"
               >
-                Orders
+                {t("nav.orders", "Orders")}
               </Link>
 
               {/* Cart Link with Badge - only shown when logged in */}
@@ -117,7 +170,7 @@ export default function Header() {
                       className="w-full text-left px-4 py-2 text-sm text-[var(--text)] hover:bg-[var(--bg-hover)] transition-colors flex items-center gap-2"
                     >
                       <Bug className="h-4 w-4" />
-                      Raise a Bug
+                      {t("nav.raiseBug", "Raise a Bug")}
                     </Link>
                     <button
                       onClick={() => {
@@ -127,7 +180,7 @@ export default function Header() {
                       className="w-full text-left px-4 py-2 text-sm text-[var(--error)] hover:bg-[var(--bg-hover)] transition-colors flex items-center gap-2"
                     >
                       <LogOut className="h-4 w-4" />
-                      Logout
+                      {t("nav.logout", "Logout")}
                     </button>
                   </div>
                 )}
@@ -140,7 +193,7 @@ export default function Header() {
                 href="/login"
                 className="hidden sm:inline-block font-medium transition-colors hover:opacity-70 text-[var(--howl-neutral)]"
               >
-                Log In
+                {t("nav.login", "Log In")}
               </Link>
 
               {/* Dashboard Button - when logged out */}
@@ -148,7 +201,7 @@ export default function Header() {
                 href="/dashboard"
                 className="px-5 py-2 font-semibold rounded-full transition-all hover:scale-105 hover:shadow-md bg-[var(--howl-secondary)] text-[var(--howl-bg)]"
               >
-                Dashboard
+                {t("nav.dashboardCta", "Dashboard")}
               </Link>
             </>
           )}

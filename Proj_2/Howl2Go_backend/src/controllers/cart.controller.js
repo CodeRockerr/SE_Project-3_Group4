@@ -171,7 +171,7 @@ export const addItemToCart = async (req, res) => {
     // Add item with all necessary data
     // Use calorie-based price calculation when item has no explicit price
     await cart.addItem({
-      foodItem: foodItem._id,
+      foodItem: foodItemId,
       restaurant: foodItem.company,
       item: foodItem.item,
       calories: foodItem.calories || 0,

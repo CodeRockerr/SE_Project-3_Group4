@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface PersonalizedGreetingProps {
   userName: string;
@@ -13,26 +14,27 @@ export default function PersonalizedGreeting({
   isSearchFocused,
 }: PersonalizedGreetingProps) {
   const [greeting, setGreeting] = useState("Hello");
+  const { t, language } = useLanguage();
 
   // Dynamic time-based greeting
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) {
-      setGreeting("Good morning");
+      setGreeting(t("greeting.morning", "Good morning"));
     } else if (hour < 18) {
-      setGreeting("Good afternoon");
+      setGreeting(t("greeting.afternoon", "Good afternoon"));
     } else {
-      setGreeting("Good evening");
+      setGreeting(t("greeting.evening", "Good evening"));
     }
-  }, []);
+  }, [t]);
 
   // Get motivational tagline
   const getTagline = () => {
     const taglines = [
-      "Track. Log. Succeed.",
-      "Your health journey continues.",
-      "Making healthy choices easy.",
-      "Stay on track, stay motivated.",
+      t("greeting.tagline1", "Track. Log. Succeed."),
+      t("greeting.tagline2", "Your health journey continues."),
+      t("greeting.tagline3", "Making healthy choices easy."),
+      t("greeting.tagline4", "Stay on track, stay motivated."),
     ];
     // Use day of month to rotate taglines consistently
     const dayIndex = new Date().getDate() % taglines.length;
@@ -116,7 +118,7 @@ export default function PersonalizedGreeting({
         transition={{ duration: 0.5, delay: isSearchFocused ? 0 : 1 }}
         className="text-sm text-[var(--text-muted)] mt-2"
       >
-        {new Date().toLocaleDateString("en-US", {
+        {new Date().toLocaleDateString(language === "es" ? "es-ES" : "en-US", {
           weekday: "long",
           month: "long",
           day: "numeric",

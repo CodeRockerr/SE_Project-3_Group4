@@ -6,6 +6,7 @@ import ItemCard from "@/components/ItemCard";
 import IngredientTagInput from "@/components/IngredientTagInput";
 import { UtensilsCrossed, SlidersHorizontal, ShoppingCart, Home } from 'lucide-react';
 import { useCart } from "@/context/CartContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { getIngredientRecommendations } from "@/lib/api";
 import type { FoodItem } from "@/types/food";
 
@@ -28,6 +29,7 @@ export default function IngredientRecommendationsPage() {
   const [limit] = useState(20);
   const [sortMode, setSortMode] = useState<'matches' | 'calories' | 'price-asc' | 'price-desc'>('matches');
   const { summary } = useCart();
+  const { t } = useLanguage();
 
   // Persist filters
   useEffect(() => {
@@ -90,9 +92,9 @@ export default function IngredientRecommendationsPage() {
         </Link>
 
         <h1 className="text-center text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-4 text-[var(--howl-neutral)]">
-          Ingredient{' '}
+          {t("recommendations.ingredient", "Ingredient")}{' '}
           <span className="relative inline-block">
-            Matches
+            {t("recommendations.matches", "Matches")}
             <motion.svg
               className="absolute -bottom-2 left-0 w-full"
               height="8"
@@ -112,13 +114,13 @@ export default function IngredientRecommendationsPage() {
           </span>
         </h1>
         <p className="mt-2 text-sm text-[var(--text-subtle)] max-w-2xl mx-auto">
-          <b>Build your Plate: Include flavors you love, Exclude what you don’t!!</b>
+          <b>{t("recommendations.subtitle", "Build your Plate: Include flavors you love, Exclude what you don't!!")}</b>
         </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 mb-8">
-        <IngredientTagInput label="Include Ingredients" value={include} onChange={(tags) => { setInclude(tags); setPage(1); }} />
-        <IngredientTagInput label="Exclude Ingredients" value={exclude} onChange={(tags) => { setExclude(tags); setPage(1); }} />
+        <IngredientTagInput label={t("recommendations.include", "Include Ingredients")} value={include} onChange={(tags) => { setInclude(tags); setPage(1); }} />
+        <IngredientTagInput label={t("recommendations.exclude", "Exclude Ingredients")} value={exclude} onChange={(tags) => { setExclude(tags); setPage(1); }} />
       </div>
 
       <div className="flex flex-col items-center gap-4 mb-6">
@@ -134,7 +136,7 @@ export default function IngredientRecommendationsPage() {
             transition={{ duration: 0.3 }}
           >
             <UtensilsCrossed className="h-4 w-4" />
-            {loading ? 'Loading...' : 'Get Matches'}
+            {loading ? t("recommendations.loading", "Loading...") : t("recommendations.getMatches", "Get Matches")}
           </motion.button>
           <motion.div 
             className="flex items-center gap-2"
@@ -153,47 +155,56 @@ export default function IngredientRecommendationsPage() {
               onChange={e => setSortMode(e.target.value as 'matches' | 'calories' | 'price-asc' | 'price-desc')}
               className="bg-[var(--bg-card)] border border-[var(--border)] rounded px-2 py-1 text-xs text-[var(--text)] focus:border-[var(--orange)] focus:outline-none"
             >
-              <option value="matches">Sort: Matches</option>
-              <option value="calories">Sort: Calories</option>
-              <option value="price-asc">Sort: Price (Low to High)</option>
-              <option value="price-desc">Sort: Price (High to Low)</option>
+              <option value="matches">{t("recommendations.sortMatches", "Sort: Matches")}</option>
+              <option value="calories">{t("recommendations.sortCalories", "Sort: Calories")}</option>
+              <option value="price-asc">{t("recommendations.sortPriceAsc", "Sort: Price (Low to High)")}</option>
+              <option value="price-desc">{t("recommendations.sortPriceDesc", "Sort: Price (High to Low)")}</option>
             </select>
           </motion.div>
         </div>
-        {loading && <span className="text-xs text-gray-500">Loading...</span>}
+        {loading && <span className="text-xs text-gray-500">{t("recommendations.loading", "Loading...")}</span>}
         {error && <span className="text-xs text-red-600">{error}</span>}
       </div>
 
       <div className="mb-6 text-xs sm:text-sm flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 bg-[var(--bg-card)] border border-[var(--border)] rounded-md px-4 py-3">
-        <div><span className="font-semibold text-[var(--cream)]">Include:</span> {include.length ? include.join(', ') : '—'}</div>
-        <div><span className="font-semibold text-[var(--cream)]">Exclude:</span> {exclude.length ? exclude.join(', ') : '—'}</div>
-        {typeof total === 'number' && <div className="ml-auto text-[var(--text-subtle)]">Total matches: {total}</div>}
+        <div><span className="font-semibold text-[var(--cream)]">{t("recommendations.include", "Include")}:</span> {include.length ? include.join(', ') : '—'}</div>
+        <div><span className="font-semibold text-[var(--cream)]">{t("recommendations.exclude", "Exclude")}:</span> {exclude.length ? exclude.join(', ') : '—'}</div>
+        {typeof total === 'number' && <div className="ml-auto text-[var(--text-subtle)]">{t("recommendations.totalMatches", "Total matches")}: {total}</div>}
       </div>
 
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {data
           .slice() // shallow copy for client sorting
           .sort((a: FoodItem, b: FoodItem) => {
             if (sortMode === 'calories') {
               return (a.calories || 0) - (b.calories || 0);
             } else if (sortMode === 'price-asc') {
-              return ((a as unknown as {price: number}).price || 0) - ((b as unknown as {price: number}).price || 0);
+              return (a.price || 0) - (b.price || 0);
             } else if (sortMode === 'price-desc') {
-              return ((b as unknown as {price: number}).price || 0) - ((a as unknown as {price: number}).price || 0);
+              return (b.price || 0) - (a.price || 0);
             }
-            return ((b as unknown as {matchScore: number}).matchScore || 0) - ((a as unknown as {matchScore: number}).matchScore || 0);
+            return (b.matchScore || 0) - (a.matchScore || 0);
           })
-          .map((food: FoodItem) => {
-          const key = food._id || `${food.restaurant || (food as unknown as {company: string}).company}-${food.item}`;
+          .map((food: FoodItem, idx: number) => {
+          const key = food._id || `${food.restaurant}-${food.item}-${idx}`;
           return (
-            <div key={key} className="space-y-2">
-              <ItemCard
-                price={(food as unknown as {price: number}).price}
+            <div
+              key={key}
+              className="opacity-0 animate-[fadeInUp_0.5s_ease-out_forwards]"
+              style={{
+                animationDelay: `${idx * 100}ms`,
+              }}
+            >
+              <ItemCard 
                 {...food}
+                disableAnimation={true}
+                variant="default"
+                showReviews={true}
+                hidePrice={true}
               />
               {/* Matched ingredients chips */}
               {include.length > 0 && (
-                <div className="flex flex-wrap gap-1 text-[10px]">
+                <div className="flex flex-wrap gap-1 text-[10px] mt-3">
                   {(food.ingredients || []).filter(ing => 
                     include.some(inc => ing.toLowerCase().includes(inc.toLowerCase()))
                   ).map(ing => (
@@ -204,7 +215,19 @@ export default function IngredientRecommendationsPage() {
             </div>
           );
         })}
-        {!loading && data.length === 0 && <p className="text-sm text-gray-500 col-span-full">No results found for current filters.</p>}
+        <style jsx>{`
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}</style>
+        {!loading && data.length === 0 && <p className="text-sm text-gray-500 col-span-full">{t("recommendations.noResults", "No results found for current filters.")}</p>}
       </div>
 
       <div className="mt-8 flex items-center gap-4">
@@ -212,13 +235,13 @@ export default function IngredientRecommendationsPage() {
           className="px-3 py-1 rounded border text-sm disabled:opacity-40"
           onClick={() => setPage(p => Math.max(1, p - 1))}
           disabled={loading || page === 1}
-        >Previous</button>
-        <span className="text-sm">Page {page}{totalPages ? ` / ${totalPages}` : ""}</span>
+        >{t("recommendations.previous", "Previous")}</button>
+        <span className="text-sm">{t("recommendations.page", "Page")} {page}{totalPages ? ` / ${totalPages}` : ""}</span>
         <button
           className="px-3 py-1 rounded border text-sm disabled:opacity-40"
           onClick={() => setPage(p => totalPages ? Math.min(totalPages, p + 1) : p + 1)}
           disabled={loading || (totalPages ? page >= totalPages : false)}
-        >Next</button>
+        >{t("recommendations.next", "Next")}</button>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { Toaster } from "react-hot-toast";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,33 +31,35 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <CartProvider>
-            {children}
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                style: {
-                  background: "var(--bg-card)",
-                  color: "var(--text)",
-                  border: "1px solid var(--border)",
-                },
-                success: {
-                  iconTheme: {
-                    primary: "var(--success)",
-                    secondary: "var(--bg-card)",
+        <LanguageProvider>
+          <AuthProvider>
+            <CartProvider>
+              {children}
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  style: {
+                    background: "var(--bg-card)",
+                    color: "var(--text)",
+                    border: "1px solid var(--border)",
                   },
-                },
-                error: {
-                  iconTheme: {
-                    primary: "var(--error)",
-                    secondary: "var(--bg-card)",
+                  success: {
+                    iconTheme: {
+                      primary: "var(--success)",
+                      secondary: "var(--bg-card)",
+                    },
                   },
-                },
-              }}
-            />
-          </CartProvider>
-        </AuthProvider>
+                  error: {
+                    iconTheme: {
+                      primary: "var(--error)",
+                      secondary: "var(--bg-card)",
+                    },
+                  },
+                }}
+              />
+            </CartProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

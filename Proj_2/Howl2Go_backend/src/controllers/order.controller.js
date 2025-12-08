@@ -22,15 +22,45 @@ export const createOrder = async (req, res) => {
     }
 
     const userId = req.user.id;
-    const sessionId = req.session?.id;
+    // Align with cart controller which uses req.sessionID
+    const sessionId = req.sessionID || req.session?.id;
+    const cartId = req.session?.cartId;
 
-    // Get cart by userId as primary lookup, fall back to sessionId
-    let cart = await Cart.findOne({ userId });
-    if (!cart && sessionId) {
-      cart = await Cart.findOne({ sessionId });
+    console.log('[OrderController] lookup cart', { userId, sessionId, cartId });
+
+    // Lookup carts separately so we can prefer the one with items
+    const userCart = await Cart.findOne({ userId });
+    const sessionCart = sessionId ? await Cart.findOne({ sessionId }) : null;
+    const sessionStoredCart = (!sessionCart && cartId) ? await Cart.findById(cartId) : null;
+
+    console.log('[OrderController] carts found', {
+      userCartId: userCart?._id,
+      userCartItems: userCart?.items?.length,
+      sessionCartId: sessionCart?._id,
+      sessionCartItems: sessionCart?.items?.length,
+      sessionStoredCartId: sessionStoredCart?._id,
+      sessionStoredCartItems: sessionStoredCart?.items?.length,
+    });
+
+    // Prefer session cart if it has items; otherwise fall back to user cart, then stored cart
+    let cart = null;
+    if (sessionCart && Array.isArray(sessionCart.items) && sessionCart.items.length > 0) {
+      cart = sessionCart;
+    } else if (userCart && Array.isArray(userCart.items) && userCart.items.length > 0) {
+      cart = userCart;
+    } else if (sessionStoredCart && Array.isArray(sessionStoredCart.items) && sessionStoredCart.items.length > 0) {
+      cart = sessionStoredCart;
+    } else {
+      // If none have items, pick sessionCart first, then userCart, then storedCart (may be empty) to allow clear error/logging
+      cart = sessionCart || userCart || sessionStoredCart;
+    }
+
+    if (cart) {
+      console.log('[OrderController] selected cart', { cartId: cart._id, items: cart.items?.length, sessionId: cart.sessionId, userId: cart.userId });
     }
 
     if (!cart || !cart.items || cart.items.length === 0) {
+      console.warn('[OrderController] cart missing or empty', { userId, sessionId, cartId });
       return res.status(400).json({
         success: false,
         message: 'Cart is empty'
@@ -40,8 +70,49 @@ export const createOrder = async (req, res) => {
     // Populate cart items with full food item data
     const populatedCart = await Cart.findById(cart._id).populate('items.foodItem');
     
+    console.log('[OrderController] Cart items before populate:', JSON.stringify(cart.items.map(i => ({ 
+      foodItem: i.foodItem, 
+      foodItemType: typeof i.foodItem,
+      item: i.item 
+    }))));
+    console.log('[OrderController] Cart items after populate:', JSON.stringify(populatedCart?.items.map(i => ({ 
+      foodItem: i.foodItem?._id || i.foodItem, 
+      foodItemType: typeof i.foodItem,
+      isNull: i.foodItem === null,
+      item: i.item 
+    }))));
+    
     // Ensure items are populated
     if (!populatedCart || !populatedCart.items || populatedCart.items.length === 0) {
+            return res.status(400).json({
+              success: false,
+              message: 'Cart is empty'
+            });
+          }
+
+          // Clean up any items with null foodItem references
+          const invalidItems = populatedCart.items.filter(item => !item.foodItem);
+          if (invalidItems.length > 0) {
+            console.warn(`[OrderController] Found ${invalidItems.length} invalid cart items, cleaning up...`, {
+              cartId: populatedCart._id,
+              sessionId: populatedCart.sessionId,
+              userId: populatedCart.userId
+            });
+            // Remove invalid items from cart
+            populatedCart.items = populatedCart.items.filter(item => item.foodItem);
+            await populatedCart.save();
+      
+            // If all items were invalid, return error
+            if (populatedCart.items.length === 0) {
+              return res.status(400).json({
+                success: false,
+                message: 'Cart contains invalid items. Please refresh and try again.'
+              });
+            }
+          }
+    
+          // Ensure items are still valid after cleanup
+          if (!populatedCart.items || populatedCart.items.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'Cart is empty'
@@ -66,27 +137,38 @@ export const createOrder = async (req, res) => {
       populatedCart.items.map(async (item) => {
         // Get full nutrition data from FastFoodItem if available
         let fullNutrition = {};
-        if (item.foodItem && typeof item.foodItem === 'object') {
-          const foodItem = await FastFoodItem.findById(item.foodItem._id).lean();
-          if (foodItem) {
-            fullNutrition = {
-              calories: foodItem.calories || item.calories || 0,
-              totalFat: foodItem.totalFat || item.totalFat || null,
-              saturatedFat: foodItem.saturatedFat || null,
-              transFat: foodItem.transFat || null,
-              protein: foodItem.protein || item.protein || null,
-              carbohydrates: foodItem.carbs || item.carbohydrates || null,
-              fiber: foodItem.fiber || null,
-              sugars: foodItem.sugars || null,
-              sodium: foodItem.sodium || null,
-              cholesterol: foodItem.cholesterol || null,
-            };
+        let foodItemId = null;
+        
+        // Extract foodItem ID - handle both populated and non-populated cases
+        if (item.foodItem) {
+          if (typeof item.foodItem === 'object' && item.foodItem._id) {
+            foodItemId = item.foodItem._id;
+            const foodItem = await FastFoodItem.findById(foodItemId).lean();
+            if (foodItem) {
+              fullNutrition = {
+                calories: foodItem.calories || item.calories || 0,
+                totalFat: foodItem.totalFat || item.totalFat || null,
+                saturatedFat: foodItem.saturatedFat || null,
+                transFat: foodItem.transFat || null,
+                protein: foodItem.protein || item.protein || null,
+                carbohydrates: foodItem.carbs || item.carbohydrates || null,
+                fiber: foodItem.fiber || null,
+                sugars: foodItem.sugars || null,
+                sodium: foodItem.sodium || null,
+                cholesterol: foodItem.cholesterol || null,
+              };
+            }
+          } else {
+            // foodItem is just an ID string/ObjectId
+            foodItemId = item.foodItem;
           }
         }
         
-        const foodItemId = item.foodItem && typeof item.foodItem === 'object'
-          ? item.foodItem._id
-          : item.foodItem;
+        // If foodItemId is still null, this item is invalid - skip it
+        if (!foodItemId) {
+          console.warn('Skipping cart item with missing foodItem:', item);
+          return null;
+        }
 
         return {
           foodItem: foodItemId,
@@ -107,6 +189,18 @@ export const createOrder = async (req, res) => {
         };
       })
     );
+    
+    // Filter out any null items (items with invalid foodItem references)
+    const validOrderItems = orderItems.filter(item => item !== null);
+    
+    // Check if we have any valid items
+    if (validOrderItems.length === 0) {
+      console.warn('[OrderController] No valid items after filtering', { cartId: populatedCart._id });
+      return res.status(400).json({
+        success: false,
+        message: 'No valid items in cart to create order'
+      });
+    }
 
     // Generate unique order number
     let orderNumber;
@@ -128,7 +222,7 @@ export const createOrder = async (req, res) => {
     const order = await Order.create({
       userId,
       orderNumber,
-      items: orderItems,
+      items: validOrderItems,
       subtotal,
       tax,
       deliveryFee,

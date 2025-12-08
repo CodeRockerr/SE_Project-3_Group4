@@ -78,6 +78,11 @@ cartSchema.pre('save', function(next) {
 
 // Methods
 cartSchema.methods.addItem = function(itemData) {
+    // Validate that foodItem exists and is not null
+    if (!itemData.foodItem) {
+      throw new Error('foodItem is required when adding to cart');
+    }
+  
   const incomingId = itemData && itemData.foodItem && itemData.foodItem._id ? String(itemData.foodItem._id) : String(itemData.foodItem);
   const existingItemIndex = this.items.findIndex(
     (item) => {

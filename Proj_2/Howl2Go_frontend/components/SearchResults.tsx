@@ -2,6 +2,7 @@
 
 import ItemCard from "./ItemCard";
 import type { FoodItem } from "@/types/food";
+import { useLanguage } from "@/context/LanguageContext";
 
 // Realistic demo data matching actual API structure
 const demoDishes: FoodItem[] = [
@@ -9,6 +10,7 @@ const demoDishes: FoodItem[] = [
     restaurant: "McDonald's",
     item: "Big Mac",
     calories: 550,
+    price: 6.49,
     ingredients: ["beef patty", "american cheese", "lettuce", "pickles", "onions", "sesame bun", "big mac sauce"],
     caloriesFromFat: null,
     totalFat: null,
@@ -26,6 +28,7 @@ const demoDishes: FoodItem[] = [
     restaurant: "Taco Bell",
     item: "Crunchy Taco",
     calories: 170,
+    price: 2.29,
     ingredients: ["seasoned beef", "shredded lettuce", "shredded cheese", "crunchy taco shell"],
     caloriesFromFat: null,
     totalFat: null,
@@ -43,6 +46,7 @@ const demoDishes: FoodItem[] = [
     restaurant: "KFC",
     item: "Chicken Breast",
     calories: 390,
+    price: 5.99,
     ingredients: ["chicken breast", "seasoned breading", "spices", "oil"],
     caloriesFromFat: null,
     totalFat: null,
@@ -75,6 +79,7 @@ export default function SearchResults({
   recommendations,
   onRecommendationClick,
 }: SearchResultsProps) {
+  const { t } = useLanguage();
   return (
     <>
       {/* ========== DEMO MODE: Animated Dish Preview Cards ========== */}
@@ -98,6 +103,7 @@ export default function SearchResults({
                 restaurant={dish.restaurant}
                 item={dish.item}
                 calories={dish.calories}
+                price={dish.price}
                 disableAnimation={true}
               />
             </div>
@@ -110,7 +116,7 @@ export default function SearchResults({
         <div key="search-recommendations">
           {/* Header */}
           <h3 className="text-xl font-semibold text-[var(--text)] mb-4 opacity-0 animate-[fadeInDown_0.4s_ease-out_forwards]">
-            Try searching for:
+            {t("search.recommendationHeader", "Try searching for:")}
           </h3>
 
           {/* Recommendations List - Clickable */}
